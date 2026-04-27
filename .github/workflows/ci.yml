@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]" || pip install -e .
+          pip install pytest
+
+      - name: Lint with python -m py_compile
+        run: |
+          find goodhart -name "*.py" -exec python -m py_compile {} +
+
+      - name: Run tests
+        run: pytest -v
+
+  lean:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan (LEAN toolchain manager)
+        run: |
+          curl https://elan-init.netlify.app/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Build LEAN proofs
+        working-directory: proofs
+        run: lake build
+        timeout-minutes: 60
+
+      - name: Verify zero sorry
+        working-directory: proofs
+        run: |
+          if grep -r "sorry" GoodhartProofs/ --include="*.lean" | grep -v "^--" | grep -v "zero sorry" | grep -v "removed"; then
+            echo "SORRY FOUND — proofs are incomplete"
+            exit 1
+          fi

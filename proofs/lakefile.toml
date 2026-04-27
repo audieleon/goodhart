@@ -1,0 +1,15 @@
+name = "GoodhartProofs"
+version = "0.1.0"
+defaultTargets = ["GoodhartProofs"]
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "master"
+
+[[lean_lib]]
+name = "GoodhartProofs"
+
+[[lean_exe]]
+name = "goodhartproofs"
+root = "Main"

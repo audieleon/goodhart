@@ -1,0 +1,53 @@
+# MiniHack-MultiRoom-N4-Monster-v0
+# 4 connected rooms, monsters guarding passages, must reach staircase.
+# One of the hardest MiniHack navigation tasks.
+
+name: "MiniHack-MultiRoom-N4-Monster"
+
+# Episode structure
+max_steps: 400
+gamma: 0.999
+
+# State space: NetHack glyphs + blstats
+n_states: 100000      # huge state space (glyph combinations)
+n_actions: 77          # NetHack has 77 possible actions
+death_probability: 0.05  # monsters can kill, ~5% per step in combat
+wall_probability: 0.4    # many invalid actions in NetHack
+
+# Reward sources
+reward_sources:
+  - name: "reach_staircase"
+    reward_type: "terminal"
+    value: 1.0
+    requires_action: true
+    requires_exploration: true
+    discovery_probability: 0.01  # very sparse: ~1% of random episodes find it
+    can_loop: false
+
+  - name: "step_penalty"
+    reward_type: "per_step"
+    value: -0.001
+    requires_action: false
+    can_loop: false
+
+# Training config
+training:
+  algorithm: "APPO"
+  lr: 0.0001
+  entropy_coeff: 0.001
+  entropy_coeff_final: 0.0001
+  num_epochs: 1
+  clip_epsilon: 0.1
+  rollout_length: 32
+  minibatch_size: 256
+  num_envs: 64
+  num_workers: 1
+  total_steps: 10000000
+  n_actors: 64
+  use_rnn: true
+  rnn_type: "lstm"
+  rnn_size: 256
+  num_specialists: 3
+  routing_floor: 0.10
+  model_params: 4600000
+  embed_dim: 128

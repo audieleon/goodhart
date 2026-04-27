@@ -1,0 +1,75 @@
+"""Example: Expert collapse in multi-specialist models.
+
+Three separate instances of the same failure:
+1. Shazeer et al. 2017 — MoE without load balancing
+2. Multi-specialist survival task — third specialist marginalized
+3. MiniHack multi-specialist — 95% MLP, 0% Transformer on MiniHack
+
+All solved by the same fix: floor constraints + load balancing.
+This example shows how the framework catches it for ANY
+multi-specialist setup.
+"""
+
+from goodhart.models import *
+from goodhart.engine import *
+from goodhart.rules.reward import *
+from goodhart.rules.training import *
+from goodhart.rules.architecture import PrecedentRule, Precedent
+
+
+def run_example():
+    model = EnvironmentModel(
+        name="Multi-specialist model (any task)",
+        max_steps=500,
+    )
+    model.add_reward_source(RewardSource(
+        name="task reward", reward_type=RewardType.TERMINAL, value=1.0,
+        discovery_probability=0.5,
+    ))
+
+    # Config WITHOUT floor — will collapse
+    config_bad = TrainingConfig(
+        num_specialists=3,
+        routing_floor=0.0,
+        balance_coef=0.0,
+    )
+
+    # Config WITH floor — safe
+    config_good = TrainingConfig(
+        num_specialists=3,
+        routing_floor=0.10,
+        balance_coef=0.01,
+    )
+
+    engine = TrainingAnalysisEngine().add_all_rules()
+
+    print("=== WITHOUT floor constraint ===")
+    engine.print_report(model, config_bad)
+
+    print("=== WITH floor constraint ===")
+    engine.print_report(model, config_good)
+
+    print("Three documented cases of this failure:")
+    print()
+    print("  1. Shazeer et al. 2017 (MoE paper)")
+    print("     Setting: Sparse gating, no load balancing")
+    print("     Outcome: Most experts receive zero traffic")
+    print("     Fix: Introduced load balancing loss (now standard)")
+    print()
+    print("  2. Multi-specialist survival task")
+    print("     Setting: 3 specialists, softmax routing, no floor")
+    print("     Outcome: Third specialist <5% weight consistently")
+    print("     Fix: Added balance_coef=0.01")
+    print()
+    print("  3. MiniHack multi-specialist")
+    print("     Setting: 3 specialists, gate MLP, no floor")
+    print("     Outcome: 95% MLP, 5% CNN, 0% Transformer")
+    print("     Fix: Added routing_floor=0.10")
+    print()
+    print("All three are the SAME failure mode. The framework")
+    print("catches it from the config alone: num_specialists > 1")
+    print("and routing_floor == 0 → CRITICAL warning.")
+
+
+if __name__ == "__main__":
+    run_example()

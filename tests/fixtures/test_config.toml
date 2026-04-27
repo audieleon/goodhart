@@ -1,0 +1,16 @@
+[environment]
+name = "toml-test"
+max_steps = 120
+n_states = 2000
+
+[[environment.reward_sources]]
+name = "reach goal"
+type = "terminal"
+value = 1.0
+discovery_probability = 0.01
+
+[training]
+algorithm = "PPO"
+lr = 0.0003
+critic_lr = 0.00003
+entropy_coeff = 0.01
