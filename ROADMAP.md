@@ -15,6 +15,9 @@ Pre-screen LLM-generated reward candidates (Eureka, CARD) in milliseconds. Rejec
 ### Training framework callbacks
 Lightweight callbacks for SB3, CleanRL, and Sample Factory that run goodhart before training starts. Reads training config from the framework, reward structure from `@reward_function` decorator or config file.
 
+### Native LEAN verification at runtime
+The LEAN proofs already export FFI functions (`proofs/GoodhartProofs/FFI.lean`) with `@[export]` annotations for 9 core checks. Build platform-specific binaries (`.so` on Linux, `.dylib` on macOS) from the LEAN compiler and load them via ctypes at runtime, falling back to pure Python when unavailable. This gives users LEAN's type-checker guarantee and compiler correctness at runtime, not just at CI time. Platform wheels for Linux (x86_64, aarch64) and macOS (arm64, x86_64).
+
 ### Expanded formal proofs
 - Prove the aggregation idle trap for general ratio objectives
 - Strengthen remaining GROUNDED proofs (exploration_threshold, budget_sufficiency, reward_dominance_imbalance)
