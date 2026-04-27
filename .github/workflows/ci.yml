@@ -42,7 +42,7 @@ jobs:
 
       - name: Install elan (LEAN toolchain manager)
         run: |
-          curl https://elan-init.netlify.app/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
       - name: Build LEAN proofs
