@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the paper below."
+title: "goodhart: Static Reward Analysis for Reinforcement Learning"
+type: software
+authors:
+  - family-names: Sheridan
+    given-names: Audie Leon
+    email: audie@w3.io
+version: 0.1.0
+date-released: 2026-04-27
+license: Apache-2.0
+url: https://github.com/audieleon/goodhart
+repository-code: https://github.com/audieleon/goodhart
+keywords:
+  - reinforcement-learning
+  - reward-hacking
+  - static-analysis
+  - formal-verification
+  - lean4
+preferred-citation:
+  type: article
+  title: "Catching Goodhart's Law Before Training: Static Reward Analysis with Formal Guarantees"
+  authors:
+    - family-names: Sheridan
+      given-names: Audie Leon
+  year: 2026

@@ -4,6 +4,8 @@
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
+**Paper:** [Catching Goodhart's Law Before Training: Static Reward Analysis with Formal Guarantees](https://github.com/audieleon/goodhart/blob/main/CITATION.cff) (Sheridan, 2026)
+
 > "When a measure becomes a target, it ceases to be a good measure."
 > -- Charles Goodhart (1975), generalized by Marilyn Strathern (1997)
 
