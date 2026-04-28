@@ -22,6 +22,7 @@ from goodhart.rules.reward import (
     StagedRewardPlateau,
     RewardDominanceImbalance,
     ExponentialSaturation,
+    IntrinsicDominance,
     REWARD_RULES,
 )
 from goodhart.rules.training import (
@@ -62,7 +63,7 @@ __all__ = [
     "ExplorationThreshold", "RespawningExploit", "DeathResetExploit",
     "ShapingLoopExploit", "ShapingNotPotentialBased", "ProxyRewardHackability",
     "IntrinsicSufficiency", "BudgetSufficiency", "CompoundTrap",
-    "StagedRewardPlateau", "RewardDominanceImbalance", "ExponentialSaturation",
+    "StagedRewardPlateau", "RewardDominanceImbalance", "ExponentialSaturation", "IntrinsicDominance",
     "REWARD_RULES",
     # Training rules
     "LearningRateRegime", "CriticLearningRate", "EntropyCollapse",

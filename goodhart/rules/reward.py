@@ -1175,6 +1175,137 @@ class ExponentialSaturation(Rule):
         return verdicts
 
 
+class IntrinsicDominance(Rule):
+    """Check if accumulated per-step intrinsic reward dominates the goal.
+
+    Non-PBRS per-step additions can change the optimal policy (Ng 1999).
+    When accumulated intrinsic EV exceeds goal EV, the agent optimizes
+    curiosity over task completion. Documented in Burda 2019 (noisy TV,
+    skull dancing), Taiga 2021 (ChopperCommand 4.7x worse with RND),
+    Mavor-Parker 2022 (MiniGrid 100->5 novel states with TV).
+    """
+
+    @property
+    def name(self): return "intrinsic_dominance"
+
+    @property
+    def description(self):
+        return ("Accumulated per-step intrinsic reward exceeds "
+                "the discounted goal reward over the episode")
+
+    @property
+    def proof(self):
+        return FormalBasis(
+            proof_name="ng_vstar_shaped",
+            strength=ProofStrength.GROUNDED,
+            statement=("Ng 1999: non-PBRS reward additions can change the "
+                       "optimal policy. When accumulated intrinsic >> goal, "
+                       "the mixed-reward policy diverges from the task policy."),
+            parameters={"intrinsic_ev": "sum(r_i * D)",
+                        "goal_ev": "R_goal * p * gamma^t"},
+        )
+
+    def applies_to(self, model):
+        # Applies when there are non-intentional per-step sources with
+        # infinite respawn (intrinsic motivation like RND/ICM) alongside
+        # terminal/event goals. Intentional per-step sources (alive bonus
+        # in a survival task) are the goal, not competing with it.
+        has_intrinsic = any(
+            s.reward_type == RewardType.PER_STEP
+            and s.respawn == RespawnBehavior.INFINITE
+            and s.value > 0
+            and not s.intentional
+            for s in model.reward_sources
+        )
+        has_goal = any(
+            s.reward_type in (RewardType.TERMINAL, RewardType.ON_EVENT)
+            and s.value > 0
+            for s in model.reward_sources
+        )
+        return has_intrinsic and has_goal
+
+    def check(self, model, config=None):
+        verdicts = []
+        disc = _discounted_steps(model.gamma, model.max_steps)
+
+        # Accumulated intrinsic EV: non-intentional per-step with
+        # INFINITE respawn. Intentional sources (alive bonus, survival
+        # reward) are the goal itself, not intrinsic motivation.
+        intrinsic_per_step = sum(
+            _best_case_value(s) for s in model.reward_sources
+            if s.reward_type == RewardType.PER_STEP
+            and s.respawn == RespawnBehavior.INFINITE
+            and s.value > 0
+            and not s.intentional
+        )
+        intrinsic_ev = intrinsic_per_step * disc
+
+        # Goal value: what the agent receives when it completes the task.
+        # We use the raw goal value (not discounted by discovery probability)
+        # because the question is whether the intrinsic signal competes with
+        # the goal AFTER the agent has learned the path, not during random
+        # exploration. Discovery probability affects exploration_threshold;
+        # this rule asks: once the agent can reach the goal, is the intrinsic
+        # reward still more attractive than finishing?
+        goal_ev = 0.0
+        for s in model.reward_sources:
+            if s.reward_type == RewardType.TERMINAL and s.value > 0:
+                goal_ev += s.value
+            elif s.reward_type == RewardType.ON_EVENT and s.value > 0:
+                goal_ev += s.value
+
+        if intrinsic_ev <= 0 or goal_ev <= 0:
+            return verdicts
+
+        ratio = intrinsic_ev / goal_ev
+
+        if ratio >= 5:
+            verdicts.append(Verdict(
+                rule_name=self.name,
+                severity=Severity.CRITICAL,
+                message=(f"Accumulated intrinsic reward "
+                         f"(EV={intrinsic_ev:+.4f}) is {ratio:.1f}x the "
+                         f"goal reward ({goal_ev:+.4f}). "
+                         f"Agent will optimize curiosity over task completion."),
+                details={"intrinsic_ev": intrinsic_ev, "goal_ev": goal_ev,
+                         "ratio": ratio},
+                recommendation=(
+                    "Reduce intrinsic coefficient, anneal it during training, "
+                    "increase goal reward, or use separate value heads for "
+                    "intrinsic and extrinsic returns (Burda 2019)"),
+                learn_more=(
+                    "Non-PBRS per-step reward additions can change the optimal "
+                    "policy (Ng 1999). When the accumulated intrinsic signal "
+                    "exceeds the goal, the agent earns more from exploring than "
+                    "from finishing the task. Documented failures: Pong agent "
+                    "maximizes bounces not score (Burda 2019), ChopperCommand "
+                    "scores 4.7x worse with RND than epsilon-greedy (Taiga 2021), "
+                    "MiniGrid agent visits 100 novel states without noise but only "
+                    "5 with noisy TV (Mavor-Parker 2022).\n"
+                    "Fixes: (1) anneal intrinsic coefficient during training, "
+                    "(2) use separate value heads with different discount factors "
+                    "(gamma_E=0.999, gamma_I=0.99 per RND paper), "
+                    "(3) constrained optimization (EIPO, Hong 2022), "
+                    "(4) increase goal reward magnitude."
+                ),
+            ))
+        elif ratio >= 0.5:
+            verdicts.append(Verdict(
+                rule_name=self.name,
+                severity=Severity.WARNING,
+                message=(f"Accumulated intrinsic reward "
+                         f"(EV={intrinsic_ev:+.4f}) is {ratio:.1f}x the "
+                         f"goal reward ({goal_ev:+.4f}). "
+                         f"Intrinsic signal may compete with task completion."),
+                details={"intrinsic_ev": intrinsic_ev, "goal_ev": goal_ev,
+                         "ratio": ratio},
+                recommendation=(
+                    "Consider reducing intrinsic coefficient or increasing "
+                    "goal reward to ensure task completion dominates"),
+            ))
+        return verdicts
+
+
 # Standard reward rule collection
 REWARD_RULES = [
     PenaltyDominatesGoal(),
@@ -1192,4 +1323,5 @@ REWARD_RULES = [
     StagedRewardPlateau(),
     RewardDominanceImbalance(),
     ExponentialSaturation(),
+    IntrinsicDominance(),
 ]

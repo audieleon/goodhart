@@ -249,6 +249,33 @@ EXPLANATIONS = {
         "papers": ["Rudin et al. 2022 (Legged Gym)"],
         "see_also": ["idle_exploit"],
     },
+    "intrinsic_dominance": {
+        "learn_more": (
+            "Non-PBRS per-step reward additions can change the optimal policy "
+            "(Ng 1999). When accumulated intrinsic motivation (RND, ICM, curiosity) "
+            "exceeds the task goal, the agent earns more from exploring than from "
+            "finishing. This is not a theoretical edge case: Pong agents maximize "
+            "ball bounces instead of scoring (Burda 2019), ChopperCommand agents "
+            "score 4.7x worse with RND than without (Taiga 2021), and MiniGrid "
+            "agents visit 20x fewer novel states when a noisy TV is present "
+            "(Mavor-Parker 2022).\n"
+            "Fixes: (1) reduce intrinsic coefficient, (2) anneal it during training, "
+            "(3) increase goal reward magnitude, (4) use separate value heads with "
+            "different discount factors (Burda 2019: gamma_E=0.999, gamma_I=0.99), "
+            "(5) constrained optimization (EIPO, Hong 2022)."
+        ),
+        "examples": ["rnd_intrinsic"],
+        "papers": [
+            "Burda et al. 2019 (RND, ICLR)",
+            "Burda et al. 2019 (Large-Scale Curiosity, ICLR)",
+            "Taiga et al. 2021 (Bonus-Based Exploration)",
+            "Mavor-Parker et al. 2022 (Noisy TV, ICML)",
+            "Hong et al. 2022 (EIPO, NeurIPS)",
+        ],
+        "see_also": ["respawning_exploit", "reward_dominance_imbalance",
+                     "exploration_threshold"],
+        "proof": "LEAN: ng_vstar_shaped (grounded — Ng proves non-PBRS can change policy; threshold is empirical)",
+    },
     "exponential_saturation": {
         "learn_more": (
             "Exponential tracking rewards like exp(-error/sigma) saturate near "
