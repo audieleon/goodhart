@@ -23,6 +23,9 @@ The LEAN proofs already export FFI functions (`proofs/GoodhartProofs/FFI.lean`) 
 - Strengthen remaining GROUNDED proofs (exploration_threshold, budget_sufficiency, reward_dominance_imbalance)
 - Target: 20+ rules with formal proofs (currently 17, of which 9 VERIFIED)
 
+### Beyond reinforcement learning
+The core analysis — structural traps in weighted reward components — applies wherever an objective function combines multiple terms: multi-task loss balancing, regularization tuning, RLHF reward models, evolutionary fitness functions. The data model would need to abstract beyond RL-specific concepts (episode structure, death probability) to a more general objective specification. Exploring if there is interest.
+
 ## Quality constraints (non-negotiable)
 
 1. Every claim is verifiable. LEAN proofs compile. Preset tests pass.
