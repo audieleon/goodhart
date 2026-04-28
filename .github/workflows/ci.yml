@@ -45,10 +45,19 @@ jobs:
           curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
+      - name: Cache LEAN build
+        uses: actions/cache@v4
+        with:
+          path: |
+            proofs/.lake
+            ~/.elan
+          key: lean-${{ hashFiles('proofs/lean-toolchain', 'proofs/lakefile.toml', 'proofs/lake-manifest.json') }}
+          restore-keys: lean-
+
       - name: Build LEAN proofs
         working-directory: proofs
         run: lake build
-        timeout-minutes: 60
+        timeout-minutes: 120
 
       - name: Verify zero sorry
         working-directory: proofs
