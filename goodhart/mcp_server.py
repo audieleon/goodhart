@@ -449,7 +449,7 @@ TOOLS = [
     },
     {
         "name": "goodhart_list_rules",
-        "description": "List all 35 analysis rules with descriptions and formal proof status.",
+        "description": "List all 41 analysis rules with descriptions and formal proof status.",
         "inputSchema": {"type": "object", "properties": {}},
     },
     {
