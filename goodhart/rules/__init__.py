@@ -23,6 +23,9 @@ from goodhart.rules.reward import (
     RewardDominanceImbalance,
     ExponentialSaturation,
     IntrinsicDominance,
+    DiscountHorizonMismatch,
+    NegativeOnlyReward,
+    RewardDelayHorizon,
     REWARD_RULES,
 )
 from goodhart.rules.training import (
@@ -51,7 +54,17 @@ from goodhart.rules.architecture import (
     ARCHITECTURE_RULES,
 )
 
-from goodhart.rules.advisories import ADVISORY_RULES
+from goodhart.rules.advisories import (
+    PhysicsExploitAdvisory,
+    GoalMisgeneralizationAdvisory,
+    CreditAssignmentAdvisory,
+    ConstrainedRLAdvisory,
+    NonStationarityAdvisory,
+    LearnedRewardAdvisory,
+    MissingConstraintAdvisory,
+    AggregationTrapAdvisory,
+    ADVISORY_RULES,
+)
 
 ALL_RULES = (list(REWARD_RULES) + list(TRAINING_RULES)
              + list(ARCHITECTURE_RULES) + list(ADVISORY_RULES))
@@ -64,6 +77,7 @@ __all__ = [
     "ShapingLoopExploit", "ShapingNotPotentialBased", "ProxyRewardHackability",
     "IntrinsicSufficiency", "BudgetSufficiency", "CompoundTrap",
     "StagedRewardPlateau", "RewardDominanceImbalance", "ExponentialSaturation", "IntrinsicDominance",
+    "DiscountHorizonMismatch", "NegativeOnlyReward", "RewardDelayHorizon",
     "REWARD_RULES",
     # Training rules
     "LearningRateRegime", "CriticLearningRate", "EntropyCollapse",
@@ -73,6 +87,12 @@ __all__ = [
     "PrecedentRule", "Precedent", "EmbedDimCapacity",
     "RoutingFloorNecessity", "RecurrenceType", "ActorCountEffect",
     "ARCHITECTURE_RULES",
+    # Advisory rules
+    "PhysicsExploitAdvisory", "GoalMisgeneralizationAdvisory",
+    "CreditAssignmentAdvisory", "ConstrainedRLAdvisory",
+    "NonStationarityAdvisory", "LearnedRewardAdvisory",
+    "MissingConstraintAdvisory", "AggregationTrapAdvisory",
+    "ADVISORY_RULES",
     # Aggregates
     "ALL_RULES", "RULE_COUNT",
 ]

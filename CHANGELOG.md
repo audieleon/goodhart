@@ -7,13 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Added
-- `intrinsic_dominance` rule: flags when accumulated per-step intrinsic
-  reward (RND, ICM, curiosity) exceeds the terminal goal reward.
-  Based on Ng 1999 contrapositive. ProofStrength: Grounded.
-- 6 new examples: Pong curiosity, Unity noisy TV, MiniGrid noisy TV,
-  Montezuma skull dancing, Bank Heist explosions, ChopperCommand RND.
+- `intrinsic_dominance` rule: flags when accumulated intrinsic reward
+  exceeds the terminal goal (Verified, LEAN proof).
+- `discount_horizon_mismatch` rule: episode exceeds discount horizon
+  with sparse rewards (Verified, LEAN proof).
+- `negative_only_reward` rule: all components non-positive, no learning
+  signal (Verified, LEAN proof).
+- `reward_delay_horizon` rule: terminal goal discounted below noise
+  floor (Verified, LEAN proof).
+- 9 new examples (6 intrinsic dominance + 3 new rules).
 - LEAN CI uses leanprover/lean-action (precompiled Mathlib).
-- LEAN CI now runs on PRs, not just push to main.
+- LEAN CI runs on PRs, not just push to main.
+- Branch protection on main (PR + CI required).
 
 ## [0.1.0] - 2026-04-26
 

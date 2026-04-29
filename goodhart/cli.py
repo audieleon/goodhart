@@ -495,6 +495,8 @@ What it can't catch:
                 "budget_sufficiency", "compound_trap",
                 "staged_reward_plateau", "reward_dominance_imbalance",
                 "exponential_saturation", "intrinsic_dominance",
+                "discount_horizon_mismatch", "negative_only_reward",
+                "reward_delay_horizon",
             ],
             "Training Hyperparameters": [
                 "lr_regime", "critic_lr_ratio", "entropy_regime",

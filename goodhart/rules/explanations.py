@@ -290,6 +290,57 @@ EXPLANATIONS = {
         "papers": ["Rudin et al. 2022 (Legged Gym, reward scales)"],
         "see_also": ["reward_dominance_imbalance"],
     },
+    "discount_horizon_mismatch": {
+        "learn_more": (
+            "The effective planning horizon is 1/(1-gamma). At gamma=0.99, "
+            "that's 100 steps. Rewards beyond step 100 are discounted to less "
+            "than 37% of their value. At 10x the horizon, they're below 0.005%.\n"
+            "If the episode is much longer than the horizon and rewards are "
+            "sparse, the agent cannot see them. It plans as if the episode "
+            "ends at the horizon.\n"
+            "Fix: increase gamma (0.999 gives horizon 1000), add intermediate "
+            "shaping rewards, or shorten the episode."
+        ),
+        "examples": [],
+        "papers": ["Hu et al. 2022 (ICML, discount factor in offline RL)",
+                   "Kakade & Langford 2002 (effective planning horizon)"],
+        "see_also": ["reward_delay_horizon", "exploration_threshold"],
+    },
+    "negative_only_reward": {
+        "learn_more": (
+            "When every reward component is zero or negative, the agent lives "
+            "in a reward desert. Every policy has negative expected return. "
+            "The agent cannot distinguish progress from failure because both "
+            "earn the same per-step penalty.\n"
+            "Mountain Car: -1 per step, 0 at the goal. The agent gets -1 "
+            "whether it's building momentum or standing still. Learning is "
+            "extremely slow because only random goal discovery provides signal.\n"
+            "Fix: add a positive reward for the desired behavior, or restructure "
+            "as reward = max_penalty - actual_penalty so progress yields "
+            "positive signal."
+        ),
+        "examples": ["sparse_reward_traps"],
+        "papers": ["Moore 1990 (Mountain Car)",
+                   "Sutton & Barto 2018 (Section 10.1, reward desert)"],
+        "see_also": ["penalty_dominates_goal", "death_beats_survival"],
+    },
+    "reward_delay_horizon": {
+        "learn_more": (
+            "A terminal reward R at step T is worth R * gamma^T at step 0. "
+            "If gamma^T is tiny, the agent's value function assigns near-zero "
+            "value to reaching the goal. The reward is there but the agent "
+            "cannot see it through the discounting.\n"
+            "Arjona-Medina et al. (NeurIPS 2019, RUDDER) proved that both "
+            "TD and Monte Carlo methods are exponentially slowed by reward "
+            "delay: the signal propagation time grows exponentially with the "
+            "number of steps between action and reward.\n"
+            "Fix: add intermediate shaping rewards (PBRS is provably safe), "
+            "increase gamma, or use return decomposition (RUDDER)."
+        ),
+        "examples": [],
+        "papers": ["Arjona-Medina et al. 2019 (NeurIPS, RUDDER)"],
+        "see_also": ["discount_horizon_mismatch", "exploration_threshold"],
+    },
     # Training rules
     "lr_regime": {
         "learn_more": (

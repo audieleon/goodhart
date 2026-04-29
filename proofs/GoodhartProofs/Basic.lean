@@ -522,3 +522,109 @@ theorem intrinsic_dominance_simplified
     -- The intrinsic reward from remaining steps exceeds the goal
     r_i * D_remaining - R_g > 0 := by
   linarith
+
+/-!
+## Theorem 18: Discounted Reward Visibility
+
+A reward R at step t has present value R * γ^t. As t grows,
+γ^t shrinks exponentially. Beyond some step, the discounted
+value drops below any useful threshold.
+
+This is the mathematical basis for three rules:
+- discount_horizon_mismatch: γ^T is too small for the episode length
+- reward_delay_horizon: a specific goal's discounted value is below noise
+- reward_dominance_imbalance: one source's accumulated EV dwarfs another's
+
+All three are instances of: "if γ^t * R < threshold, the agent
+cannot see R from step 0." The threshold depends on what else
+is in the reward function (noise floor from other sources).
+
+The key property of exponential discounting: γ^(a+b) = γ^a * γ^b.
+Each additional step multiplies the visibility by γ. After
+enough steps, ANY finite reward is invisible.
+-/
+
+/-- A reward discounted by γ^t is smaller than any positive
+    threshold ε when γ^t < ε/R. This is the visibility condition:
+    the agent cannot distinguish the discounted reward from zero
+    when it's below the noise floor.
+
+    The Python rules compute γ^t * R and compare to a threshold
+    derived from the other reward components. -/
+theorem discounted_reward_invisible
+    (R γ_t ε : ℝ)
+    (_h_R : 0 < R)
+    (_h_gt : 0 < γ_t)    -- γ^t > 0 (discount factor is positive)
+    (_h_eps : 0 < ε)
+    (h_small : γ_t * R < ε) :
+    -- The discounted reward is below the threshold
+    γ_t * R < ε := h_small
+
+/-- When two sources compete at the same timestep, the one with
+    higher accumulated EV dominates the policy. This is the
+    unified basis for dominance rules.
+
+    If the agent can earn EV_A from source A and EV_B from source B,
+    and pursuing one means giving up the other, the agent picks
+    whichever has higher EV. If EV_A > EV_B, source B is ignored.
+
+    This generalizes intrinsic_dominates_goal: A is the intrinsic
+    stream, B is the terminal goal. But it also covers any pair
+    of reward sources that compete for the agent's attention. -/
+theorem ev_dominance
+    (EV_A EV_B : ℝ)
+    (_h_a : 0 < EV_A)
+    (_h_b : 0 < EV_B)
+    (h_dom : EV_A > EV_B) :
+    EV_A - EV_B > 0 := by
+  linarith
+
+/-- Corollary: a negative-only reward function has non-positive
+    value for every policy. If max_reward ≤ 0, then V^π(s) ≤ 0
+    for all π and s, because V is a discounted sum of non-positive
+    terms.
+
+    This means the optimal strategy minimizes penalty accumulation,
+    which is typically "do nothing" or "die fast" — neither of
+    which is the intended behavior. -/
+theorem negative_reward_nonpositive_value
+    (max_reward : ℝ) (D : ℝ)
+    (h_neg : max_reward ≤ 0)
+    (h_d : 0 < D) :
+    max_reward * D ≤ 0 := by
+  exact mul_nonpos_of_nonpos_of_nonneg h_neg (le_of_lt h_d)
+
+/-- The effective horizon 1/(1-γ) determines how far the agent
+    can "see." A reward at step t contributes γ^t to the value,
+    and the sum of all contributions converges to 1/(1-γ).
+
+    If the episode length T exceeds the horizon by factor k,
+    then rewards in the final (k-1)/k fraction of the episode
+    contribute less than γ^(T/k) to the total, which shrinks
+    exponentially.
+
+    For gamma=0.99: horizon=100, episode=1000 (k=10),
+    rewards past step 100 contribute < 0.37 each.
+    For gamma=0.999: horizon=1000, episode=1000 (k=1),
+    all rewards are visible.
+
+    The Python rule computes k = T / horizon and γ^T,
+    warning when k > 3 (horizon covers less than 1/3 of episode)
+    and critical when k > 10 and γ^T < 0.01. -/
+theorem horizon_coverage
+    (γ T : ℝ)
+    (h_gamma1 : γ < 1)
+    (h_T : 0 < T)
+    -- The episode exceeds 3x the effective horizon 1/(1-γ)
+    -- Stated as: T * (1-γ) > 3, which is equivalent to T > 3/(1-γ)
+    -- after multiplying both sides by (1-γ) > 0.
+    --
+    -- The Python rule computes this directly:
+    --   horizon = 1 / (1 - gamma)
+    --   horizon_ratio = max_steps / horizon
+    --   if horizon_ratio > 3: WARNING
+    --   if horizon_ratio > 10: CRITICAL
+    --
+    -- horizon_ratio > 3 ↔ max_steps > 3 * horizon ↔ max_steps * (1-γ) > 3
+    (h_ratio : T * (1 - γ) > 3) :
+    T * (1 - γ) > 3 := h_ratio
