@@ -9,7 +9,7 @@
 > "When a measure becomes a target, it ceases to be a good measure."
 > -- Charles Goodhart (1975), generalized by Marilyn Strathern (1997)
 
-**Catch reward traps before training.** Goodhart runs 40 composable analysis rules on your RL reward configuration and reports degenerate equilibria, perverse incentives, and exploitable reward structures -- before you spend compute. 17 rules are backed by machine-verified LEAN 4 proofs (zero sorry), including formalizations of Ng 1999 and Skalse 2022.
+**Catch reward traps before training.** Goodhart runs 44 composable analysis rules on your RL reward configuration and reports degenerate equilibria, perverse incentives, and exploitable reward structures -- before you spend compute. 21 rules are backed by machine-verified LEAN 4 proofs (zero sorry), including formalizations of Ng 1999 and Skalse 2022.
 
 ## Installation
 
@@ -173,14 +173,14 @@ goodhart --preset cartpole       # run CartPole (clean pass)
 
 ## Rules
 
-40 composable rules in four categories:
+44 composable rules in four categories:
 
 ```bash
 goodhart --rules      # list all with descriptions
 goodhart --explain X  # deep-dive on rule X
 ```
 
-- **15 reward rules**: penalty dominance, death incentive, idle exploit, exploration threshold, respawning exploit, death reset, shaping loops, shaping safety (Ng 1999), proxy hackability (Skalse 2022), intrinsic sufficiency, budget sufficiency, compound traps, staged plateaus, reward dominance, exponential saturation
+- **19 reward rules**: penalty dominance, death incentive, idle exploit, exploration threshold, respawning exploit, death reset, shaping loops, shaping safety (Ng 1999), proxy hackability (Skalse 2022), intrinsic sufficiency, budget sufficiency, compound traps, staged plateaus, reward dominance, exponential saturation, intrinsic dominance, discount horizon mismatch, negative-only reward, reward delay horizon
 - **13 training rules**: learning rate regime (all algorithms), critic LR ratio, entropy regime, clip fraction risk (PPO), expert collapse, batch size interaction, parallelism effect, memory capacity, replay buffer ratio (off-policy), target network update (DQN), epsilon schedule (DQN), soft update rate (SAC/DDPG/TD3), SAC alpha
 - **4 architecture rules**: embedding capacity, routing floor necessity, recurrence type, actor count effect
 - **8 blind-spot advisories**: pattern-based hints about failure modes static analysis cannot detect (physics exploits, goal misgeneralization, credit assignment depth, constrained RL, non-stationarity, learned rewards, missing constraints, aggregation traps)

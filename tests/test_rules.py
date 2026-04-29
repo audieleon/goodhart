@@ -9,7 +9,8 @@ from goodhart.rules.reward import (
     PenaltyDominatesGoal, DeathBeatsSurvival, IdleExploit,
     ExplorationThreshold, RespawningExploit, DeathResetExploit,
     ShapingLoopExploit, IntrinsicSufficiency, BudgetSufficiency,
-    CompoundTrap,
+    CompoundTrap, IntrinsicDominance,
+    DiscountHorizonMismatch, NegativeOnlyReward, RewardDelayHorizon,
 )
 from goodhart.rules.training import (
     LearningRateRegime, CriticLearningRate, EntropyCollapse,
@@ -515,3 +516,134 @@ def test_no_contradiction_clean():
     ]
     contradictions = AnalysisEngine._check_contradictions(verdicts)
     assert len(contradictions) == 0
+
+
+# ---- Discount Horizon Mismatch ----
+
+class TestDiscountHorizonMismatch:
+    rule = DiscountHorizonMismatch()
+
+    def test_short_horizon_sparse_goal(self):
+        """gamma=0.95, 500 steps, sparse goal → CRITICAL."""
+        model = EnvironmentModel(
+            name="test", max_steps=500, gamma=0.95,
+            n_actions=4, action_type="discrete",
+        )
+        model.add_reward_source(RewardSource(
+            name="goal", reward_type=RewardType.TERMINAL, value=10.0,
+            requires_action=True, intentional=True, discovery_probability=0.02,
+        ))
+        assert self.rule.applies_to(model)
+        verdicts = self.rule.check(model)
+        assert len(verdicts) == 1
+        assert verdicts[0].severity == Severity.CRITICAL
+
+    def test_long_horizon_ok(self):
+        """gamma=0.999, 500 steps → no fire (horizon covers episode)."""
+        model = EnvironmentModel(
+            name="test", max_steps=500, gamma=0.999,
+            n_actions=4, action_type="discrete",
+        )
+        model.add_reward_source(RewardSource(
+            name="goal", reward_type=RewardType.TERMINAL, value=10.0,
+            requires_action=True, intentional=True, discovery_probability=0.02,
+        ))
+        verdicts = self.rule.check(model)
+        assert len(verdicts) == 0
+
+    def test_dense_reward_skips(self):
+        """Dense per-step reward → rule doesn't apply."""
+        model = EnvironmentModel(
+            name="test", max_steps=500, gamma=0.95,
+            n_actions=4, action_type="discrete",
+        )
+        model.add_reward_source(RewardSource(
+            name="dense", reward_type=RewardType.PER_STEP, value=1.0,
+            requires_action=True, intentional=True,
+        ))
+        assert not self.rule.applies_to(model)
+
+
+# ---- Negative Only Reward ----
+
+class TestNegativeOnlyReward:
+    rule = NegativeOnlyReward()
+
+    def test_all_negative(self):
+        """All sources ≤ 0 → CRITICAL."""
+        model = EnvironmentModel(
+            name="test", max_steps=200, gamma=1.0,
+            n_actions=3, action_type="discrete",
+        )
+        model.add_reward_source(RewardSource(
+            name="penalty", reward_type=RewardType.PER_STEP, value=-1.0,
+        ))
+        model.add_reward_source(RewardSource(
+            name="goal", reward_type=RewardType.TERMINAL, value=0.0,
+            requires_action=True, intentional=True,
+        ))
+        verdicts = self.rule.check(model)
+        assert len(verdicts) == 1
+        assert verdicts[0].severity == Severity.CRITICAL
+
+    def test_has_positive(self):
+        """At least one positive source → no fire."""
+        model = EnvironmentModel(
+            name="test", max_steps=200, gamma=0.99,
+            n_actions=3, action_type="discrete",
+        )
+        model.add_reward_source(RewardSource(
+            name="penalty", reward_type=RewardType.PER_STEP, value=-1.0,
+        ))
+        model.add_reward_source(RewardSource(
+            name="goal", reward_type=RewardType.TERMINAL, value=1.0,
+            requires_action=True, intentional=True,
+        ))
+        verdicts = self.rule.check(model)
+        assert len(verdicts) == 0
+
+    def test_positive_range(self):
+        """Value is negative but range includes positive → no fire."""
+        model = EnvironmentModel(
+            name="test", max_steps=200, gamma=0.99,
+            n_actions=3, action_type="discrete",
+        )
+        model.add_reward_source(RewardSource(
+            name="variable", reward_type=RewardType.PER_STEP,
+            value=-0.5, value_range=(-1.0, 0.5),
+        ))
+        verdicts = self.rule.check(model)
+        assert len(verdicts) == 0
+
+
+# ---- Reward Delay Horizon ----
+
+class TestRewardDelayHorizon:
+    rule = RewardDelayHorizon()
+
+    def test_heavily_discounted_goal(self):
+        """Goal at ~step 5000, gamma=0.99 → invisible."""
+        model = EnvironmentModel(
+            name="test", max_steps=10000, gamma=0.99,
+            n_actions=4, action_type="discrete",
+        )
+        model.add_reward_source(RewardSource(
+            name="goal", reward_type=RewardType.TERMINAL, value=10.0,
+            requires_action=True, intentional=True, discovery_probability=0.001,
+        ))
+        verdicts = self.rule.check(model)
+        assert len(verdicts) == 1
+        assert verdicts[0].severity == Severity.CRITICAL
+
+    def test_reachable_goal(self):
+        """Goal at ~step 100, gamma=0.99 → visible."""
+        model = EnvironmentModel(
+            name="test", max_steps=200, gamma=0.99,
+            n_actions=4, action_type="discrete",
+        )
+        model.add_reward_source(RewardSource(
+            name="goal", reward_type=RewardType.TERMINAL, value=10.0,
+            requires_action=True, intentional=True, discovery_probability=0.05,
+        ))
+        verdicts = self.rule.check(model)
+        assert len(verdicts) == 0
