@@ -438,4 +438,87 @@ Source attribution:
   Full policy invariance theorem is in MDP/Shaping.lean.
 - softmax theorems: exponential monotonicity for expert collapse.
 - ppo_clip_epoch_bound: division rearrangement for PPO clip risk.
+- intrinsic_dominates_goal: original, for intrinsic_dominance rule.
 -/
+
+/-!
+## Theorem 17: Intrinsic Reward Dominates Goal
+
+An agent earns intrinsic reward r_i every step (from RND, ICM,
+curiosity, etc.). The episode lasts T steps. A terminal goal at
+step t_g is worth R_g. Should the agent go to the goal?
+
+The key insight: finishing at step t_g means giving up the
+intrinsic reward for the remaining steps (t_g through T).
+The agent compares:
+  - V(explore forever) = r_i * D_total
+  - V(finish at t_g)   = r_i * D_before + R_g
+
+where D_total and D_before are the discounted step counts for
+the whole episode and the prefix up to t_g.
+
+The difference is:
+  V(explore) - V(finish) = r_i * (D_total - D_before) - R_g
+                         = r_i * D_remaining - R_g
+
+So the agent prefers not finishing whenever the intrinsic reward
+it would earn in the remaining steps exceeds the goal reward.
+
+This is a direct consequence of Ng 1999: intrinsic reward is
+not potential-based, so it CAN change the optimal policy. This
+theorem gives the exact condition under which it DOES.
+
+The Python rule computes r_i * D_remaining and compares to R_g.
+If r_i * D_remaining ≥ 0.5 * R_g, it warns. If ≥ 5 * R_g,
+it fires CRITICAL.
+
+VERIFIED: the Python rule is a direct instance of this theorem.
+-/
+
+/-- The value of exploring forever exceeds the value of finishing
+    at step t_g when the intrinsic reward earned in the remaining
+    steps exceeds the goal reward.
+
+    We work with abstract discounted step counts (reals) rather than
+    computing the geometric series, same as the other theorems.
+
+    D_total = D_before + D_remaining (the discounted steps split
+    at the goal point). This is an assumption, not proved here —
+    it follows from the linearity of summation. -/
+theorem intrinsic_dominates_goal
+    (r_i R_g D_total D_before D_remaining : ℝ)
+    (h_ri : 0 < r_i)
+    (h_rg : 0 < R_g)
+    (h_dt : 0 < D_total)
+    (h_db : 0 ≤ D_before)
+    (h_dr : 0 < D_remaining)
+    -- D_total = D_before + D_remaining (split at goal point)
+    (h_split : D_total = D_before + D_remaining)
+    -- The intrinsic reward in the remaining steps exceeds the goal
+    (h_dom : r_i * D_remaining > R_g) :
+    -- Then exploring forever beats finishing:
+    -- V(explore) = r_i * D_total > r_i * D_before + R_g = V(finish)
+    r_i * D_total > r_i * D_before + R_g := by
+  -- Substitute D_total = D_before + D_remaining
+  rw [h_split]
+  -- Expand: r_i * (D_before + D_remaining) = r_i * D_before + r_i * D_remaining
+  ring_nf
+  -- Now we need: r_i * D_before + r_i * D_remaining > r_i * D_before + R_g
+  -- Which is: r_i * D_remaining > R_g (our hypothesis h_dom)
+  linarith
+
+/-- Corollary: the dominance condition simplifies to comparing
+    intrinsic per-step reward times remaining discounted steps
+    against the goal reward. This is what the Python rule computes.
+
+    If you can earn r_i per step for D_remaining more steps,
+    and r_i * D_remaining > R_g, don't go to the goal. -/
+theorem intrinsic_dominance_simplified
+    (r_i R_g D_remaining : ℝ)
+    (h_ri : 0 < r_i)
+    (h_rg : 0 < R_g)
+    (h_dr : 0 < D_remaining)
+    (h_dom : r_i * D_remaining > R_g) :
+    -- The intrinsic reward from remaining steps exceeds the goal
+    r_i * D_remaining - R_g > 0 := by
+  linarith

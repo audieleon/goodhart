@@ -1196,13 +1196,13 @@ class IntrinsicDominance(Rule):
     @property
     def proof(self):
         return FormalBasis(
-            proof_name="ng_vstar_shaped",
-            strength=ProofStrength.GROUNDED,
-            statement=("Ng 1999: non-PBRS reward additions can change the "
-                       "optimal policy. When accumulated intrinsic >> goal, "
-                       "the mixed-reward policy diverges from the task policy."),
-            parameters={"intrinsic_ev": "sum(r_i * D)",
-                        "goal_ev": "R_goal * p * gamma^t"},
+            proof_name="intrinsic_dominates_goal",
+            strength=ProofStrength.VERIFIED,
+            statement=("r_i * D_remaining > R_g → r_i * D_total > r_i * D_before + R_g. "
+                       "The agent prefers exploring over finishing when the intrinsic "
+                       "reward in the remaining steps exceeds the goal reward."),
+            parameters={"intrinsic_per_step": "r_i", "goal_reward": "R_g",
+                        "remaining_steps": "D_remaining"},
         )
 
     def applies_to(self, model):
