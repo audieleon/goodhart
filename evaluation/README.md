@@ -18,4 +18,4 @@ python evaluation/heldout/heldout_omnigrasp.py
 
 ## Relationship to the paper
 
-These correspond to Table 3 (held-out evaluation) and Table 5 (Eureka screening) in the paper. The tool's built-in 57 examples live in `goodhart/examples/` and are entirely separate.
+These correspond to Table 3 (held-out evaluation) and Table 5 (Eureka screening) in the paper. The tool's built-in 66 examples live in `goodhart/examples/` and are entirely separate.

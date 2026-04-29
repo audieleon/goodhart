@@ -2,7 +2,7 @@
 
 ## Current (v0.1.0)
 
-40 composable rules, 23 presets, 57 examples, 92 LEAN 4 theorems (zero sorry), `@reward_function` decorator, CLI, Python API, MCP server.
+44 composable rules, 23 presets, 66 examples, 103 LEAN 4 theorems (zero sorry), `@reward_function` decorator, CLI, Python API, MCP server.
 
 ## Next
 
