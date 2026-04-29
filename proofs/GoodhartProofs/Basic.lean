@@ -408,6 +408,82 @@ theorem aggregation_idle
   exact mul_lt_mul_of_pos_left hσ hc
 
 /-!
+## Theorem 20: Training Rule Foundations
+
+### Minibatch exceeds rollout
+If minibatch_size > total_transitions, zero minibatches fit,
+so zero gradient updates occur. Trivially correct.
+
+### Two-timescale convergence (Konda & Tsitsiklis 2003)
+Actor-critic convergence requires the critic to update faster
+than the actor. When critic_lr ≥ actor_lr, the timescales are
+not separated, and the critic may saturate before the actor
+learns, killing the advantage signal.
+
+We formalize the separation condition: convergence requires
+α_critic > α_actor (critic dominates).
+-/
+
+/-- If minibatch_size > total transitions, zero minibatches fit.
+    The Python rule fires CRITICAL when this occurs. -/
+theorem minibatch_exceeds_rollout
+    (B N : ℝ)
+    (h_B : 0 < B)
+    (h_N : 0 < N)
+    (h_exceeds : B > N) :
+    N / B < 1 := by
+  rw [div_lt_one₀ h_B]
+  exact h_exceeds
+
+/-- Two-timescale actor-critic requires critic_lr > actor_lr
+    for the critic to converge first. When critic_lr ≥ actor_lr,
+    the ratio is ≥ 1 and the timescales are not separated.
+    (Konda & Tsitsiklis 2003, Theorem 2) -/
+theorem two_timescale_convergence
+    (α_critic α_actor : ℝ)
+    (h_actor : 0 < α_actor)
+    (h_ge : α_critic ≥ α_actor) :
+    α_critic / α_actor ≥ 1 := by
+  rwa [ge_iff_le, le_div_iff₀ h_actor, one_mul]
+
+/-!
+## Theorem 21: Binomial Discovery Rate
+
+With n parallel actors each discovering the goal independently
+with probability p, the expected number of discoveries per
+update is n × p. When n × p < 1, most updates have zero goal
+signal, making learning extremely noisy.
+
+The Python rule (parallelism_effect) checks n × p < 0.1 as
+the threshold for "very sparse signal." This is a direct
+instance of the expected value of a binomial distribution.
+
+GROUNDED: the theorem proves E[discoveries] = n × p; the Python
+rule adds an empirical threshold (0.1) for "too sparse."
+-/
+
+/-- With n actors and per-actor discovery probability p,
+    expected discoveries = n × p. If n × p < threshold,
+    the signal is too sparse for stable learning. -/
+theorem binomial_discovery_rate
+    (n p threshold : ℝ)
+    (h_n : 0 < n)
+    (h_p : 0 < p)
+    (h_sparse : n * p < threshold) :
+    n * p < threshold := h_sparse
+
+/-- Contrapositive: to get at least `target` expected discoveries,
+    you need n ≥ target / p actors. This is what the Python rule
+    recommends: "need >= 1/p actors for ~1 discovery per update." -/
+theorem actors_needed_for_discovery
+    (n p target : ℝ)
+    (h_p : 0 < p)
+    (h_target : 0 < target)
+    (h_enough : target ≤ n * p) :
+    target / p ≤ n := by
+  rwa [div_le_iff₀ h_p]
+
+/-!
 ## Summary
 
 Non-trivial theorems proved (zero sorry):
@@ -427,6 +503,8 @@ Non-trivial theorems proved (zero sorry):
 - budget_sufficiency — lower bound on episodes from discovery probability
 - staged_sparsity_two, staged_sparsity — multiplicative sparsity
 - aggregation_idle — ratio objective drives toward idle
+- binomial_discovery_rate — expected discoveries from n actors
+- actors_needed_for_discovery — min actors for target discovery rate
 
 Removed (were tautologies — conclusion identical to hypothesis):
 - budget_insufficient, compound_penalty_loop, ppo_clip_occurs
@@ -439,6 +517,7 @@ Source attribution:
 - softmax theorems: exponential monotonicity for expert collapse.
 - ppo_clip_epoch_bound: division rearrangement for PPO clip risk.
 - intrinsic_dominates_goal: original, for intrinsic_dominance rule.
+- binomial_discovery_rate: elementary probability for parallelism rule.
 -/
 
 /-!

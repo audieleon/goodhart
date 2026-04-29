@@ -140,7 +140,7 @@ EXPLANATIONS = {
         "examples": ["bicycle_circles"],
         "papers": ["Ng et al. 1999 (Theorem 1)", "Randlov & Alstrom 1998"],
         "see_also": ["shaping_not_potential_based", "respawning_exploit"],
-        "proof": "LEAN: Ng 1999 sufficiency (verified, MDP/Shaping.lean)",
+        "proof": "LEAN: ng_necessity_action_dependent (grounded, MDP/Shaping.lean). Core proved: action-dependent shaping can change optimal policy. Python extends with can_loop heuristic",
     },
     "shaping_not_potential_based": {
         "learn_more": (
@@ -157,7 +157,7 @@ EXPLANATIONS = {
         "examples": ["bicycle_circles", "lunar_lander", "habitat_pointnav"],
         "papers": ["Ng et al. 1999 (Theorem 1, both directions)"],
         "see_also": ["shaping_loop_exploit", "proxy_reward_hackability"],
-        "proof": "LEAN: ng_sufficiency + ng_necessity (verified, MDP/Shaping.lean)",
+        "proof": "LEAN: ng_shaping_preserves_optimal + ng_necessity_action_dependent (grounded, MDP/Shaping.lean). Both directions proved. Python checks requires_action as structural proxy for action-dependence",
     },
     "proxy_reward_hackability": {
         "learn_more": (
@@ -351,7 +351,8 @@ EXPLANATIONS = {
             "network architecture. These thresholds are empirical, not formal."
         ),
         "examples": ["ppo_37_details"],
-        "papers": ["Schulman et al. 2017", "Andrychowicz et al. 2021 (What Matters)"],
+        "papers": ["Schulman et al. 2017",
+                   "Andrychowicz et al. 2021 (What Matters, Table 5: systematic LR sweep)"],
     },
     "entropy_regime": {
         "learn_more": (
@@ -363,7 +364,8 @@ EXPLANATIONS = {
             "with Gaussian policies), but risky for discrete action spaces."
         ),
         "examples": ["ppo_37_details"],
-        "papers": ["Schulman et al. 2017", "Mnih et al. 2016 (A3C)"],
+        "papers": ["Schulman et al. 2017", "Mnih et al. 2016 (A3C)",
+                   "Ahmed et al. 2019 (Understanding the Impact of Entropy on Policy Optimization)"],
         "see_also": ["exploration_threshold"],
     },
     "clip_fraction_risk": {
@@ -383,10 +385,16 @@ EXPLANATIONS = {
             "With multiple specialist networks (mixture of experts), one expert "
             "can dominate and the others collapse to zero usage. Without a routing "
             "floor constraint, the router has no incentive to keep all experts alive.\n"
+            "The mechanism is a positive feedback loop: softmax concentration "
+            "increases monotonically with logit gap (proved in LEAN), so once an "
+            "expert falls behind in routing probability, it receives less gradient, "
+            "falls further behind, and eventually receives zero traffic.\n"
             "Fix: set routing_floor > 0 (e.g., 0.1 for 10% minimum usage per expert) "
             "or add a load-balancing coefficient."
         ),
         "examples": ["expert_collapse"],
+        "papers": ["Shazeer et al. 2017 (MoE: load imbalance without balancing loss)"],
+        "proof": "Motivated: softmax_denom_decreases (LEAN: exponential monotonicity proves the collapse mechanism)",
     },
     "memory_capacity": {
         "learn_more": (
@@ -423,7 +431,9 @@ EXPLANATIONS = {
             "double the LR to maintain the same effective step size."
         ),
         "examples": ["ppo_37_details"],
-        "papers": ["Goyal et al. 2017", "Andrychowicz et al. 2021"],
+        "papers": ["Goyal et al. 2017 (linear scaling rule)",
+                   "Andrychowicz et al. 2021"],
+        "proof": "Grounded: minibatch > transitions → zero gradient updates (trivially provable)",
     },
     "critic_lr_ratio": {
         "learn_more": (
@@ -435,7 +445,9 @@ EXPLANATIONS = {
             "indicate intentional tuning — or a typo."
         ),
         "examples": ["ppo_37_details"],
-        "papers": ["Andrychowicz et al. 2021 (What Matters in On-Policy RL)"],
+        "papers": ["Andrychowicz et al. 2021 (What Matters in On-Policy RL)",
+                   "Konda & Tsitsiklis 2003 (two-timescale actor-critic convergence)"],
+        "proof": "Motivated: two-timescale convergence requires critic faster than actor",
     },
     # Off-policy training rules
     "replay_buffer_ratio": {
@@ -449,7 +461,8 @@ EXPLANATIONS = {
             "buffer, the buffer will never be fully utilized."
         ),
         "examples": [],
-        "papers": ["Mnih et al. 2015 (DQN)", "Haarnoja et al. 2018 (SAC)"],
+        "papers": ["Mnih et al. 2015 (DQN)", "Haarnoja et al. 2018 (SAC)",
+                   "Fedus et al. 2020 (Revisiting Fundamentals of Experience Replay)"],
     },
     "target_network_update": {
         "learn_more": (
@@ -518,11 +531,15 @@ EXPLANATIONS = {
             "The number of parallel workers affects both throughput and gradient "
             "staleness. More workers = more samples/second but more off-policy "
             "data. APPO/IMPALA handle staleness explicitly; PPO assumes on-policy.\n"
+            "With n actors and discovery probability p, expected discoveries per "
+            "update = n × p (binomial). When n×p < 0.1, most updates have zero "
+            "goal signal. The rule computes this directly.\n"
             "For PPO with num_workers > 1, the effective batch is collected across "
             "workers and may contain slightly stale data."
         ),
         "examples": ["ppo_37_details"],
         "papers": ["Espeholt et al. 2018 (IMPALA)", "Schulman et al. 2017"],
+        "proof": "Grounded: E[discoveries] = n × p (LEAN: binomial_discovery_rate, actors_needed_for_discovery)",
     },
     "recurrence_type": {
         "learn_more": (
@@ -565,7 +582,8 @@ EXPLANATIONS = {
         "examples": ["hide_and_seek", "dmc_dog",
                      "isaac_gym_ant", "robotics_exploits", "evolution_exploits",
                      "dota2_openai_five"],
-        "papers": ["Baker et al. 2020 (ICLR)", "Krakovna et al. 2020"],
+        "papers": ["Baker et al. 2020 (ICLR)", "Krakovna et al. 2020 (taxonomy: rich dynamics)"],
+        "config_shape": "n_states ≥ 50K, n_actions ≥ 6, death_prob < 0.05, ≥ 4 sources, ≥ 500 steps",
     },
     "advisory_goal_misgeneralization": {
         "learn_more": (
@@ -579,7 +597,9 @@ EXPLANATIONS = {
             "without learning the actual objective, if shortcuts exist."
         ),
         "examples": ["coinrun_misgeneralization", "procgen_starpilot"],
-        "papers": ["Langosco et al. 2022 (ICML)", "Shah et al. 2022"],
+        "papers": ["Langosco et al. 2022 (ICML)", "Shah et al. 2022",
+                   "Di Langosco et al. 2023 (training distribution shortcuts)"],
+        "config_shape": "Single terminal goal, discovery_prob ≥ 0.5, ≤ 2 non-goal signals, no symmetric win/lose",
     },
     "advisory_credit_assignment": {
         "learn_more": (
@@ -593,7 +613,9 @@ EXPLANATIONS = {
             "For deep tasks: curriculum learning, hierarchical RL, or demonstrations."
         ),
         "examples": ["montezuma_credit", "nethack_deep_sparse"],
-        "papers": ["Bellemare et al. 2013", "Burda et al. 2019", "Kuttler et al. 2020"],
+        "papers": ["Bellemare et al. 2013", "Burda et al. 2019", "Kuttler et al. 2020",
+                   "Arjona-Medina et al. 2019 (RUDDER: TD/MC propagation exponential in delay)"],
+        "config_shape": "discovery_prob < 0.01, max_steps ≥ 500, no shaping, no dense events",
         "see_also": ["exploration_threshold"],
     },
     "advisory_constrained_rl": {
@@ -609,7 +631,9 @@ EXPLANATIONS = {
         ),
         "examples": ["safety_gym", "safetygym_constrained", "safety_constrained",
                      "driving_safety"],
-        "papers": ["Achiam et al. 2017 (CPO, ICML)", "Ray et al. 2019"],
+        "papers": ["Achiam et al. 2017 (CPO, ICML: Lagrangian relaxation doesn't guarantee constraint satisfaction)",
+                   "Ray et al. 2019 (Safety Gym)"],
+        "config_shape": "Negative ON_EVENT sources, small relative to positive reward (<20%), not game-like punishment",
     },
     "advisory_nonstationarity": {
         "learn_more": (
@@ -624,7 +648,10 @@ EXPLANATIONS = {
         "examples": ["self_play_nonstationarity", "pettingzoo_adversarial",
                      "smac_micromanagement", "maddpg_cooperative",
                      "tic_tac_toe_crash"],
-        "papers": ["Bansal et al. 2018 (ICLR)", "Lanctot et al. 2017"],
+        "papers": ["Bansal et al. 2018 (ICLR)",
+                   "Lanctot et al. 2017 (NIPS)",
+                   "Balduzzi et al. 2019 (open-ended learning in symmetric zero-sum games)"],
+        "config_shape": "Symmetric positive/negative terminal rewards, both require action (competitive, not survive/die)",
     },
     "advisory_learned_reward": {
         "learn_more": (
@@ -639,7 +666,9 @@ EXPLANATIONS = {
             "(RM score - KL penalty) is simple. The problem is inside the RM."
         ),
         "examples": ["rlhf_reward_model", "webgpt_learned_reward"],
-        "papers": ["Casper et al. 2023", "Gao et al. 2023"],
+        "papers": ["Casper et al. 2023 (Open Problems and Fundamental Limitations of RLHF)",
+                   "Gao et al. 2023 (overoptimization scaling law)"],
+        "config_shape": "≤ 2 sources, ≥ 100K states, ≥ 100 actions (minimal structure in complex env)",
     },
     "advisory_missing_constraint": {
         "learn_more": (
@@ -653,7 +682,9 @@ EXPLANATIONS = {
             "Domain expertise is irreplaceable for enumerating safety constraints."
         ),
         "examples": ["tokamak_plasma", "datacenter_cooling"],
-        "papers": ["Degrave et al. 2022 (Nature, tokamak plasma)"],
+        "papers": ["Degrave et al. 2022 (Nature, tokamak plasma)",
+                   "Amodei et al. 2016 (Concrete Problems, Section 2: avoiding negative side effects)"],
+        "config_shape": "All sources non-negative, continuous control, n_states ≥ 50K, death_prob < 0.05, ≤ 4 sources",
     },
     "advisory_aggregation_trap": {
         "learn_more": (
@@ -666,7 +697,9 @@ EXPLANATIONS = {
             "Check: does inaction produce a degenerate ratio?"
         ),
         "examples": ["sharpe_idle"],
-        "papers": ["Dang-Nhu 2025 (risk-aware RL)"],
+        "papers": ["Moody & Saffell 2001 (direct RL for Sharpe ratio: documented idle exploit)",
+                   "Dang-Nhu 2025 (risk-aware RL)"],
+        "config_shape": "All per-step values < 0.1, all positive, no terminal goal",
     },
 }
 

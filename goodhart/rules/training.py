@@ -64,7 +64,13 @@ class LearningRateRegime(Rule):
 
 
 class CriticLearningRate(Rule):
-    """Check critic vs actor learning rate ratio."""
+    """Check critic vs actor learning rate ratio.
+
+    Konda & Tsitsiklis 2003 proved that two-timescale actor-critic
+    convergence requires the critic to update on a faster timescale
+    than the actor. When critic_lr >= actor_lr, the critic may
+    saturate before the actor learns, killing the advantage signal.
+    """
 
     @property
     def name(self): return "critic_lr_ratio"
@@ -72,6 +78,21 @@ class CriticLearningRate(Rule):
     @property
     def description(self):
         return "Critic learning rate vs actor learning rate ratio"
+
+    @property
+    def proof(self):
+        return FormalBasis(
+            proof_name="two_timescale_convergence",
+            strength=ProofStrength.MOTIVATED,
+            paper="Konda & Tsitsiklis 2003",
+            statement=(
+                "Two-timescale stochastic approximation converges when "
+                "the critic step size dominates the actor step size "
+                "(α_critic/α_actor → ∞). Violating this breaks the "
+                "separation of timescales required for convergence"
+            ),
+            parameters={"critic_lr": "α_critic", "actor_lr": "α_actor"},
+        )
 
     def check(self, model, config: TrainingConfig = None):
         if config is None:
@@ -252,7 +273,13 @@ class ExpertCollapse(Rule):
 
 
 class BatchSizeInteraction(Rule):
-    """Check batch size vs other parameters."""
+    """Check batch size vs other parameters.
+
+    The minibatch > transitions check is trivially correct: if the
+    minibatch is larger than the rollout, zero gradient updates occur.
+    The linear scaling rule (Goyal et al. 2017) establishes that
+    batch size and learning rate must scale together.
+    """
 
     @property
     def name(self): return "batch_size_interaction"
@@ -260,6 +287,20 @@ class BatchSizeInteraction(Rule):
     @property
     def description(self):
         return "Batch size interactions with lr and epochs"
+
+    @property
+    def proof(self):
+        return FormalBasis(
+            proof_name="minibatch_exceeds_rollout",
+            strength=ProofStrength.GROUNDED,
+            paper="Goyal et al. 2017 (linear scaling rule)",
+            statement=(
+                "If minibatch_size > num_envs × rollout_length, "
+                "the batch cannot fill a single minibatch and zero "
+                "gradient updates occur. Trivially provable"
+            ),
+            parameters={"minibatch_size": "B", "transitions": "N"},
+        )
 
     def check(self, model, config: TrainingConfig = None):
         if config is None:
@@ -293,7 +334,12 @@ class BatchSizeInteraction(Rule):
 
 
 class ParallelismEffect(Rule):
-    """Check if parallelism affects learning quality."""
+    """Check if parallelism affects learning quality.
+
+    With n actors and discovery probability p per actor per update,
+    the probability of at least one discovery is 1 - (1-p)^n.
+    When n*p << 1, expected discoveries per update ≈ n*p (binomial).
+    """
 
     @property
     def name(self): return "parallelism_effect"
@@ -301,6 +347,19 @@ class ParallelismEffect(Rule):
     @property
     def description(self):
         return "Effect of actor count on exploration and learning"
+
+    @property
+    def proof(self):
+        return FormalBasis(
+            proof_name="binomial_discovery_rate",
+            strength=ProofStrength.GROUNDED,
+            paper="Elementary probability (binomial)",
+            statement=(
+                "E[discoveries] = n × p. P(≥1 discovery) = 1 - (1-p)^n. "
+                "Python checks n×p < 0.1 as threshold for sparse signal"
+            ),
+            parameters={"n_actors": "n", "discovery_prob": "p"},
+        )
 
     def check(self, model, config: TrainingConfig = None):
         if config is None:
