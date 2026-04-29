@@ -1306,6 +1306,235 @@ class IntrinsicDominance(Rule):
         return verdicts
 
 
+class DiscountHorizonMismatch(Rule):
+    """Check if discount factor makes distant rewards invisible.
+
+    The effective horizon is 1/(1-gamma). If the episode is much
+    longer than this, rewards beyond the horizon are discounted
+    to near zero. The agent literally cannot see them.
+
+    Hu et al. (ICML 2022) showed this systematically: the wrong
+    gamma makes agents myopic to distant rewards even when the
+    agent can physically reach them.
+    """
+
+    @property
+    def name(self): return "discount_horizon_mismatch"
+
+    @property
+    def description(self):
+        return ("Discount factor creates an effective horizon shorter "
+                "than the episode, making distant rewards invisible")
+
+    @property
+    def proof(self):
+        return FormalBasis(
+            proof_name="horizon_coverage",
+            strength=ProofStrength.VERIFIED,
+            statement=("T > 3 × 1/(1-γ) → T(1-γ) > 3. The episode is "
+                       "more than 3x the effective horizon."),
+            parameters={"gamma": "γ", "episode_length": "T",
+                        "horizon": "1/(1-γ)"},
+        )
+
+    def applies_to(self, model):
+        # Only relevant when there are sparse terminal/event rewards
+        # and the episode is long. Per-step rewards don't need the
+        # full horizon — they're visible immediately.
+        has_sparse = any(
+            s.reward_type in (RewardType.TERMINAL, RewardType.ON_EVENT)
+            and s.value > 0
+            and s.discovery_probability < 0.1
+            for s in model.reward_sources
+        )
+        has_dense = any(
+            s.reward_type == RewardType.PER_STEP and s.value > 0
+            for s in model.reward_sources
+        )
+        return model.gamma < 1.0 and has_sparse and not has_dense
+
+    def check(self, model, config=None):
+        verdicts = []
+        if model.gamma >= 1.0:
+            return verdicts
+
+        effective_horizon = 1.0 / (1.0 - model.gamma)
+        horizon_ratio = model.max_steps / effective_horizon
+
+        end_discount = model.gamma ** model.max_steps
+
+        if horizon_ratio > 10 and end_discount < 0.01:
+            verdicts.append(Verdict(
+                rule_name=self.name,
+                severity=Severity.CRITICAL,
+                message=(f"Effective horizon is {effective_horizon:.0f} steps "
+                         f"but episode is {model.max_steps} steps "
+                         f"({horizon_ratio:.0f}x longer). A reward at the "
+                         f"end is discounted to {end_discount:.6f} "
+                         f"(effectively zero)."),
+                details={"effective_horizon": effective_horizon,
+                         "max_steps": model.max_steps,
+                         "end_discount": end_discount},
+                recommendation=(f"Increase gamma to {1 - 1/model.max_steps:.4f} "
+                                f"or higher, or shorten the episode"),
+            ))
+        elif horizon_ratio > 3:
+            verdicts.append(Verdict(
+                rule_name=self.name,
+                severity=Severity.WARNING,
+                message=(f"Effective horizon is {effective_horizon:.0f} steps "
+                         f"but episode is {model.max_steps} steps "
+                         f"({horizon_ratio:.1f}x longer). Rewards in the "
+                         f"second half are heavily discounted "
+                         f"(end={end_discount:.4f})."),
+                details={"effective_horizon": effective_horizon,
+                         "max_steps": model.max_steps,
+                         "end_discount": end_discount},
+                recommendation="Consider increasing gamma or adding shaping",
+            ))
+        return verdicts
+
+
+class NegativeOnlyReward(Rule):
+    """Check if all reward components are negative or zero.
+
+    When there is no positive reward anywhere, every policy has
+    negative expected return. The agent cannot distinguish progress
+    from failure. The optimal strategy is whichever accumulates
+    the least penalty: standing still, dying fast, or doing nothing.
+
+    Mountain Car (Moore 1990): -1/step, 0 at goal. The agent
+    receives the same -1 whether it's building momentum or sitting
+    still. Sutton & Barto call this a "reward desert."
+    """
+
+    @property
+    def name(self): return "negative_only_reward"
+
+    @property
+    def description(self):
+        return ("All reward components are zero or negative. "
+                "No positive signal to guide learning.")
+
+    @property
+    def proof(self):
+        return FormalBasis(
+            proof_name="negative_reward_nonpositive_value",
+            strength=ProofStrength.VERIFIED,
+            statement=("max_reward ≤ 0 ∧ D > 0 → max_reward × D ≤ 0. "
+                       "Non-positive rewards yield non-positive value "
+                       "for every policy."),
+            parameters={"max_reward": "max(s.value)", "D": "discounted_steps"},
+        )
+
+    def applies_to(self, model):
+        return len(model.reward_sources) > 0
+
+    def check(self, model, config=None):
+        verdicts = []
+        if not model.reward_sources:
+            return verdicts
+
+        has_positive = any(s.value > 0 for s in model.reward_sources)
+        has_positive_range = any(
+            s.value_range and max(s.value_range) > 0
+            for s in model.reward_sources
+        )
+
+        if not has_positive and not has_positive_range:
+            verdicts.append(Verdict(
+                rule_name=self.name,
+                severity=Severity.CRITICAL,
+                message=("All reward sources are zero or negative. "
+                         "The agent has no positive signal to learn from. "
+                         "Every policy has negative expected return."),
+                details={"sources": [s.name for s in model.reward_sources],
+                         "values": [s.value for s in model.reward_sources]},
+                recommendation=("Add a positive reward for the desired "
+                                "behavior, or restructure as reward = "
+                                "max_penalty - actual_penalty so progress "
+                                "yields positive signal"),
+            ))
+        return verdicts
+
+
+class RewardDelayHorizon(Rule):
+    """Check if sparse terminal reward is discounted to near-zero.
+
+    A terminal reward at step T is worth R * gamma^T at step 0.
+    If gamma^T is tiny, the agent's value function at the start
+    of the episode assigns near-zero value to reaching the goal.
+    The agent cannot learn from a reward it cannot see.
+
+    Arjona-Medina et al. (NeurIPS 2019, RUDDER) proved that both
+    TD and MC methods are exponentially slowed by reward delay.
+    """
+
+    @property
+    def name(self): return "reward_delay_horizon"
+
+    @property
+    def description(self):
+        return ("Terminal goal reward is discounted to near-zero "
+                "by the time the agent could reach it")
+
+    @property
+    def proof(self):
+        return FormalBasis(
+            proof_name="discounted_reward_invisible",
+            strength=ProofStrength.VERIFIED,
+            statement=("γ^t × R < ε → the discounted reward is below "
+                       "the visibility threshold."),
+            parameters={"reward": "R", "discount": "γ^t",
+                        "threshold": "ε"},
+        )
+
+    def applies_to(self, model):
+        return (len(model.goal_sources) > 0 and
+                model.gamma < 1.0 and
+                model.max_steps > 0)
+
+    def check(self, model, config=None):
+        verdicts = []
+        for source in model.goal_sources:
+            # Earliest the goal can appear: estimate from discovery_probability
+            # If discovery prob is low, the expected first discovery is late
+            avg_discovery_step = max(1, int(model.max_steps * 0.5))
+
+            discounted_value = source.value * model.gamma ** avg_discovery_step
+            ratio = discounted_value / source.value if source.value > 0 else 1.0
+
+            if ratio < 0.01:
+                verdicts.append(Verdict(
+                    rule_name=self.name,
+                    severity=Severity.CRITICAL,
+                    message=(f"'{source.name}' ({source.value:+.1f}) at ~step "
+                             f"{avg_discovery_step} is discounted to "
+                             f"{discounted_value:+.6f} ({ratio:.4%} of "
+                             f"original). The agent cannot see this reward."),
+                    details={"source": source.name,
+                             "original_value": source.value,
+                             "discounted_value": discounted_value,
+                             "avg_step": avg_discovery_step},
+                    recommendation=(f"Increase gamma, add intermediate "
+                                    f"shaping rewards, or shorten the episode"),
+                ))
+            elif ratio < 0.1:
+                verdicts.append(Verdict(
+                    rule_name=self.name,
+                    severity=Severity.WARNING,
+                    message=(f"'{source.name}' ({source.value:+.1f}) at ~step "
+                             f"{avg_discovery_step} is discounted to "
+                             f"{discounted_value:+.4f} ({ratio:.1%} of "
+                             f"original). Weak signal."),
+                    details={"source": source.name,
+                             "discounted_value": discounted_value,
+                             "avg_step": avg_discovery_step},
+                    recommendation="Consider adding shaping or increasing gamma",
+                ))
+        return verdicts
+
+
 # Standard reward rule collection
 REWARD_RULES = [
     PenaltyDominatesGoal(),
@@ -1324,4 +1553,7 @@ REWARD_RULES = [
     RewardDominanceImbalance(),
     ExponentialSaturation(),
     IntrinsicDominance(),
+    DiscountHorizonMismatch(),
+    NegativeOnlyReward(),
+    RewardDelayHorizon(),
 ]
