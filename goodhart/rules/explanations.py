@@ -301,7 +301,7 @@ EXPLANATIONS = {
             "Fix: increase gamma (0.999 gives horizon 1000), add intermediate "
             "shaping rewards, or shorten the episode."
         ),
-        "examples": [],
+        "examples": ["discount_myopia", "long_horizon_sparse"],
         "papers": ["Hu et al. 2022 (ICML, discount factor in offline RL)",
                    "Kakade & Langford 2002 (effective planning horizon)"],
         "see_also": ["reward_delay_horizon", "exploration_threshold"],
@@ -337,7 +337,7 @@ EXPLANATIONS = {
             "Fix: add intermediate shaping rewards (PBRS is provably safe), "
             "increase gamma, or use return decomposition (RUDDER)."
         ),
-        "examples": [],
+        "examples": ["long_horizon_sparse", "nethack_deep_sparse"],
         "papers": ["Arjona-Medina et al. 2019 (NeurIPS, RUDDER)"],
         "see_also": ["discount_horizon_mismatch", "exploration_threshold"],
     },
@@ -510,7 +510,7 @@ EXPLANATIONS = {
             "Rule of thumb: embed_dim >= sqrt(n_states) for tabular-like "
             "coverage, but real performance depends on the state structure."
         ),
-        "examples": [],
+        "examples": ["nethack_deep_sparse"],
         "papers": ["Vaswani et al. 2017 (Transformer scaling)"],
     },
     "parallelism_effect": {
@@ -521,7 +521,7 @@ EXPLANATIONS = {
             "For PPO with num_workers > 1, the effective batch is collected across "
             "workers and may contain slightly stale data."
         ),
-        "examples": [],
+        "examples": ["ppo_37_details"],
         "papers": ["Espeholt et al. 2018 (IMPALA)", "Schulman et al. 2017"],
     },
     "recurrence_type": {
@@ -533,7 +533,7 @@ EXPLANATIONS = {
             "For most RL tasks, LSTM and GRU perform similarly. LSTM is the safer "
             "default for longer sequences (>100 steps)."
         ),
-        "examples": [],
+        "examples": ["nethack_deep_sparse"],
         "papers": ["Hochreiter & Schmidhuber 1997 (LSTM)", "Cho et al. 2014 (GRU)"],
     },
     "routing_floor_necessity": {
