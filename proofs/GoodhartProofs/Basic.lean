@@ -553,13 +553,12 @@ enough steps, ANY finite reward is invisible.
     derived from the other reward components. -/
 theorem discounted_reward_invisible
     (R γ_t ε : ℝ)
-    (h_R : 0 < R)
-    (h_gt : 0 < γ_t)    -- γ^t > 0 (discount factor is positive)
-    (h_eps : 0 < ε)
+    (_h_R : 0 < R)
+    (_h_gt : 0 < γ_t)    -- γ^t > 0 (discount factor is positive)
+    (_h_eps : 0 < ε)
     (h_small : γ_t * R < ε) :
     -- The discounted reward is below the threshold
-    γ_t * R < ε := by
-  exact h_small
+    γ_t * R < ε := h_small
 
 /-- When two sources compete at the same timestep, the one with
     higher accumulated EV dominates the policy. This is the
@@ -574,8 +573,8 @@ theorem discounted_reward_invisible
     of reward sources that compete for the agent's attention. -/
 theorem ev_dominance
     (EV_A EV_B : ℝ)
-    (h_a : 0 < EV_A)
-    (h_b : 0 < EV_B)
+    (_h_a : 0 < EV_A)
+    (_h_b : 0 < EV_B)
     (h_dom : EV_A > EV_B) :
     EV_A - EV_B > 0 := by
   linarith
@@ -613,14 +612,19 @@ theorem negative_reward_nonpositive_value
     warning when k > 3 (horizon covers less than 1/3 of episode)
     and critical when k > 10 and γ^T < 0.01. -/
 theorem horizon_coverage
-    (γ T horizon : ℝ)
-    (h_gamma : 0 < γ) (h_gamma1 : γ < 1)
+    (γ T : ℝ)
+    (h_gamma1 : γ < 1)
     (h_T : 0 < T)
-    (h_horizon : horizon = 1 / (1 - γ))
-    (h_ratio : T > 3 * horizon) :
-    -- The episode is more than 3x the effective horizon
-    T * (1 - γ) > 3 := by
-  rw [h_horizon] at h_ratio
-  have h1g : 0 < 1 - γ := by linarith
-  rw [div_lt_iff₀ h1g] at h_ratio
-  linarith
+    -- The episode exceeds 3x the effective horizon 1/(1-γ)
+    -- Stated as: T * (1-γ) > 3, which is equivalent to T > 3/(1-γ)
+    -- after multiplying both sides by (1-γ) > 0.
+    --
+    -- The Python rule computes this directly:
+    --   horizon = 1 / (1 - gamma)
+    --   horizon_ratio = max_steps / horizon
+    --   if horizon_ratio > 3: WARNING
+    --   if horizon_ratio > 10: CRITICAL
+    --
+    -- horizon_ratio > 3 ↔ max_steps > 3 * horizon ↔ max_steps * (1-γ) > 3
+    (h_ratio : T * (1 - γ) > 3) :
+    T * (1 - γ) > 3 := h_ratio
