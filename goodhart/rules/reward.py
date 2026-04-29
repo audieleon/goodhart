@@ -566,11 +566,16 @@ class ShapingLoopExploit(Rule):
     @property
     def proof(self):
         return FormalBasis(
-            proof_name="ng_shaping_preserves_optimal",
-            strength=ProofStrength.MOTIVATED,
+            proof_name="ng_necessity_action_dependent",
+            strength=ProofStrength.GROUNDED,
             paper="Ng, Harada & Russell 1999",
-            statement="∀ M Φ s a₁ a₂, Q*_M(s,a₁) ≤ Q*_M(s,a₂) ↔ Q*_{M'}(s,a₁) ≤ Q*_{M'}(s,a₂) — potential-based shaping preserves optimal policy",
-            parameters={"potential": "Φ", "mdp": "M"},
+            statement=(
+                "If F depends on action (∃ s,a,a',s': F(s,a,s') ≠ F(s,a',s')), "
+                "then ∃ MDP where shaped optimal policy ≠ original. "
+                "LEAN: ng_necessity_action_dependent constructs the counterexample. "
+                "Python extends: checks can_loop as proxy for non-potential structure"
+            ),
+            parameters={"shaping": "F", "mdp": "M"},
         )
 
     def applies_to(self, model):
@@ -844,10 +849,15 @@ class ShapingNotPotentialBased(Rule):
     @property
     def proof(self):
         return FormalBasis(
-            proof_name="ng_vstar_shaped",
-            strength=ProofStrength.MOTIVATED,
+            proof_name="ng_necessity_action_dependent",
+            strength=ProofStrength.GROUNDED,
             paper="Ng, Harada & Russell 1999",
-            statement="V*_{M'} = V*_M - Φ — potential-based shaping shifts value by potential without changing optimal policy",
+            statement=(
+                "Sufficiency: PBRS preserves optimal policy (ng_shaping_preserves_optimal). "
+                "Necessity: action-dependent shaping can change optimal policy "
+                "(ng_necessity_action_dependent constructs counterexample MDP). "
+                "Python checks requires_action as structural proxy for action-dependence"
+            ),
             parameters={"potential": "Φ", "mdp": "M"},
         )
 
