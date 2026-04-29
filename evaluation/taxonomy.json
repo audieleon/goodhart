@@ -1,0 +1,999 @@
+{
+  "generated": "2026-04-30",
+  "total_entries": 64,
+  "entries": [
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_allegro_hand.py",
+      "source": "eureka",
+      "name": "eureka_allegro_hand",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "no critical issues (PASS)",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_ant.py",
+      "source": "eureka",
+      "name": "eureka_ant",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "shaping with no terminal goal (critical),",
+      "criticals": 1,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "shaping_not_potential_based",
+        "compound_trap",
+        "exponential_saturation"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_anymal.py",
+      "source": "eureka",
+      "name": "eureka_anymal",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "no critical issues (PASS)",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_ball_balance.py",
+      "source": "eureka",
+      "name": "eureka_ball_balance",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "all components passive (critical), doing nothing",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_block_stack.py",
+      "source": "eureka",
+      "name": "eureka_block_stack",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "no critical issues (PASS), possible warnings",
+      "criticals": 0,
+      "warnings": 4,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_cartpole.py",
+      "source": "eureka",
+      "name": "eureka_cartpole",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "no critical issues (PASS)",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_franka_cabinet.py",
+      "source": "eureka",
+      "name": "eureka_franka_cabinet",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "no critical issues (PASS)",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_humanoid.py",
+      "source": "eureka",
+      "name": "eureka_humanoid",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "time penalty dominates alive bonus (critical),",
+      "criticals": 1,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "intrinsic_sufficiency"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_quadcopter.py",
+      "source": "eureka",
+      "name": "eureka_quadcopter",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "penalties 12x goal (critical), idle exploit",
+      "criticals": 3,
+      "warnings": 3,
+      "infos": 0,
+      "rules_fired": [
+        "penalty_dominates_goal",
+        "death_beats_survival",
+        "exploration_threshold",
+        "discount_horizon_mismatch",
+        "reward_delay_horizon",
+        "contradiction"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive distance reward creates idle floor",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_bottle_cap.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_bottle_cap",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive hand_distance_transformed_reward creates",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_catch_abreast.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_catch_abreast",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive grasp_reward creates idle floor (critical)",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_catch_underarm.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_catch_underarm",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive fingertip_reward (critical), vel_reward",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_door_close_inward.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_door_close_inward",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive hand_distance_rewards (critical),",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_door_close_outward.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_door_close_outward",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive alignment rewards if door starts aligned,",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_door_open_inward.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_door_open_inward",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive hand_handle_dist rewards (critical),",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_door_open_outward.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_door_open_outward",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive handle_reward (critical), redundant",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_grasp_and_place.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_grasp_and_place",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "instability penalty rewards idleness (critical),",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_kettle.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_kettle",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive handle rewards (critical), hardcoded",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_lift_underarm.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_lift_underarm",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive grasping_reward (critical), extreme",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_over.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_over",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "catch_reward compares position to velocity",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_pen.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_pen",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive hands_to_handles_reward (critical)",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_push_block.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_push_block",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive hand proximity rewards (critical)",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_re_orientation.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_re_orientation",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "no critical issues (PASS), clean rotation reward",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_scissors.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_scissors",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "unbounded opened_reward (critical), passive",
+      "criticals": 2,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "idle_exploit",
+        "contradiction"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_swing_cup.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_swing_cup",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive grasp_reward (critical), negative",
+      "criticals": 2,
+      "warnings": 2,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "idle_exploit",
+        "intrinsic_sufficiency",
+        "contradiction"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_shadow_hand_switch.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_switch",
+      "source_paper": "Ma et al. 2024 (ICLR), Eureka project \u2014 GPT-4 generated reward",
+      "expected": "passive touch_reward (critical), no task",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/heldout/heldout_agile_soccer.py",
+      "source": "heldout",
+      "name": "heldout_agile_soccer",
+      "source_paper": "Haarnoja et al. 2024, \"Learning Agile Soccer Skills for a",
+      "criticals": 2,
+      "warnings": 3,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "exploration_threshold",
+        "intrinsic_sufficiency",
+        "reward_delay_horizon",
+        "contradiction"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/heldout/heldout_curriculum_rl.py",
+      "source": "heldout",
+      "name": "heldout_curriculum_rl",
+      "source_paper": "CurriculumRL (EWRL 2025) \u2014 curriculum learning for RL",
+      "criticals": 0,
+      "warnings": 5,
+      "infos": 0,
+      "rules_fired": [
+        "exploration_threshold",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/heldout/heldout_eme_exploration.py",
+      "source": "heldout",
+      "name": "heldout_eme_exploration",
+      "source_paper": "EME Exploration (NeurIPS 2024) \u2014 intrinsic motivation",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/heldout/heldout_extreme_parkour.py",
+      "source": "heldout",
+      "name": "heldout_extreme_parkour",
+      "source_paper": "Cheng et al. 2024, \"Extreme Parkour with Legged Robots\"",
+      "criticals": 2,
+      "warnings": 2,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "intrinsic_sufficiency",
+        "reward_dominance_imbalance",
+        "batch_size_interaction"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/heldout/heldout_humanoid_parkour.py",
+      "source": "heldout",
+      "name": "heldout_humanoid_parkour",
+      "source_paper": "Zhuang, Yao, Zhao 2024, \"Humanoid Parkour Learning\"",
+      "criticals": 0,
+      "warnings": 2,
+      "infos": 0,
+      "rules_fired": [
+        "intrinsic_sufficiency",
+        "reward_dominance_imbalance"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/heldout/heldout_humanoid_saw.py",
+      "source": "heldout",
+      "name": "heldout_humanoid_saw",
+      "source_paper": "van Marum et al. 2024, \"Revisiting Reward Design and",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/heldout/heldout_omnigrasp.py",
+      "source": "heldout",
+      "name": "heldout_omnigrasp",
+      "source_paper": "Luo et al. 2024, \"Omnigrasp: Grasping Diverse Objects",
+      "expected": "shaping dominates goal (30x), making goal",
+      "criticals": 2,
+      "warnings": 4,
+      "infos": 2,
+      "rules_fired": [
+        "exploration_threshold",
+        "respawning_exploit",
+        "shaping_loop_exploit",
+        "shaping_not_potential_based",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/heldout/heldout_rapid_locomotion.py",
+      "source": "heldout",
+      "name": "heldout_rapid_locomotion",
+      "source_paper": "Margolis et al. 2022, \"Rapid Locomotion via Reinforcement",
+      "criticals": 1,
+      "warnings": 3,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "intrinsic_sufficiency",
+        "reward_dominance_imbalance",
+        "clip_fraction_risk"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/heldout/heldout_reward_machines.py",
+      "source": "heldout",
+      "name": "heldout_reward_machines",
+      "source_paper": "Reward Machines (NeurIPS 2024) \u2014 non-Markovian reward",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "advisory_goal_misgeneralization"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/heldout/heldout_rma_locomotion.py",
+      "source": "heldout",
+      "name": "heldout_rma_locomotion",
+      "source_paper": "Kumar et al. 2021, \"Rapid Motor Adaptation for Legged",
+      "criticals": 0,
+      "warnings": 2,
+      "infos": 0,
+      "rules_fired": [
+        "reward_dominance_imbalance",
+        "clip_fraction_risk"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_bicycle.py",
+      "source": "krakovna",
+      "name": "krakovna_bicycle",
+      "source_paper": "Randlov & Alstrom 1998",
+      "failure": "Agent rides in tight circles instead of reaching the goal.",
+      "mechanism": "Progress reward (distance decrease) without regression penalty.",
+      "domain": "Control / navigation",
+      "criticals": 4,
+      "warnings": 3,
+      "infos": 2,
+      "rules_fired": [
+        "exploration_threshold",
+        "respawning_exploit",
+        "shaping_loop_exploit",
+        "shaping_not_potential_based",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "discount_horizon_mismatch",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_block_moving.py",
+      "source": "krakovna",
+      "name": "krakovna_block_moving",
+      "source_paper": "Chopra 2018",
+      "failure": "Agent moves the table the block is sitting on, rather than the",
+      "mechanism": "Distance-to-target measured in the wrong reference frame.",
+      "domain": "Robotics / manipulation",
+      "criticals": 0,
+      "warnings": 6,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "shaping_not_potential_based",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "discount_horizon_mismatch",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_cartwheel.py",
+      "source": "krakovna",
+      "name": "krakovna_cartwheel",
+      "source_paper": "Jucys 2024",
+      "failure": "Ant does a cartwheel instead of jumping. The torso z-coordinate",
+      "mechanism": "Z-coordinate threshold used as proxy for \"jump height.\"",
+      "domain": "MuJoCo / locomotion",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "respawning_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_coast_runners.py",
+      "source": "krakovna",
+      "name": "krakovna_coast_runners",
+      "source_paper": "Amodei & Clark 2016",
+      "failure": "Agent drives in circles collecting sparse waypoint bonuses",
+      "mechanism": "Waypoint rewards respawn on a loop. The per-lap waypoint",
+      "domain": "Atari / racing",
+      "criticals": 2,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "respawning_exploit",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_football.py",
+      "source": "krakovna",
+      "name": "krakovna_football",
+      "source_paper": "Kurach et al 2019 (Google Research Football)",
+      "failure": "Agent learns to kick the ball out of bounds to trigger a",
+      "mechanism": "Sparse goal reward incentivizes any strategy that leads to",
+      "domain": "Simulated sports / multi-agent",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "discount_horizon_mismatch"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_go_pass.py",
+      "source": "krakovna",
+      "name": "krakovna_go_pass",
+      "source_paper": "Chew 2019",
+      "failure": "Agent learns to pass on every turn, never placing a stone.",
+      "mechanism": "Reward is average score across games. Passing forever",
+      "domain": "Board games",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 2,
+      "rules_fired": [
+        "exploration_threshold",
+        "advisory_nonstationarity"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_goal_classifiers.py",
+      "source": "krakovna",
+      "name": "krakovna_goal_classifiers",
+      "source_paper": "Singh 2019",
+      "failure": "Robot arm exploits a learned goal classifier by moving in a",
+      "mechanism": "Distance-based shaping toward a learned goal signal. The",
+      "domain": "Robotics / manipulation",
+      "criticals": 0,
+      "warnings": 4,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_half_cheetah_spinning.py",
+      "source": "krakovna",
+      "name": "krakovna_half_cheetah_spinning",
+      "source_paper": "Zhang et al 2021",
+      "failure": "Half Cheetah exploits MuJoCo contact overflow to achieve",
+      "mechanism": "Per-step velocity reward with no directional constraint.",
+      "domain": "Continuous control / locomotion",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_hide_and_seek.py",
+      "source": "krakovna",
+      "name": "krakovna_hide_and_seek",
+      "source_paper": "Baker et al 2019",
+      "failure": "Multi-agent hide-and-seek where agents discover physics",
+      "mechanism": "Binary win/lose terminal reward plus per-step survival.",
+      "domain": "Multi-agent / navigation",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 2,
+      "rules_fired": [
+        "exploration_threshold",
+        "advisory_nonstationarity"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_lego_stacking.py",
+      "source": "krakovna",
+      "name": "krakovna_lego_stacking",
+      "source_paper": "Popov et al 2017",
+      "failure": "Agent flips the block upside-down instead of stacking it on",
+      "mechanism": "Stacking proxy measures height of the bottom face of the",
+      "domain": "Robotics / manipulation",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_line_follower.py",
+      "source": "krakovna",
+      "name": "krakovna_line_follower",
+      "source_paper": "Vamplew 2004",
+      "failure": "Robot follows the line backward instead of forward.",
+      "mechanism": "On-track reward without directional constraint. The reward",
+      "domain": "Robotics / navigation",
+      "criticals": 4,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "penalty_dominates_goal",
+        "exploration_threshold",
+        "respawning_exploit",
+        "intrinsic_sufficiency",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_long_legs.py",
+      "source": "krakovna",
+      "name": "krakovna_long_legs",
+      "source_paper": "Ha 2018",
+      "failure": "Agent grows extremely long legs and falls toward the goal",
+      "mechanism": "Distance-to-goal reward combined with body modification",
+      "domain": "Evolutionary / morphology optimization",
+      "criticals": 1,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "shaping_not_potential_based",
+        "compound_trap",
+        "advisory_aggregation_trap"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_model_based_planner.py",
+      "source": "krakovna",
+      "name": "krakovna_model_based_planner",
+      "source_paper": "Mishra et al 2017",
+      "failure": "Agent plans through a learned world model and exploits the",
+      "mechanism": "Per-step task reward optimized via a learned dynamics model.",
+      "domain": "Model-based RL / control",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_montezuma_key.py",
+      "source": "krakovna",
+      "name": "krakovna_montezuma_key",
+      "source_paper": "Salimans & Chen 2018",
+      "failure": "Agent exploits an Atari emulator flaw to make the key",
+      "mechanism": "Sparse score reward on item collection, plus death",
+      "domain": "Atari / discrete control",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "discount_horizon_mismatch"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_montezuma_room.py",
+      "source": "krakovna",
+      "name": "krakovna_montezuma_room",
+      "source_paper": "Ecoffet et al 2019",
+      "failure": "Agent discovers a bug that lets it stay in a treasure room",
+      "mechanism": "Per-event score with items that erroneously respawn. Unlike",
+      "domain": "Atari / discrete control",
+      "criticals": 2,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "respawning_exploit",
+        "discount_horizon_mismatch"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_overkill.py",
+      "source": "krakovna",
+      "name": "krakovna_overkill",
+      "source_paper": "Toromanoff et al 2019",
+      "failure": "Agent stays at the beginning of the level killing the first",
+      "mechanism": "Score reward from kills without level-progress incentive.",
+      "domain": "Atari / action game",
+      "criticals": 3,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "respawning_exploit",
+        "discount_horizon_mismatch",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_pancake.py",
+      "source": "krakovna",
+      "name": "krakovna_pancake",
+      "source_paper": "Unity 2018",
+      "failure": "Agent throws the pancake as high as possible instead of",
+      "mechanism": "Time-away-from-surface used as proxy for a successful flip.",
+      "domain": "Simulated manipulation / physics",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_pinball_nudging.py",
+      "source": "krakovna",
+      "name": "krakovna_pinball_nudging",
+      "source_paper": "Lapuschkin et al 2019",
+      "failure": "Agent learns to nudge the pinball table so the ball",
+      "mechanism": "Per-event score from flipper hits and target switches.",
+      "domain": "Atari / discrete control",
+      "criticals": 2,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "respawning_exploit",
+        "respawning_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_reward_modeling_hero.py",
+      "source": "krakovna",
+      "name": "krakovna_reward_modeling_hero",
+      "source_paper": "Ibarz et al 2018",
+      "failure": "Agent shoots at a spider but deliberately barely misses,",
+      "mechanism": "Learned reward model provides per-step signal. The model",
+      "domain": "Atari / reward modeling",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_reward_modeling_mr.py",
+      "source": "krakovna",
+      "name": "krakovna_reward_modeling_mr",
+      "source_paper": "Ibarz et al 2018",
+      "failure": "Agent moves toward the key without ever grabbing it. The",
+      "mechanism": "Learned reward model provides per-step signal. The model",
+      "domain": "Atari / reward modeling",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_road_runner.py",
+      "source": "krakovna",
+      "name": "krakovna_road_runner",
+      "source_paper": "Saunders et al 2017",
+      "failure": "Agent commits suicide at the end of level 1 to avoid losing",
+      "mechanism": "Score reward without level-progress incentive. Level 2 is",
+      "domain": "Atari",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "staged_reward_plateau"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_roomba.py",
+      "source": "krakovna",
+      "name": "krakovna_roomba",
+      "source_paper": "Custard Smingleigh (anecdotal, widely cited)",
+      "failure": "Roomba drives backward to avoid triggering the front bumper",
+      "mechanism": "Speed reward with front-bumper penalty. Driving backward",
+      "domain": "Robotics / navigation",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_running_gaits.py",
+      "source": "krakovna",
+      "name": "krakovna_running_gaits",
+      "source_paper": "Kidzinski et al 2018 (Learning to Run challenge)",
+      "failure": "Agent develops bizarre, unnatural gaits (hopping, skipping,",
+      "mechanism": "Distance/time reward without naturalness constraint.",
+      "domain": "MuJoCo / biomechanics",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_soccer.py",
+      "source": "krakovna",
+      "name": "krakovna_soccer",
+      "source_paper": "Ng et al 1999",
+      "failure": "Agent learns to vibrate in place while touching the ball,",
+      "mechanism": "Ball-contact shaping reward. The agent receives reward for",
+      "domain": "Simulated sports / control",
+      "criticals": 2,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "respawning_exploit",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_sonic.py",
+      "source": "krakovna",
+      "name": "krakovna_sonic",
+      "source_paper": "Hesse et al 2018",
+      "failure": "Agent clips through walls to move rightward faster, earning",
+      "mechanism": "Per-step forward progress reward plus level completion",
+      "domain": "Atari / platformer",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_walker.py",
+      "source": "krakovna",
+      "name": "krakovna_walker",
+      "source_paper": "Lee et al 2021",
+      "failure": "Walker learns to hop on one leg instead of walking normally,",
+      "mechanism": "Speed-matching reward without style or naturalness penalty.",
+      "domain": "MuJoCo / locomotion",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exponential_saturation"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/krakovna/krakovna_wall_sensor_stack.py",
+      "source": "krakovna",
+      "name": "krakovna_wall_sensor_stack",
+      "source_paper": "Le Paine et al 2019",
+      "failure": "Agent is supposed to stack blocks to press a wall sensor,",
+      "mechanism": "Binary reward for sensor activation. The intended solution",
+      "domain": "Robotics / manipulation",
+      "criticals": 0,
+      "warnings": 5,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "discount_horizon_mismatch",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    }
+  ]
+}
