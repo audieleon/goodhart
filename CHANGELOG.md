@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+- `intrinsic_dominance` rule: flags when accumulated per-step intrinsic
+  reward (RND, ICM, curiosity) exceeds the terminal goal reward.
+  Based on Ng 1999 contrapositive. ProofStrength: Grounded.
+- 6 new examples: Pong curiosity, Unity noisy TV, MiniGrid noisy TV,
+  Montezuma skull dancing, Bank Heist explosions, ChopperCommand RND.
+- LEAN CI uses leanprover/lean-action (precompiled Mathlib).
+- LEAN CI now runs on PRs, not just push to main.
+
 ## [0.1.0] - 2026-04-26
 
 Initial release.

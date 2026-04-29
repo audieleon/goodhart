@@ -9,7 +9,7 @@ from goodhart.rules.reward import (
     PenaltyDominatesGoal, DeathBeatsSurvival, IdleExploit,
     ExplorationThreshold, RespawningExploit, DeathResetExploit,
     ShapingLoopExploit, IntrinsicSufficiency, BudgetSufficiency,
-    CompoundTrap,
+    CompoundTrap, IntrinsicDominance,
 )
 from goodhart.rules.training import (
     LearningRateRegime, CriticLearningRate, EntropyCollapse,
@@ -515,3 +515,66 @@ def test_no_contradiction_clean():
     ]
     contradictions = AnalysisEngine._check_contradictions(verdicts)
     assert len(contradictions) == 0
+
+
+# ---- Intrinsic Dominance ----
+
+class TestIntrinsicDominance:
+    rule = IntrinsicDominance()
+
+    def _make_model(self, goal, intrinsic, steps=1000, gamma=0.99,
+                    intentional=False):
+        model = EnvironmentModel(
+            name="test", max_steps=steps, gamma=gamma,
+            n_actions=8, action_type="discrete",
+        )
+        model.add_reward_source(RewardSource(
+            name="goal", reward_type=RewardType.TERMINAL, value=goal,
+            requires_action=True, intentional=True,
+            discovery_probability=0.05,
+        ))
+        model.add_reward_source(RewardSource(
+            name="intrinsic", reward_type=RewardType.PER_STEP,
+            value=intrinsic, respawn=RespawnBehavior.INFINITE,
+            requires_action=True, intentional=intentional,
+        ))
+        return model
+
+    def test_pong_like_critical(self):
+        """High intrinsic on long episode: 10x ratio = CRITICAL."""
+        model = self._make_model(goal=1.0, intrinsic=0.1, steps=18000)
+        verdicts = self.rule.check(model)
+        assert len(verdicts) == 1
+        assert verdicts[0].severity == Severity.CRITICAL
+
+    def test_warning_at_1x(self):
+        """Intrinsic ~= goal: WARNING."""
+        model = self._make_model(goal=1.0, intrinsic=0.05, steps=500)
+        verdicts = self.rule.check(model)
+        assert len(verdicts) == 1
+        assert verdicts[0].severity == Severity.WARNING
+
+    def test_clean_when_goal_dominates(self):
+        """Goal >> intrinsic: no finding."""
+        model = self._make_model(goal=10.0, intrinsic=0.001, steps=1000)
+        verdicts = self.rule.check(model)
+        assert len(verdicts) == 0
+
+    def test_intentional_skipped(self):
+        """Intentional per-step (alive bonus) should not trigger."""
+        model = self._make_model(goal=5.0, intrinsic=1.0, steps=2000,
+                                 intentional=True)
+        assert not self.rule.applies_to(model)
+
+    def test_no_goal_no_fire(self):
+        """No terminal goal: rule does not apply."""
+        model = EnvironmentModel(
+            name="test", max_steps=1000, gamma=0.99,
+            n_actions=8, action_type="discrete",
+        )
+        model.add_reward_source(RewardSource(
+            name="intrinsic", reward_type=RewardType.PER_STEP,
+            value=0.1, respawn=RespawnBehavior.INFINITE,
+            requires_action=True, intentional=False,
+        ))
+        assert not self.rule.applies_to(model)
