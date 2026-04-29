@@ -23,6 +23,9 @@ from goodhart.rules.reward import (
     RewardDominanceImbalance,
     ExponentialSaturation,
     IntrinsicDominance,
+    DiscountHorizonMismatch,
+    NegativeOnlyReward,
+    RewardDelayHorizon,
     REWARD_RULES,
 )
 from goodhart.rules.training import (
@@ -64,6 +67,7 @@ __all__ = [
     "ShapingLoopExploit", "ShapingNotPotentialBased", "ProxyRewardHackability",
     "IntrinsicSufficiency", "BudgetSufficiency", "CompoundTrap",
     "StagedRewardPlateau", "RewardDominanceImbalance", "ExponentialSaturation", "IntrinsicDominance",
+    "DiscountHorizonMismatch", "NegativeOnlyReward", "RewardDelayHorizon",
     "REWARD_RULES",
     # Training rules
     "LearningRateRegime", "CriticLearningRate", "EntropyCollapse",
