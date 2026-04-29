@@ -19,6 +19,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 - LEAN CI uses leanprover/lean-action (precompiled Mathlib).
 - LEAN CI runs on PRs, not just push to main.
 - Branch protection on main (PR + CI required).
+- Total theorems increased from 92 to 103.
+- Proved rules increased from 17 to 24 (13 verified, 7 grounded, 4 motivated).
+- Examples increased from 57 to 66.
+- Upgraded `shaping_loop_exploit` and `shaping_not_potential_based` from
+  Motivated to Grounded.
+- Added FormalBasis to `critic_lr_ratio`, `batch_size_interaction`,
+  `parallelism_effect`.
 
 ## [0.1.0] - 2026-04-26
 
@@ -40,16 +47,16 @@ Initial release.
 - `--verbose` mode with educational explanations for each finding
 - `--explain <rule>` for standalone rule deep-dives with examples and references
 - Contradiction detection across rule recommendations
-- 92 LEAN 4 theorems across 10 files, zero sorry
-- 17 rules linked to formal proofs via ProofStrength hierarchy
-  (9 verified, 3 grounded, 5 motivated)
+- 103 LEAN 4 theorems across 10 files, zero sorry
+- 24 rules linked to formal proofs via ProofStrength hierarchy
+  (13 verified, 7 grounded, 4 motivated)
 - Ng 1999 Theorem 1 formalization (sufficiency, necessity, general policy
   version, undiscounted extension)
 - Skalse 2022 Theorems 1-3 formalization (impossibility, existence,
   simplification, |Pi|=2 edge case)
 - MDP infrastructure (FiniteMDP, Bellman contraction via Banach fixed point)
 - 23 presets from published papers
-- 57 cookbook examples spanning 40+ papers from 1983-2025
+- 66 cookbook examples spanning 40+ papers from 1983-2025
 - Explanations database with learn_more context for all 40 rules
 - CLI with preset, config, check, rules, examples, explain, about, doctor,
   detect, json, quiet, verbose modes

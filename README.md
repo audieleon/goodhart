@@ -9,7 +9,7 @@
 > "When a measure becomes a target, it ceases to be a good measure."
 > -- Charles Goodhart (1975), generalized by Marilyn Strathern (1997)
 
-**Catch reward traps before training.** Goodhart runs 44 composable analysis rules on your RL reward configuration and reports degenerate equilibria, perverse incentives, and exploitable reward structures -- before you spend compute. 21 rules are backed by machine-verified LEAN 4 proofs (zero sorry), including formalizations of Ng 1999 and Skalse 2022.
+**Catch reward traps before training.** Goodhart runs 44 composable analysis rules on your RL reward configuration and reports degenerate equilibria, perverse incentives, and exploitable reward structures -- before you spend compute. 24 rules are backed by machine-verified LEAN 4 proofs (zero sorry), including formalizations of Ng 1999 and Skalse 2022.
 
 ## Installation
 
@@ -185,7 +185,7 @@ goodhart --explain X  # deep-dive on rule X
 - **4 architecture rules**: embedding capacity, routing floor necessity, recurrence type, actor count effect
 - **8 blind-spot advisories**: pattern-based hints about failure modes static analysis cannot detect (physics exploits, goal misgeneralization, credit assignment depth, constrained RL, non-stationarity, learned rewards, missing constraints, aggregation traps)
 
-Reward structure rules (15) are algorithm-agnostic — they analyze the MDP reward regardless of training algorithm. Training rules (13) cover PPO, APPO, DQN, SAC, DDPG, TD3, IMPALA, and A2C with algorithm-specific thresholds and checks.
+Reward structure rules (19) are algorithm-agnostic — they analyze the MDP reward regardless of training algorithm. Training rules (13) cover PPO, APPO, DQN, SAC, DDPG, TD3, IMPALA, and A2C with algorithm-specific thresholds and checks.
 
 ## What it catches vs. what it can't
 
@@ -208,7 +208,7 @@ Reward structure rules (15) are algorithm-agnostic — they analyze the MDP rewa
 
 ## Examples
 
-57 cookbook examples spanning 40+ published papers from 1983-2025:
+66 cookbook examples spanning 40+ published papers from 1983-2025:
 
 ```bash
 goodhart --examples              # list all
@@ -219,11 +219,11 @@ Examples include documented failures (CoastRunners, Humanoid, Mountain Car), pos
 
 ## Formal Proofs
 
-17 rules link to machine-verified LEAN 4 theorems (92 theorems, zero sorry). Each link has a strength level:
+24 rules link to machine-verified LEAN 4 theorems (103 theorems, zero sorry). Each link has a strength level:
 
-- **VERIFIED** (9 rules): The Python check is a direct instance of the theorem.
-- **GROUNDED** (3 rules): The theorem proves the core. Python extends with discounting and thresholds.
-- **MOTIVATED** (5 rules): The theorem proves WHY the issue matters. Python checks a structural heuristic.
+- **VERIFIED** (13 rules): The Python check is a direct instance of the theorem.
+- **GROUNDED** (7 rules): The theorem proves the core. Python extends with discounting and thresholds.
+- **MOTIVATED** (4 rules): The theorem proves WHY the issue matters. Python checks a structural heuristic.
 
 Key formalizations:
 
