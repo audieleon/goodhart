@@ -259,8 +259,46 @@ class EnvironmentModel:
 
     @property
     def total_step_penalty(self) -> float:
+        """Sum of negative per-step rewards, excluding multiplicative modifiers.
+
+        Multiplicative modifiers (modifier_type != "none") scale another
+        source's value rather than adding independently. Including them
+        in the additive sum double-counts their effect and produces
+        incorrect EV calculations (e.g., treating a 0.5x factor as -0.5
+        penalty).
+        """
         return sum(s.value for s in self.reward_sources
-                   if s.reward_type == RewardType.PER_STEP and s.value < 0)
+                   if s.reward_type == RewardType.PER_STEP
+                   and s.value < 0
+                   and s.modifier_type == "none")
+
+    @property
+    def independent_sources(self) -> list:
+        """Sources that contribute independently (not modifiers of others)."""
+        return [s for s in self.reward_sources
+                if s.modifier_type == "none"]
+
+    def effective_value(self, source: 'RewardSource') -> float:
+        """Compute the effective per-step value of a source after modifiers.
+
+        For a base source with multiplicative modifiers, the effective
+        value is: base_value * prod(1 + modifier_value) for each modifier.
+        For sources with no modifiers, returns the raw value.
+        """
+        if source.modifier_type != "none":
+            return 0.0  # Modifiers don't have independent value
+        modifiers = [s for s in self.reward_sources
+                     if s.modifies == source.name
+                     and s.modifier_type == "multiplicative"]
+        if not modifiers:
+            return source.value
+        # Multiplicative modifiers are factors in [0,1] applied to base
+        # Worst case for designer: all modifiers at their penalty value
+        factor = 1.0
+        for m in modifiers:
+            # modifier value is the penalty (e.g., -0.5 means p=0.5)
+            factor *= max(0.0, 1.0 + m.value)
+        return source.value * factor
 
     @property
     def max_goal_reward(self) -> float:

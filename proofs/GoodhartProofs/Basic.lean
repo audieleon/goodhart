@@ -447,7 +447,50 @@ theorem two_timescale_convergence
   rwa [ge_iff_le, le_div_iff₀ h_actor, one_mul]
 
 /-!
-## Theorem 21: Binomial Discovery Rate
+## Theorem 21: Multiplicative Reward Modifiers
+
+A multiplicative modifier scales a base reward by a factor p ∈ [0,1].
+The effective reward is base × p, not base + p. When p < 1, the
+modifier REDUCES the base reward but cannot make it negative (if
+base ≥ 0). This is different from an additive penalty, which can
+make the total negative.
+
+Key property: for base ≥ 0 and p ∈ [0,1], base × p ≥ 0.
+An additive model would compute base + (p-1)*base, which equals
+base*p but the intermediate sum base + penalty can be negative
+if penalty is treated independently. The multiplicative model
+preserves non-negativity.
+
+This justifies excluding multiplicative modifiers from additive
+EV sums: they don't contribute independently, they scale.
+-/
+
+/-- A multiplicative modifier with factor p ∈ [0,1] applied to a
+    non-negative base reward produces a non-negative result.
+    This is why multiplicative modifiers should not be summed
+    additively — they cannot make the total negative. -/
+theorem multiplicative_modifier_nonneg
+    (base p : ℝ)
+    (h_base : 0 ≤ base)
+    (h_p_lo : 0 ≤ p)
+    (_h_p_hi : p ≤ 1) :
+    0 ≤ base * p :=
+  mul_nonneg h_base h_p_lo
+
+/-- The effective value of a multiplicatively modified reward is
+    at most the base value (modifier can only reduce, not amplify). -/
+theorem multiplicative_modifier_bounded
+    (base p : ℝ)
+    (h_base : 0 ≤ base)
+    (h_p_lo : 0 ≤ p)
+    (h_p_hi : p ≤ 1) :
+    base * p ≤ base := by
+  calc base * p ≤ base * 1 := by
+        apply mul_le_mul_of_nonneg_left h_p_hi h_base
+    _ = base := mul_one base
+
+/-!
+## Theorem 22: Binomial Discovery Rate
 
 With n parallel actors each discovering the goal independently
 with probability p, the expected number of discoveries per

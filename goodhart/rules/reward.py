@@ -138,7 +138,8 @@ class DeathBeatsSurvival(Rule):
         passive_penalty = sum(s.value for s in model.reward_sources
                               if s.reward_type == RewardType.PER_STEP
                               and s.value < 0
-                              and not s.requires_action)
+                              and not s.requires_action
+                              and s.modifier_type == "none")
         return passive_penalty < 0 and model.death_probability > 0
 
     def check(self, model, config=None):
@@ -146,10 +147,12 @@ class DeathBeatsSurvival(Rule):
         # Net per-step reward for a PASSIVE agent (not taking actions).
         # Only count rewards that don't require action — a dead/idle agent
         # doesn't receive action-dependent bonuses like movement rewards.
+        # Exclude modifiers — they scale other sources, not independent.
         passive_positive = sum(s.value for s in model.reward_sources
                                if s.reward_type == RewardType.PER_STEP
                                and s.value > 0
-                               and not s.requires_action)
+                               and not s.requires_action
+                               and s.modifier_type == "none")
         net_per_step = model.total_step_penalty + passive_positive
         # If net per-step is positive even passively, surviving beats dying
         if net_per_step >= 0:
@@ -238,9 +241,12 @@ class IdleExploit(Rule):
 
     def check(self, model, config=None):
         verdicts = []
+        # Exclude multiplicative modifiers — they scale other sources,
+        # not independent additive contributions
         idle_sources = [s for s in model.reward_sources
                         if not s.requires_action
-                        and s.reward_type == RewardType.PER_STEP]
+                        and s.reward_type == RewardType.PER_STEP
+                        and s.modifier_type == "none"]
         # If all positive idle sources are intentional (e.g., survival reward),
         # getting reward for existing IS the design. Not an exploit.
         # But only skip if there ARE positive idle sources — an empty list
@@ -257,10 +263,13 @@ class IdleExploit(Rule):
         # random exploration earns). Default explore_fraction=0.0 is
         # conservative (assumes random exploration earns nothing from
         # intentional rewards like velocity tracking).
+        # Exclude modifiers — they don't add independently.
         explore_per_step = 0.0
         for s in model.reward_sources:
             if s.reward_type != RewardType.PER_STEP:
                 continue
+            if s.modifier_type != "none":
+                continue  # Skip multiplicative modifiers
             if s.intentional:
                 explore_per_step += s.value * s.explore_fraction
             else:
@@ -331,7 +340,8 @@ class ExplorationThreshold(Rule):
         passive_per_step = sum(s.value for s in model.reward_sources
                                if s.reward_type == RewardType.PER_STEP
                                and not s.requires_action
-                               and not s.intentional)
+                               and not s.intentional
+                               and s.modifier_type == "none")
         idle_rate = model.total_step_penalty + passive_per_step
         disc_idle = _discounted_steps(model.gamma, model.max_steps)
         ev_idle = idle_rate * disc_idle
