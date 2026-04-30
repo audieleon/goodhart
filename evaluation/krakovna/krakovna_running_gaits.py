@@ -1,17 +1,37 @@
 """Krakovna entry: Running gaits -- unusual locomotion strategies.
 
-Source: Kidzinski et al 2018 (Learning to Run challenge)
-Failure: Agent develops bizarre, unnatural gaits (hopping, skipping,
-  dragging limbs) instead of human-like running.
-Mechanism: Distance/time reward without naturalness constraint.
-  The objective is purely kinematic (maximize forward velocity),
-  so the agent exploits simulator physics to find gaits that are
-  efficient in simulation but physically impossible or unnatural.
-Domain: MuJoCo / biomechanics
+Forward velocity reward without naturalness constraints; agent
+develops bizarre gaits that exploit simulator physics.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_running_gaits",
+    "source_paper": (
+        'Kidzinski et al 2018, "Learning to Run Challenge"'
+    ),
+    "paper_url": "https://arxiv.org/abs/1804.00361",
+    "year": 2018,
+    "domain": "locomotion",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Forward velocity reward without naturalness constraint."
+        " Agent exploits simulator physics to find gaits that"
+        " are efficient in simulation but physically unnatural."
+    ),
+    "documented_failure": (
+        "Agent develops bizarre, unnatural gaits (hopping,"
+        " skipping, dragging limbs) instead of human-like"
+        " running."
+    ),
+    "failure_mechanism": "proxy_reward",
+    "detection_type": "structural",
+    "is_negative_example": False,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

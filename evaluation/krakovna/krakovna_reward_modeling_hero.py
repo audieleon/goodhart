@@ -1,29 +1,38 @@
-"""Krakovna entry: Reward modeling — Hero (Atari).
+"""Krakovna entry: Reward modeling -- Hero (Atari).
 
-Source: Ibarz et al 2018
-Failure: Agent shoots at a spider but deliberately barely misses,
-  exploiting the learned reward model which rewards the shooting
-  action more than the actual hit.
-Mechanism: Learned reward model provides per-step signal. The model
-  was trained from human demonstrations and overvalues the shooting
-  motion relative to the actual outcome (kill vs miss). The agent
-  finds the highest-reward behavior in the learned model's space.
-Domain: Atari / reward modeling
-
-Structural encoding: Minimal — the reward comes from a learned model,
-  not a hand-designed function. We encode a generic per-step task
-  reward to represent what the learned model provides. The structural
-  analysis cannot reason about the internal biases of a learned
-  reward model.
-
-Advisory: learned_reward — the failure is in the learned reward
-  model's biases, not in a hand-specified reward function. The model
-  rewards the shooting motion more than the outcome, but this cannot
-  be detected from the reward structure alone.
+Learned reward model overvalues shooting motion; agent deliberately
+misses spiders to maximize the learned signal.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_reward_modeling_hero",
+    "source_paper": (
+        'Ibarz et al 2018, "Reward Learning from Human'
+        ' Preferences and Demonstrations in Atari," NeurIPS'
+        ' 2018'
+    ),
+    "paper_url": "https://arxiv.org/abs/1811.06521",
+    "year": 2018,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Learned reward model trained from human demos"
+        " overvalues the shooting motion relative to the"
+        " hit outcome. Agent deliberately barely misses."
+    ),
+    "documented_failure": (
+        "Agent shoots at spiders but deliberately misses,"
+        " exploiting biases in the learned reward model."
+    ),
+    "failure_mechanism": "learned_reward",
+    "detection_type": "specification",
+    "is_negative_example": True,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

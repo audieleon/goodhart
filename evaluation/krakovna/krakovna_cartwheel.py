@@ -1,17 +1,45 @@
-"""Krakovna entry: Cartwheel Ant -- MuJoCo Ant does cartwheels.
-
-Source: Jucys 2024
-Failure: Ant does a cartwheel instead of jumping. The torso z-coordinate
-  exceeds the threshold, but via rotation rather than vertical leap.
-Mechanism: Z-coordinate threshold used as proxy for "jump height."
-  The Ant's body geometry allows it to achieve high torso z by
-  cartwheeling (rotating the body so limbs act as spokes), which
-  satisfies the threshold without any actual jumping.
-Domain: MuJoCo / locomotion
-"""
+"""Krakovna entry: Cartwheel Ant -- MuJoCo Ant does cartwheels."""
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_cartwheel",
+    "source_paper": "Jucys 2024 (informal, blog or video)",
+    "paper_url": None,
+    "year": 2024,
+    "domain": "locomotion",
+    "encoding_basis": "catalog_derived",
+    "verification_date": "2026-04-29",
+    "brief_summary": (
+        "MuJoCo Ant was supposed to jump. Instead it cartwheels,"
+        " achieving high torso z-coordinate via rotation rather"
+        " than vertical leap."
+    ),
+    "documented_failure": (
+        "Ant does cartwheels instead of jumping. Z-coordinate"
+        " threshold is satisfied by rotating the body so limbs"
+        " act as spokes, not by vertical displacement."
+    ),
+    "failure_mechanism": "proxy_reward",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "source_quality": (
+            "Informal source (Jucys 2024, blog/video). No"
+            " peer-reviewed paper. Encoding derived from Krakovna"
+            " catalog description."
+        ),
+        "z_threshold_bonus": (
+            "Per-step reward for torso z exceeding threshold."
+            " Cartwheeling satisfies this more easily than jumping."
+        ),
+    },
+}
 
 
 def run_example():

@@ -1,26 +1,37 @@
-"""Krakovna entry: Goal classifiers — robot arm exploits learned goal.
+"""Krakovna entry: Goal classifiers -- robot arm exploits learned goal.
 
-Source: Singh 2019
-Failure: Robot arm exploits a learned goal classifier by moving in a
-  peculiar way that triggers erroneous high-confidence goal detection.
-Mechanism: Distance-based shaping toward a learned goal signal. The
-  classifier provides the terminal "success" signal, so the agent
-  optimizes whatever triggers the classifier rather than the true goal.
-Domain: Robotics / manipulation
-
-Structural encoding: We encode the distance shaping and a terminal
-  goal reward. The structural issue is that the terminal signal comes
-  from a learned classifier, not ground truth. A static analysis tool
-  can flag the shaping-without-robust-terminal pattern, but cannot
-  detect that the terminal signal itself is exploitable.
-
-Advisory: learned_reward — the terminal goal signal is a learned
-  classifier, not a ground-truth check. The exploit is the classifier
-  being fooled, which is outside the scope of reward structure analysis.
+Agent fools a learned goal classifier by moving in ways that trigger
+false positives instead of achieving the true goal.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_goal_classifiers",
+    "source_paper": (
+        'Singh et al 2019, "End-to-End Robotic Reinforcement'
+        ' Learning without Reward Engineering"'
+    ),
+    "paper_url": "https://arxiv.org/abs/1904.07854",
+    "year": 2019,
+    "domain": "manipulation",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Learned goal classifier provides the terminal signal."
+        " Agent optimizes whatever triggers the classifier"
+        " rather than the true goal."
+    ),
+    "documented_failure": (
+        "Robot arm fools the learned goal classifier by"
+        " moving in ways that trigger false positives."
+    ),
+    "failure_mechanism": "learned_reward",
+    "detection_type": "specification",
+    "is_negative_example": True,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

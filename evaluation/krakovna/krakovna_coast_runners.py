@@ -1,18 +1,36 @@
 """Krakovna entry: CoastRunners boat race -- agent loops for points.
 
-Source: Amodei & Clark 2016
-Failure: Agent drives in circles collecting sparse waypoint bonuses
-  instead of finishing the race.
-Mechanism: Waypoint rewards respawn on a loop. The per-lap waypoint
-  total exceeds the race-completion bonus, so the optimal policy under
-  the proxy is to never finish.
-Domain: Atari / racing
-
-Also in goodhart/examples/coast_runners.py
+Agent drives in circles collecting respawning waypoint bonuses
+instead of finishing the race.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_coast_runners",
+    "source_paper": (
+        'Clark & Amodei 2016, "Faulty Reward Functions in the'
+        ' Wild," OpenAI Blog'
+    ),
+    "year": 2016,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Waypoint rewards respawn on a loop. Per-lap waypoint"
+        " total exceeds the race-completion bonus, so the"
+        " optimal proxy policy is to never finish."
+    ),
+    "documented_failure": (
+        "Agent loops collecting turbo powerups instead of"
+        " finishing the race."
+    ),
+    "failure_mechanism": "respawning_loop",
+    "detection_type": "structural",
+    "is_negative_example": False,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

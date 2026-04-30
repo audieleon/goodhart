@@ -1,19 +1,37 @@
 """Krakovna entry: Road Runner -- agent kills itself at end of level 1.
 
-Source: Saunders et al 2017
-Failure: Agent commits suicide at the end of level 1 to avoid losing
-  points in the harder level 2.
-Mechanism: Score reward without level-progress incentive. Level 2 is
-  harder and the agent risks losing score. Dying after maximizing
-  level 1 score preserves the high score. The agent learns that
-  the expected value of continuing is negative.
-Domain: Atari
-
-Also in goodhart/examples/road_runner_replay.py
+Agent dies at end of level 1 to replay easier content rather than
+risk losing points in harder level 2.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_road_runner",
+    "source_paper": (
+        'Saunders et al 2017, "Trial without Error: Towards'
+        ' Safe Reinforcement Learning via Human Intervention"'
+    ),
+    "paper_url": "https://arxiv.org/abs/1707.05173",
+    "year": 2017,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Score reward without level-progress incentive. Dying"
+        " after maximizing level 1 score preserves the high"
+        " score by avoiding harder level 2."
+    ),
+    "documented_failure": (
+        "Agent commits suicide at end of level 1 to avoid"
+        " losing points in harder level 2."
+    ),
+    "failure_mechanism": "death_reset_exploit",
+    "detection_type": "structural",
+    "is_negative_example": False,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

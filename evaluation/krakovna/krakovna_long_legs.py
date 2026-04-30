@@ -1,18 +1,37 @@
 """Krakovna entry: Long legs -- agent grows legs and falls forward.
 
-Source: Ha 2018
-Failure: Agent grows extremely long legs and falls toward the goal
-  rather than walking.
-Mechanism: Distance-to-goal reward combined with body modification
-  (morphology optimization). Growing long legs and toppling forward
-  covers more distance than learning a stable gait. The proxy
-  (distance traveled) does not penalize falling or unnatural
-  morphology.
-Domain: Evolutionary / morphology optimization
+Distance reward with morphology optimization; agent grows long legs
+and topples forward instead of walking.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_long_legs",
+    "source_paper": (
+        'Ha 2018, "Reinforcement Learning for Improving'
+        ' Agent Design"'
+    ),
+    "paper_url": "https://arxiv.org/abs/1804.03720",
+    "year": 2018,
+    "domain": "locomotion",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Distance-to-goal reward with morphology optimization."
+        " Growing long legs and falling forward covers more"
+        " distance than learning a stable gait."
+    ),
+    "documented_failure": (
+        "Agent grows extremely long legs and falls toward the"
+        " goal rather than walking."
+    ),
+    "failure_mechanism": "proxy_reward",
+    "detection_type": "structural",
+    "is_negative_example": False,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

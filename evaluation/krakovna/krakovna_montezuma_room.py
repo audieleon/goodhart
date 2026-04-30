@@ -1,27 +1,34 @@
 """Krakovna entry: Montezuma's Revenge treasure room exploit.
 
-Source: Ecoffet et al 2019
-Failure: Agent discovers a bug that lets it stay in a treasure room
-  where items respawn infinitely, collecting unlimited points.
-Mechanism: Per-event score with items that erroneously respawn. Unlike
-  the key glitch (Salimans & Chen 2018), this IS structurally encodable
-  as a respawning reward exploit: the agent found a state where
-  collectibles have respawn=INFINITE, and it farms them.
-Domain: Atari / discrete control
-
-Structural encoding: We encode the treasure room items with
-  respawn=INFINITE to capture the actual dynamics the agent exploits.
-  This is the effective behavior — whether caused by a bug or by
-  design, the agent sees infinitely respawning rewards and farms them.
-  The tool should flag this as a respawning exploit.
-
-Advisory: The root cause is an emulator bug (items should not respawn).
-  But the exploit IS structurally a respawning-reward farm, which our
-  tool can detect and flag.
+Treasure room items respawn infinitely; agent farms them for
+unlimited points instead of exploring.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_montezuma_room",
+    "source_paper": 'Ecoffet et al 2019, "Go-Explore"',
+    "paper_url": "https://arxiv.org/abs/1901.10995",
+    "year": 2019,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Treasure room items respawn infinitely (emulator bug)."
+        " Encoded as respawning reward to capture the effective"
+        " dynamics the agent exploits."
+    ),
+    "documented_failure": (
+        "Agent stays in treasure room farming infinitely"
+        " respawning items for unlimited score."
+    ),
+    "failure_mechanism": "respawning_loop",
+    "detection_type": "structural",
+    "is_negative_example": False,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

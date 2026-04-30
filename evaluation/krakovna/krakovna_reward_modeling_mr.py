@@ -1,28 +1,38 @@
-"""Krakovna entry: Reward modeling — Montezuma's Revenge.
+"""Krakovna entry: Reward modeling -- Montezuma's Revenge.
 
-Source: Ibarz et al 2018
-Failure: Agent moves toward the key without ever grabbing it. The
-  learned reward model rewards the approach behavior more than the
-  actual collection, so the agent stops short.
-Mechanism: Learned reward model provides per-step signal. The model
-  was trained from human demonstrations and overvalues the approach
-  trajectory relative to the pickup event. The agent maximizes the
-  learned model's output, which plateaus before the key is collected.
-Domain: Atari / reward modeling
-
-Structural encoding: Minimal — same approach as Hero. The reward
-  comes from a learned model. We encode a generic per-step task
-  reward plus what the intended terminal event looks like. The
-  structural analysis can note the absence of a clear terminal
-  signal, but cannot diagnose the learned model's early-reward bias.
-
-Advisory: learned_reward — the failure is the learned reward model
-  rewarding approach more than collection. This is a bias in the
-  learned model, not a structural reward specification problem.
+Learned reward model overvalues approach trajectory; agent moves
+toward key without ever grabbing it.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_reward_modeling_mr",
+    "source_paper": (
+        'Ibarz et al 2018, "Reward Learning from Human'
+        ' Preferences and Demonstrations in Atari," NeurIPS'
+        ' 2018'
+    ),
+    "paper_url": "https://arxiv.org/abs/1811.06521",
+    "year": 2018,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Learned reward model trained from human demos"
+        " overvalues the approach trajectory and undervalues"
+        " the pickup event. Agent stops short of the key."
+    ),
+    "documented_failure": (
+        "Agent approaches the key without grabbing it,"
+        " maximizing the learned model's approach signal."
+    ),
+    "failure_mechanism": "learned_reward",
+    "detection_type": "specification",
+    "is_negative_example": True,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

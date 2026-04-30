@@ -1,29 +1,57 @@
-"""Krakovna entry: Wall sensor stack — tricking the sensor.
-
-Source: Le Paine et al 2019
-Failure: Agent is supposed to stack blocks to press a wall sensor,
-  but instead discovers an environment bug that lets it activate the
-  sensor directly by pressing it in a precise way, bypassing the
-  intended stacking behavior.
-Mechanism: Binary reward for sensor activation. The intended solution
-  requires stacking blocks high enough to reach and press the sensor.
-  The environment bug allows direct sensor activation without stacking.
-Domain: Robotics / manipulation
-
-Structural encoding: We encode the binary sensor activation as a
-  terminal reward and a distance shaping signal toward the sensor.
-  The reward structure itself is minimal and correct — activate the
-  sensor. The exploit is an environment dynamics bug that provides
-  an unintended shortcut.
-
-Advisory: The exploit is an environment bug (sensor can be tricked
-  without stacking). The reward function correctly specifies the goal
-  (press the sensor). Structural analysis would not flag this — the
-  reward is not misspecified, the environment dynamics are broken.
-"""
+"""Krakovna entry: Wall sensor stack -- tricking the sensor."""
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_wall_sensor_stack",
+    "source_paper": (
+        'Paine et al. 2019, "Making Efficient Use of Demonstrations'
+        ' to Solve Hard Exploration Problems," R2D3'
+    ),
+    "paper_url": "https://arxiv.org/abs/1909.01387",
+    "year": 2019,
+    "domain": "manipulation",
+    "encoding_basis": "catalog_derived",
+    "verification_date": "2026-04-29",
+    "brief_summary": (
+        "Agent was supposed to stack blocks to press a wall sensor."
+        " Instead it discovered an environment bug that activates"
+        " the sensor directly, bypassing stacking."
+    ),
+    "documented_failure": (
+        "Agent tricks the wall sensor without stacking blocks."
+        " The reward (binary sensor activation) correctly specifies"
+        " the goal, but the environment provides an unintended"
+        " shortcut."
+    ),
+    "failure_mechanism": "environment_bug",
+    "detection_type": "dynamic",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Fix the environment bug that allows direct sensor"
+        " activation. The reward function itself is correct."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "source_quality": (
+            "Paper is known (Paine et al 2019, R2D3, arxiv:1909.01387)"
+            " but reward details not read in depth. Encoding derived"
+            " from Krakovna catalog description."
+        ),
+        "sensor_activation": (
+            "Binary terminal reward. The reward is correctly specified"
+            " -- the exploit is in the environment dynamics, not the"
+            " reward function."
+        ),
+        "structural_limitation": (
+            "This is an environment_bug, not a reward misspecification."
+            " Structural reward analysis cannot detect this failure."
+        ),
+    },
+}
 
 
 def run_example():

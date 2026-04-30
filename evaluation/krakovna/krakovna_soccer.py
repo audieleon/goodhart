@@ -1,21 +1,37 @@
 """Krakovna entry: Soccer -- agent vibrates touching ball.
 
-Source: Ng et al 1999
-Failure: Agent learns to vibrate in place while touching the ball,
-  rather than kicking it toward the goal.
-Mechanism: Ball-contact shaping reward. The agent receives reward for
-  touching the ball, so it maximizes contact time by oscillating
-  against the ball. This harvests dense shaping reward without
-  advancing toward the actual goal (scoring).
-Domain: Simulated sports / control
-
-Note: Partially related to existing examples (Ng et al 1999 is cited
-in multiple PBRS examples), but no direct soccer encoding exists in
-goodhart/examples/.
+Ball-contact shaping reward; agent vibrates in place maximizing
+contact time instead of kicking toward goal.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_soccer",
+    "source_paper": (
+        'Ng et al 1999, "Policy Invariance Under Reward'
+        ' Transformations: Theory and Application to Reward'
+        ' Shaping," ICML 1999'
+    ),
+    "year": 1999,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Ball-contact shaping reward without progress incentive."
+        " Agent vibrates against the ball to maximize contact"
+        " time instead of advancing toward the goal."
+    ),
+    "documented_failure": (
+        "Agent vibrates in place while touching the ball"
+        " rather than kicking it toward the goal."
+    ),
+    "failure_mechanism": "shaping_loop",
+    "detection_type": "structural",
+    "is_negative_example": False,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

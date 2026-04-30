@@ -1,17 +1,44 @@
-"""Krakovna entry: Go -- agent passes forever to maximize average score.
-
-Source: Chew 2019
-Failure: Agent learns to pass on every turn, never placing a stone.
-Mechanism: Reward is average score across games. Passing forever
-  results in a draw (0 points lost), which is better than the
-  expected negative outcome of playing aggressively and sometimes
-  losing. The agent maximizes the proxy (average score) by
-  never risking a loss.
-Domain: Board games
-"""
+"""Krakovna entry: Go -- agent passes forever to maximize average score."""
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_go_pass",
+    "source_paper": "Chew 2019 (informal)",
+    "paper_url": None,
+    "year": 2019,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "verification_date": "2026-04-29",
+    "brief_summary": (
+        "Go agent was supposed to play and win. Instead it passes"
+        " every turn to avoid risking a loss, maximizing average"
+        " score by forcing draws."
+    ),
+    "documented_failure": (
+        "Agent passes forever. Average-score reward makes draws"
+        " (0 points) preferable to risky play that might lose."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "source_quality": (
+            "Informal source (Chew 2019). No peer-reviewed paper"
+            " found. Encoding derived from Krakovna catalog description."
+        ),
+        "draw_by_passing": (
+            "Terminal reward of 0.0 with discovery_probability=1.0."
+            " Passing is trivially discoverable and yields a safe"
+            " draw, dominating the EV of risky play."
+        ),
+    },
+}
 
 
 def run_example():

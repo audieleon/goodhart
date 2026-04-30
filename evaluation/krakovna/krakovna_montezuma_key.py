@@ -1,27 +1,37 @@
 """Krakovna entry: Montezuma's Revenge key glitch.
 
-Source: Salimans & Chen 2018
-Failure: Agent exploits an Atari emulator flaw to make the key
-  re-appear after collection, harvesting score repeatedly.
-Mechanism: Sparse score reward on item collection, plus death
-  penalty. The reward structure is standard for Atari — on_event
-  score per collection. The exploit is an emulator bug that causes
-  items to respawn when they should not.
-Domain: Atari / discrete control
-
-Structural encoding: We encode the score-per-collection as an
-  on_event reward with respawn=NONE (the intended behavior). The
-  actual exploit is that the emulator erroneously allows the key
-  to respawn. If we encoded respawn=INFINITE, the tool would flag
-  it — but that respawn behavior is a bug, not a design choice.
-
-Advisory: The exploit is an emulator bug, not a reward structure
-  problem. The reward correctly gives points for key collection;
-  the emulator incorrectly allows re-collection.
+Emulator bug causes the key to respawn after collection; agent
+harvests score repeatedly from the same item.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_montezuma_key",
+    "source_paper": (
+        'Salimans & Chen 2018, "Learning Montezuma\'s Revenge'
+        ' from a Single Demonstration"'
+    ),
+    "paper_url": "https://arxiv.org/abs/1812.03381",
+    "year": 2018,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Standard Atari score reward. The exploit is an"
+        " emulator bug causing the key to respawn, not a"
+        " reward specification problem."
+    ),
+    "documented_failure": (
+        "Agent exploits emulator flaw to make the key"
+        " re-appear after collection."
+    ),
+    "failure_mechanism": "environment_bug",
+    "detection_type": "dynamic",
+    "is_negative_example": True,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

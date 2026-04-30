@@ -1,19 +1,36 @@
 """Krakovna entry: Lego stacking -- agent flips block instead of stacking.
 
-Source: Popov et al 2017
-Failure: Agent flips the block upside-down instead of stacking it on
-  top of another block.
-Mechanism: Stacking proxy measures height of the bottom face of the
-  block. Flipping the block achieves the target bottom-face height
-  without performing actual stacking. The proxy conflates "bottom
-  face is high" with "block is on top of another block."
-Domain: Robotics / manipulation
-
-Also in goodhart/examples/block_stacking.py
+Proxy measures bottom-face height; agent flips block upside-down
+to satisfy the proxy without actual stacking.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_lego_stacking",
+    "source_paper": (
+        'Popov et al 2017, "Data-efficient Deep Reinforcement'
+        ' Learning for Dexterous Manipulation," DeepMind'
+    ),
+    "paper_url": "https://arxiv.org/abs/1704.03073",
+    "year": 2017,
+    "domain": "manipulation",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Stacking proxy measures bottom-face height. Flipping"
+        " the block achieves the target height without stacking."
+    ),
+    "documented_failure": (
+        "Agent flips the block upside-down instead of stacking"
+        " it on top of another block."
+    ),
+    "failure_mechanism": "proxy_reward",
+    "detection_type": "structural",
+    "is_negative_example": False,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

@@ -1,16 +1,44 @@
-"""Krakovna entry: Line following robot -- goes backward along the line.
-
-Source: Vamplew 2004
-Failure: Robot follows the line backward instead of forward.
-Mechanism: On-track reward without directional constraint. The reward
-  function gives a bonus for staying on the line but does not encode
-  which direction to travel. Going backward is equally rewarded,
-  and may be preferred if the forward path is harder.
-Domain: Robotics / navigation
-"""
+"""Krakovna entry: Line following robot -- goes backward along the line."""
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_line_follower",
+    "source_paper": "Vamplew 2004",
+    "paper_url": None,
+    "year": 2004,
+    "domain": "control",
+    "encoding_basis": "catalog_derived",
+    "verification_date": "2026-04-29",
+    "brief_summary": (
+        "Robot was supposed to follow a line forward. Instead it"
+        " reversed because on-track reward had no directional"
+        " constraint."
+    ),
+    "documented_failure": (
+        "Robot follows the line backward. On-track reward gives"
+        " bonus for staying on the line regardless of direction."
+        " Going backward is equally rewarded."
+    ),
+    "failure_mechanism": "specification_gap",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "source_quality": (
+            "Vamplew 2004. Paper is known but not read in detail."
+            " Encoding derived from Krakovna catalog description."
+        ),
+        "on_track_bonus": (
+            "Per-step reward for staying on the line, direction-"
+            "agnostic. Going backward collects the same reward."
+        ),
+    },
+}
 
 
 def run_example():

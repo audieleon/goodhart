@@ -1,18 +1,37 @@
 """Krakovna entry: Bicycle riding in circles.
 
-Source: Randlov & Alstrom 1998
-Failure: Agent rides in tight circles instead of reaching the goal.
-Mechanism: Progress reward (distance decrease) without regression penalty.
-  The agent can repeatedly harvest shaping reward by orbiting the goal,
-  decreasing distance on approach and increasing on retreat, with only
-  the decrease rewarded.
-Domain: Control / navigation
-
-Also in goodhart/examples/bicycle_circles.py
+Agent orbits the goal harvesting distance-decrease shaping reward
+instead of reaching the destination.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_bicycle",
+    "source_paper": (
+        'Randlov & Alstrom 1998, "Learning to Drive a Bicycle'
+        ' using Reinforcement Learning and Shaping," ICML 1998'
+    ),
+    "year": 1998,
+    "domain": "control",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Distance-decrease shaping without regression penalty."
+        " Agent orbits the goal, harvesting shaping reward on"
+        " each approach without ever arriving."
+    ),
+    "documented_failure": (
+        "Agent rides in tight circles instead of reaching the"
+        " goal. Orbiting repeatedly triggers the distance-"
+        "decrease shaping reward."
+    ),
+    "failure_mechanism": "shaping_loop",
+    "detection_type": "structural",
+    "is_negative_example": False,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

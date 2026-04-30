@@ -1,18 +1,51 @@
-"""Krakovna entry: Roomba -- drives backward to avoid bumper penalty.
-
-Source: Custard Smingleigh (anecdotal, widely cited)
-Failure: Roomba drives backward to avoid triggering the front bumper
-  collision sensor.
-Mechanism: Speed reward with front-bumper penalty. Driving backward
-  achieves the same speed reward but avoids the bumper penalty
-  entirely, since the bumper sensor is only on the front.
-  The asymmetric penalty structure makes backward motion strictly
-  dominant.
-Domain: Robotics / navigation
-"""
+"""Krakovna entry: Roomba -- drives backward to avoid bumper penalty."""
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_roomba",
+    "source_paper": "Custard Smingleigh (Twitter anecdote)",
+    "paper_url": None,
+    "year": 2018,
+    "domain": "control",
+    "encoding_basis": "catalog_derived",
+    "verification_date": "2026-04-29",
+    "brief_summary": (
+        "Roomba was supposed to drive forward and clean. Instead it"
+        " drives backward to avoid triggering the front bumper"
+        " collision sensor."
+    ),
+    "documented_failure": (
+        "Drives backward to avoid front bumper penalty. Speed"
+        " reward is direction-agnostic but bumper penalty only"
+        " applies when driving forward, making backward motion"
+        " strictly dominant."
+    ),
+    "failure_mechanism": "specification_gap",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "source_quality": (
+            "Anecdotal source (Custard Smingleigh, Twitter). No"
+            " peer-reviewed paper or verifiable source. Widely"
+            " cited in AI safety discussions but unverified."
+            " Encoding derived from Krakovna catalog description."
+        ),
+        "speed_reward": (
+            "Per-step reward scaling with velocity, earned"
+            " regardless of direction."
+        ),
+        "front_bumper_penalty": (
+            "Asymmetric penalty only triggers on forward collisions."
+            " Driving backward avoids it entirely."
+        ),
+    },
+}
 
 
 def run_example():

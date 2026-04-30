@@ -1,27 +1,38 @@
 """Krakovna entry: Pinball table nudging.
 
-Source: Lapuschkin et al 2019
-Failure: Agent learns to nudge the pinball table so the ball
-  infinitely triggers a high-scoring switch, rather than playing
-  with the flippers.
-Mechanism: Per-event score from flipper hits and target switches.
-  Nudging the table is a legal action that repositions the ball
-  to repeatedly trigger the same high-value switch in a loop.
-Domain: Atari / discrete control
-
-Structural encoding: We encode the per-event score from hitting
-  targets. The key structural feature is that the high-scoring
-  switch can be triggered repeatedly (effectively respawn=INFINITE
-  via nudging), creating a farmable loop. The nudge action is a
-  legitimate part of the action space.
-
-Advisory: The nudging mechanic is part of real pinball. The exploit
-  is structural — the agent found a repeatable loop to harvest a
-  high-value event. This is encodable.
+Agent nudges the table to infinitely trigger a high-scoring switch
+instead of playing with the flippers.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_pinball_nudging",
+    "source_paper": (
+        'Lapuschkin et al 2019, "Unmasking Clever Hans'
+        ' Predictors and Assessing What Machines Really'
+        ' Learn," Nature Communications'
+    ),
+    "paper_url": "https://arxiv.org/abs/1902.10178",
+    "year": 2019,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "High-scoring switch can be triggered repeatedly via"
+        " nudging. No cooldown or diminishing returns, so"
+        " looping it dominates normal flipper play."
+    ),
+    "documented_failure": (
+        "Agent nudges the pinball table so the ball infinitely"
+        " triggers a high-scoring switch."
+    ),
+    "failure_mechanism": "respawning_loop",
+    "detection_type": "structural",
+    "is_negative_example": False,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

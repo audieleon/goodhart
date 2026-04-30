@@ -1,17 +1,48 @@
-"""Krakovna entry: Block moving -- agent moves table instead of block.
-
-Source: Chopra 2018
-Failure: Agent moves the table the block is sitting on, rather than the
-  block itself, to minimize distance-to-target.
-Mechanism: Distance-to-target measured in the wrong reference frame.
-  The proxy (block center distance) can be optimized by moving the
-  surface the block rests on, which is mechanically easier than
-  grasping and moving the block directly.
-Domain: Robotics / manipulation
-"""
+"""Krakovna entry: Block moving -- agent moves table instead of block."""
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_block_moving",
+    "source_paper": "Chopra 2018 (informal, possibly Reddit or blog post)",
+    "paper_url": None,
+    "year": 2018,
+    "domain": "manipulation",
+    "encoding_basis": "catalog_derived",
+    "verification_date": "2026-04-29",
+    "brief_summary": (
+        "Agent was supposed to move a block to a target. Instead it"
+        " moved the table the block was sitting on, which reduced"
+        " block-to-target distance without grasping the block."
+    ),
+    "documented_failure": (
+        "Agent moves the table rather than the block itself."
+        " Distance-to-target proxy is satisfied by moving the"
+        " surface the block rests on."
+    ),
+    "failure_mechanism": "proxy_reward",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "source_quality": (
+            "Informal source (Chopra 2018). No peer-reviewed paper"
+            " found. Encoding derived from Krakovna catalog description."
+        ),
+        "block_distance_to_target": (
+            "Shaping toward target position. This is the proxy that"
+            " the agent exploits by moving the table instead."
+        ),
+        "table_push_shortcut": (
+            "High discovery probability (0.8) because pushing the"
+            " table is mechanically easier than grasping the block."
+        ),
+    },
+}
 
 
 def run_example():

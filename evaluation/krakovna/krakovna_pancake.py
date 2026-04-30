@@ -1,17 +1,45 @@
-"""Krakovna entry: Pancake flipping -- agent throws pancake to ceiling.
-
-Source: Unity 2018
-Failure: Agent throws the pancake as high as possible instead of
-  flipping it and catching it.
-Mechanism: Time-away-from-surface used as proxy for a successful flip.
-  Maximizing airtime is easier than executing a controlled flip and
-  catch. The agent discovers that launching the pancake vertically
-  maximizes the proxy without any intent to catch.
-Domain: Simulated manipulation / physics
-"""
+"""Krakovna entry: Pancake flipping -- agent throws pancake high."""
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_pancake",
+    "source_paper": "Unity 2018 (ML-Agents demo)",
+    "paper_url": None,
+    "year": 2018,
+    "domain": "manipulation",
+    "encoding_basis": "catalog_derived",
+    "verification_date": "2026-04-29",
+    "brief_summary": (
+        "Agent was supposed to flip a pancake and catch it. Instead"
+        " it throws the pancake as high as possible to maximize"
+        " airtime proxy."
+    ),
+    "documented_failure": (
+        "Agent launches pancake vertically instead of flipping."
+        " Airtime proxy is maximized by throwing, not by"
+        " executing a controlled flip and catch."
+    ),
+    "failure_mechanism": "proxy_reward",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "source_quality": (
+            "Informal source (Unity 2018, ML-Agents demo). Not a"
+            " peer-reviewed paper. Encoding derived from Krakovna"
+            " catalog description."
+        ),
+        "airtime": (
+            "Per-step reward scaling with z-position. Throwing"
+            " maximizes this without any catch behavior."
+        ),
+    },
+}
 
 
 def run_example():

@@ -1,28 +1,38 @@
 """Krakovna entry: Model-based planner exploiting learned world model.
 
-Source: Mishra et al 2017
-Failure: Agent plans through a learned world model and exploits the
-  worst-modeled regions to achieve high predicted reward that does
-  not transfer to the real environment.
-Mechanism: Per-step task reward optimized via a learned dynamics model.
-  The agent finds trajectories where the model's prediction errors
-  are systematically biased upward, yielding high predicted return
-  but poor real-world performance.
-Domain: Model-based RL / control
-
-Structural encoding: We encode the task reward as a per-step signal.
-  The reward structure itself is straightforward. The exploit occurs
-  because the agent optimizes through a learned model that has
-  systematic prediction errors in underexplored regions.
-
-Advisory: learned_reward — the failure is in the learned dynamics
-  model, not the reward specification. The planner optimizes reward
-  correctly, but the model it plans through is wrong in exploitable
-  ways. This is outside the scope of reward structure analysis.
+Agent exploits systematic prediction errors in a learned dynamics
+model to achieve high predicted (but not real) reward.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_model_based_planner",
+    "source_paper": (
+        'Mishra et al 2017, "Prediction and Control with'
+        ' Temporal Segment Models"'
+    ),
+    "paper_url": "https://arxiv.org/abs/1703.04070",
+    "year": 2017,
+    "domain": "control",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Reward structure is straightforward. Agent exploits"
+        " systematic biases in a learned dynamics model to"
+        " achieve high predicted but poor real reward."
+    ),
+    "documented_failure": (
+        "Agent finds trajectories where model prediction"
+        " errors are biased upward, yielding high predicted"
+        " return but poor real-world performance."
+    ),
+    "failure_mechanism": "learned_reward",
+    "detection_type": "specification",
+    "is_negative_example": True,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

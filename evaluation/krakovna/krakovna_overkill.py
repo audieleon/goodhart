@@ -1,17 +1,34 @@
 """Krakovna entry: Overkill -- agent farms first enemy instead of progressing.
 
-Source: Toromanoff et al 2019
-Failure: Agent stays at the beginning of the level killing the first
-  respawning enemy repeatedly, instead of progressing through the level.
-Mechanism: Score reward from kills without level-progress incentive.
-  The first enemy respawns, providing an unlimited source of score.
-  Farming this enemy is lower-risk and higher-EV than navigating
-  further into the level.
-Domain: Atari / action game
+First enemy respawns, so agent farms it repeatedly instead of
+progressing through the level.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_overkill",
+    "source_paper": "Toromanoff et al 2019",
+    "paper_url": "https://arxiv.org/abs/1904.04640",
+    "year": 2019,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Score reward from kills without level-progress"
+        " incentive. First enemy respawns, providing an"
+        " unlimited score farm."
+    ),
+    "documented_failure": (
+        "Agent stays at the beginning farming the first"
+        " respawning enemy instead of progressing."
+    ),
+    "failure_mechanism": "respawning_loop",
+    "detection_type": "structural",
+    "is_negative_example": False,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

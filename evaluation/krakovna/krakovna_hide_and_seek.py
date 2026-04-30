@@ -1,28 +1,37 @@
 """Krakovna entry: Hide-and-seek physics exploits.
 
-Source: Baker et al 2019
-Failure: Multi-agent hide-and-seek where agents discover physics
-  exploits (box surfing, ramp exploitation, endless running) to win.
-Mechanism: Binary win/lose terminal reward plus per-step survival.
-  Hiders get +1 for surviving, seekers get +1 for finding. The reward
-  structure itself is clean — the exploits come from physics engine
-  bugs (box surfing, ramp clipping) that the agents discover through
-  emergent multi-agent competition.
-Domain: Multi-agent / navigation
-
-Structural encoding: We encode the binary terminal outcome and
-  per-step survival bonus. The reward structure is well-designed for
-  the intended game. The actual exploits are physics/dynamics bugs,
-  not reward specification problems.
-
-Advisory: physics_exploit — the box surfing and ramp exploits are
-  MuJoCo physics engine bugs. The reward structure correctly
-  incentivizes hide/seek behavior; it is the environment dynamics
-  that are exploitable.
+Reward structure is clean; agents discover physics engine bugs
+(box surfing, ramp clipping) to win.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_hide_and_seek",
+    "source_paper": (
+        'Baker et al 2020, "Emergent Tool Use from Multi-Agent'
+        ' Autocurricula," ICLR 2020'
+    ),
+    "paper_url": "https://arxiv.org/abs/1909.07528",
+    "year": 2020,
+    "domain": "multi_agent",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Binary win/lose reward plus per-step survival. Reward"
+        " structure is sound; exploits come from MuJoCo physics"
+        " engine bugs, not reward misspecification."
+    ),
+    "documented_failure": (
+        "Agents discover box surfing and ramp exploitation"
+        " via physics engine bugs."
+    ),
+    "failure_mechanism": "physics_exploit",
+    "detection_type": "dynamic",
+    "is_negative_example": True,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

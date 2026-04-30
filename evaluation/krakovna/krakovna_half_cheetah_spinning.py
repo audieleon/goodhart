@@ -1,27 +1,50 @@
-"""Krakovna entry: Half Cheetah spinning in place.
-
-Source: Zhang et al 2021
-Failure: Half Cheetah exploits MuJoCo contact overflow to achieve
-  extreme velocity by spinning in place rather than running forward.
-Mechanism: Per-step velocity reward with no directional constraint.
-  The reward is proportional to velocity magnitude, so spinning
-  (which accumulates angular velocity via physics overflow) scores
-  higher than forward locomotion.
-Domain: Continuous control / locomotion
-
-Structural encoding: We encode the velocity reward as a per-step
-  signal that scales with velocity. The structural issue IS encodable:
-  the reward tracks velocity magnitude without constraining direction.
-  A well-designed reward would use forward velocity (dot product with
-  heading), not raw speed.
-
-Advisory: The MuJoCo contact overflow that enables extreme magnitudes
-  is a physics/simulator issue. But even without the overflow, the
-  lack of directional constraint is a structural reward design flaw.
-"""
+"""Krakovna entry: Half Cheetah spinning in place."""
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_half_cheetah_spinning",
+    "source_paper": "Zhang et al 2021 (uncertain attribution)",
+    "paper_url": None,
+    "year": 2021,
+    "domain": "locomotion",
+    "encoding_basis": "catalog_derived",
+    "verification_date": "2026-04-29",
+    "brief_summary": (
+        "Half Cheetah was supposed to run forward. Instead it spins"
+        " in place, exploiting MuJoCo contact overflow to achieve"
+        " extreme velocity magnitude."
+    ),
+    "documented_failure": (
+        "Half Cheetah spins via MuJoCo overflow. Velocity reward"
+        " tracks magnitude without constraining direction, so"
+        " spinning scores higher than forward locomotion."
+    ),
+    "failure_mechanism": "physics_exploit",
+    "detection_type": "dynamic",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Use forward velocity (dot product with heading) instead"
+        " of raw speed magnitude."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "source_quality": (
+            "Uncertain attribution to Zhang et al 2021. Paper not"
+            " confirmed or read. Encoding derived from Krakovna"
+            " catalog description."
+        ),
+        "velocity_reward": (
+            "Per-step reward proportional to velocity magnitude."
+            " No directional constraint. Even without the MuJoCo"
+            " overflow, the reward incentivizes any high-speed"
+            " movement equally."
+        ),
+    },
+}
 
 
 def run_example():

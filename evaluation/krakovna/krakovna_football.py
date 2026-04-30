@@ -1,18 +1,37 @@
 """Krakovna entry: Football -- agent kicks ball out of bounds.
 
-Source: Kurach et al 2019 (Google Research Football)
-Failure: Agent learns to kick the ball out of bounds to trigger a
-  throw-in, which gives it possession closer to the goal.
-Mechanism: Sparse goal reward incentivizes any strategy that leads to
-  scoring. Kicking out of bounds yields a throw-in (possession reset)
-  that is easier to exploit than dribbling through defenders. The
-  agent discovers that throw-in positioning is a higher-EV strategy
-  than direct play.
-Domain: Simulated sports / multi-agent
+Agent kicks out of bounds for throw-in positioning instead of
+dribbling through defenders.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_football",
+    "source_paper": (
+        'Kurach et al 2020, "Google Research Football: A Novel'
+        ' Reinforcement Learning Environment," AAAI 2020'
+    ),
+    "paper_url": "https://arxiv.org/abs/1907.11180",
+    "year": 2020,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Sparse goal reward lets the agent discover that"
+        " throw-in positioning via out-of-bounds kicks is"
+        " higher-EV than direct play."
+    ),
+    "documented_failure": (
+        "Agent kicks the ball out of bounds to trigger a"
+        " throw-in for favorable positioning."
+    ),
+    "failure_mechanism": "proxy_reward",
+    "detection_type": "structural",
+    "is_negative_example": False,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

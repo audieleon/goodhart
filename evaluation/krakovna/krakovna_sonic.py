@@ -1,28 +1,37 @@
 """Krakovna entry: Sonic wall clipping for forward progress.
 
-Source: Hesse et al 2018
-Failure: Agent clips through walls to move rightward faster, earning
-  higher forward-progress score than intended platforming gameplay.
-Mechanism: Per-step forward progress reward plus level completion
-  bonus. The reward correctly incentivizes rightward movement, but
-  the physics engine allows wall clipping. The agent discovers that
-  clipping through walls is a faster way to accumulate forward
-  progress than platforming.
-Domain: Atari / platformer
-
-Structural encoding: We encode per-step forward progress (position
-  delta) and a terminal level-completion bonus. The reward structure
-  is reasonable for a platformer. The exploit is a physics/collision
-  bug — the game engine allows the agent to pass through walls.
-
-Advisory: The wall clipping is a physics/collision bug in the game
-  engine, not a reward structure problem. The forward progress reward
-  is a standard and appropriate signal for platformers. Structural
-  analysis would not flag this encoding.
+Reward structure is sound; agent clips through walls via a physics
+bug to accumulate forward progress faster.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_sonic",
+    "source_paper": (
+        'Nichol et al 2018, "Gotta Learn Fast: A New'
+        ' Benchmark for Generalization in RL"'
+    ),
+    "paper_url": "https://arxiv.org/abs/1804.03720",
+    "year": 2018,
+    "domain": "game_ai",
+    "encoding_basis": "catalog_derived",
+    "brief_summary": (
+        "Forward progress reward plus level completion bonus."
+        " Reward is appropriate for a platformer; the exploit"
+        " is a collision detection bug in the game engine."
+    ),
+    "documented_failure": (
+        "Agent clips through walls to move rightward faster"
+        " than intended platforming gameplay."
+    ),
+    "failure_mechanism": "physics_exploit",
+    "detection_type": "dynamic",
+    "is_negative_example": True,
+    "compute_cost_class": "low",
+}
 
 
 def run_example():

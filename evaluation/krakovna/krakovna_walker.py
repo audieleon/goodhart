@@ -1,17 +1,47 @@
-"""Krakovna entry: Walker -- walks on one leg to match target speed.
-
-Source: Lee et al 2021
-Failure: Walker learns to hop on one leg instead of walking normally,
-  because this matches the target velocity without naturalness.
-Mechanism: Speed-matching reward without style or naturalness penalty.
-  The agent finds that hopping on one leg is a simpler control
-  strategy that achieves the target velocity. Without a penalty
-  for unnatural postures, this degenerate gait dominates.
-Domain: MuJoCo / locomotion
-"""
+"""Krakovna entry: Walker -- walks on one leg to match target speed."""
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "krakovna_walker",
+    "source_paper": "Lee et al 2021",
+    "paper_url": None,
+    "year": 2021,
+    "domain": "locomotion",
+    "encoding_basis": "catalog_derived",
+    "verification_date": "2026-04-29",
+    "brief_summary": (
+        "Walker was supposed to walk with a natural gait. Instead"
+        " it hops on one leg, matching target velocity without"
+        " any naturalness constraint."
+    ),
+    "documented_failure": (
+        "Walker hops on one leg. Speed-matching reward has no"
+        " style or naturalness penalty, so the degenerate"
+        " one-leg gait dominates."
+    ),
+    "failure_mechanism": "proxy_reward",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Add a gait symmetry term or motion-capture reference"
+        " to constrain the solution to natural bipedal walking."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "source_quality": (
+            "Lee et al 2021. Paper is known but not read in detail."
+            " Encoding derived from Krakovna catalog description."
+        ),
+        "speed_matching": (
+            "Per-step exponential reward for matching target velocity."
+            " No constraint on gait style or body posture."
+        ),
+    },
+}
 
 
 def run_example():
