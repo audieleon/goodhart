@@ -1,17 +1,7 @@
 """Examples: MuJoCo locomotion reward design.
 
-The standard MuJoCo locomotion reward is a multi-component
-design: forward_velocity - energy_cost + alive_bonus.
-
-This example shows how the framework analyzes the interaction
-between these components and predicts which degenerate
-strategies are viable.
-
-Covers:
-- Walker2d alive bonus exploitation
-- Hopper early termination incentive
-- Humanoid energy minimization
-- The general pattern: alive_bonus vs velocity tradeoff
+When alive_bonus >= velocity_reward, standing still is rational. Shows
+Walker2d, Hopper, and the fix (scale alive bonus below velocity).
 
 Source: Todorov et al. 2012 (MuJoCo, IROS); Brockman et al. 2016
   (OpenAI Gym); Towers et al. 2023 (Gymnasium, arXiv:2407.17032)
@@ -21,6 +11,30 @@ from goodhart.models import *
 from goodhart.engine import *
 from goodhart.rules.reward import *
 from goodhart.rules.training import *
+
+METADATA = {
+    "id": "mujoco_locomotion",
+    "source_paper": "Todorov et al. 2012 (MuJoCo, IROS); Brockman et al. 2016 (OpenAI Gym); Towers et al. 2023 (Gymnasium)",
+    "paper_url": "https://arxiv.org/abs/2407.17032",
+    "source_code_url": None,
+    "reward_location": "Gymnasium Walker2d/Hopper default reward structure",
+    "year": 2012,
+    "domain": "locomotion",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to walk. When alive_bonus >= velocity_reward, standing still is rational because movement risks falling.",
+    "documented_failure": "Walker2d and Hopper alive_bonus (1.0/step) matches or exceeds velocity_reward; standing still gives EV=+1000 while walking risks falling and losing the alive bonus stream",
+    "failure_mechanism": "idle_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Scale alive_bonus below velocity_reward (e.g., 0.1 instead of 1.0)",
+    "compute_cost_class": "medium",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "idle_exploit": "Passive alive_bonus >= active velocity_reward makes standing still rational",
+        "multi_env_comparison": "Shows Walker2d, Hopper, and the fixed version side by side",
+    },
+}
 
 
 def run_example():

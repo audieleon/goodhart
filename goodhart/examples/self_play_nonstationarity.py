@@ -1,23 +1,35 @@
 """Example: Self-play reward non-stationarity (LIMITATION).
 
-In self-play (AlphaGo, OpenAI Five, hide-and-seek), the opponent
-changes during training, making the reward distribution non-stationary.
-An agent that beats last week's opponent may lose to this week's.
-
-LIMITATION: goodhart assumes stationary reward dynamics. We can model
-the reward components of a self-play environment, but we can't capture
-the fact that the effective reward distribution shifts as the opponent
-improves. This means we can't detect:
-  - Forgetting cycles (agent forgets how to beat old strategies)
-  - Strategy collapse (both players converge to a dominated equilibrium)
-  - Non-transitivity (A beats B, B beats C, C beats A)
-
-Source: Silver et al. 2017 (AlphaGo Zero), Bansal et al. 2018
-("Emergent Complexity via Multi-Agent Competition", ICLR)
+Opponent changes during training, making reward distribution non-stationary.
+Source: Silver et al. 2017 (AlphaGo Zero), Bansal et al. 2018 (ICLR)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "self_play_nonstationarity",
+    "source_paper": "Silver et al. 2017 (AlphaGo Zero), Bansal et al. 2018 ('Emergent Complexity via Multi-Agent Competition', ICLR)",
+    "paper_url": "https://arxiv.org/abs/1710.03748",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2018,
+    "domain": "multi_agent",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to learn competitive play. Reward structure is clean (+1/-1 win/lose) but non-stationarity causes forgetting cycles, strategy collapse, and non-transitivity.",
+    "documented_failure": "goodhart assumes stationary reward dynamics. Cannot capture forgetting cycles, strategy collapse, or non-transitivity in self-play environments where reward distribution shifts as opponent improves.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Population-based training, league training, diversity metrics",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "limitation_example": "Reward structure is correct; the problem is non-stationarity from changing opponents",
+        "game_theory": "Self-play is about game theory, not reward structure",
+    },
+}
 
 
 def run_example():

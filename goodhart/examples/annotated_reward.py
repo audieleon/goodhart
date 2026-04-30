@@ -1,22 +1,35 @@
 """Example: Using the @reward_function decorator.
 
-The recommended pattern: define reward constants ONCE, share them
-between the decorator (structural analysis) and the function body
-(runtime computation). No duplication, no drift.
-
-Usage:
-    # Python API
-    from goodhart.examples.annotated_reward import compute_reward
-    compute_reward.goodhart_check()          # print report
-    assert compute_reward.goodhart_passed()  # CI gate
-
-    # CLI
-    goodhart --check goodhart.examples.annotated_reward:compute_reward
+Tutorial showing the recommended single-source-of-truth pattern for
+reward constants shared between the decorator and function body.
 
 Source: Tutorial example — demonstrates the @reward_function decorator. No external paper.
 """
 
 from goodhart import reward_function, RewardSource, RewardType, RespawnBehavior
+
+METADATA = {
+    "id": "annotated_reward",
+    "source_paper": "Tutorial example — no external paper",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from tutorial design",
+    "year": 2025,
+    "domain": "control",
+    "encoding_basis": "tutorial",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Tutorial demonstrating the @reward_function decorator with shared constants.",
+    "documented_failure": "N/A — tutorial example with well-designed reward",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "single_source_of_truth": "Constants defined once and shared by decorator and function body",
+    },
+}
 
 
 # =========================================================================

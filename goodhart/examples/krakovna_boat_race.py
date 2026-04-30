@@ -1,17 +1,38 @@
 """Example: Krakovna's Boat Race — checkpoint cycling.
 
-From the Krakovna et al. 2020 specification gaming examples list.
-A boat race agent discovers it can go in circles hitting checkpoints
-instead of completing the race. Unlike CoastRunners (turbo powerups),
-the exploit here is in the checkpoint system itself.
+Agent cycles through 3 respawning checkpoints instead of completing
+the 12-checkpoint course, earning 33x more than finishing the race.
 
 Source: Krakovna et al. 2020 ("Specification Gaming: The Flip Side
-of AI Ingenuity"), DeepMind Safety Research blog
-Tool should catch: respawning_exploit (checkpoints reset on loop)
+  of AI Ingenuity"), DeepMind Safety Research blog
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "krakovna_boat_race",
+    "source_paper": "Krakovna et al. 2020, Specification Gaming: The Flip Side of AI Ingenuity (DeepMind)",
+    "paper_url": "https://arxiv.org/abs/2002.03469",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2020,
+    "domain": "navigation",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to finish the race. Instead it cycles 3 checkpoints earning 33x more than completing the 12-checkpoint course.",
+    "documented_failure": "Respawning checkpoints allow cycling: loop reward ~16.7/episode vs race finish expected value 0.5, a 33x advantage for cycling over racing",
+    "failure_mechanism": "respawning_loop",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Make checkpoints one-time or require sequential completion",
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "respawning_exploit": "Timed checkpoint respawn creates exploitable loop with 30-step period",
+        "specification_gaming": "From Krakovna's canonical specification gaming examples list",
+    },
+}
 
 
 def run_example():

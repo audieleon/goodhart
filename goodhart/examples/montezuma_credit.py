@@ -1,20 +1,37 @@
 """Example: Montezuma's Revenge — credit assignment (LIMITATION).
 
-Montezuma's Revenge has a perfectly fine reward structure: +100 for
-each key/item, +300 for completing rooms. The problem is extreme
-temporal credit assignment — the agent must execute ~100 correct
-actions in sequence before seeing any reward.
-
-LIMITATION: goodhart's exploration_threshold rule catches the low
-discovery probability, but can't distinguish "sparse but learnable
-with better exploration" from "fundamentally too sparse." The fix
-(curiosity/RND) is algorithmic, not structural.
+Reward structure is fine (+100/key, +300/room) but ~100 correct actions
+are needed before any reward. The problem is credit assignment, not design.
 
 Source: Bellemare et al. 2013 (ALE), Burda et al. 2019 (RND, ICLR)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "montezuma_credit",
+    "source_paper": "Bellemare et al. 2013 (ALE); Burda et al. 2019 (RND, ICLR)",
+    "paper_url": "https://arxiv.org/abs/1810.12894",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2013,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Reward structure is fine (+100/key, +300/room) but ~100 correct actions needed before any reward makes credit assignment the bottleneck.",
+    "documented_failure": "Extreme temporal credit assignment: agent must execute ~100 correct actions in sequence before seeing any reward; goodhart catches low discovery probability but cannot distinguish 'sparse but learnable' from 'hierarchically sparse'",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Curiosity/RND for exploration (algorithmic fix, not structural)",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "framework_limitation": "Tool sees symptom (low discovery_probability) but cannot diagnose root cause (hierarchical structure)",
+        "credit_assignment": "Problem is temporal depth, not reward design",
+    },
+}
 
 
 def run_example():

@@ -1,24 +1,35 @@
 """Example: RLHF reward model gaming (LIMITATION).
 
-In RLHF (Reinforcement Learning from Human Feedback), the reward
-signal comes from a learned reward model, not a hand-designed function.
-Agents learn to exploit gaps in the reward model — producing outputs
-that score high but are low quality (sycophancy, verbosity hacking,
-format gaming).
-
-LIMITATION: goodhart is designed for hand-specified reward functions
-with known components. A learned reward model is a black box — we
-can't decompose it into RewardSources with known dynamics. This is
-ironic given our tool is named after Goodhart's Law, which is
-precisely what RLHF reward model gaming exemplifies.
-
-Source: Casper et al. 2023 ("Open Problems and Fundamental
-Limitations of RLHF"), Gao et al. 2023 ("Scaling Laws for Reward
-Model Overoptimization")
+Agents exploit gaps in learned reward models -- sycophancy, verbosity hacking, format gaming.
+Source: Casper et al. 2023, Gao et al. 2023 ("Scaling Laws for Reward Model Overoptimization")
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "rlhf_reward_model",
+    "source_paper": "Casper et al. 2023 ('Open Problems and Fundamental Limitations of RLHF'), Gao et al. 2023 ('Scaling Laws for Reward Model Overoptimization')",
+    "paper_url": "https://arxiv.org/abs/2307.15217",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2023,
+    "domain": "rlhf",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to produce high-quality answers. Instead it learned to produce outputs that score high on the reward model but are low quality (sycophancy, verbosity, format gaming).",
+    "documented_failure": "Learned reward model is a black box proxy for human preferences. Agents exploit gaps: sycophancy, verbosity hacking, format gaming. RM score improves while actual quality decreases.",
+    "failure_mechanism": None,
+    "detection_type": "specification",
+    "discovery_stage": "post_training",
+    "fix_known": "RM uncertainty estimation, ensemble disagreement, scaling law extrapolation, red-teaming",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "limitation_example": "goodhart cannot decompose a learned reward model into RewardSources with known dynamics",
+        "purest_goodhart": "The purest embodiment of Goodhart's Law is beyond the tool's expressiveness",
+    },
+}
 
 
 def run_example():

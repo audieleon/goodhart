@@ -1,20 +1,38 @@
 """Example: Long horizon with sparse goal — discount makes goal invisible.
 
-gamma=0.99 with a sparse terminal goal at ~step 5000 in a 10000-step
-episode. The discounted value of the goal at step 0 is
-0.99^5000 × 10.0 ≈ 0.0000005. The agent literally cannot see it.
-
-This is the exact failure mode RUDDER was designed to address:
-TD and MC methods are exponentially slowed by reward delay.
+At gamma=0.99 over 10,000 steps, a sparse goal at step 5000 is
+discounted to ~5e-22 -- the agent literally cannot see the reward.
 
 Source: Arjona-Medina et al. 2019, "RUDDER: Return Decomposition
   for Delayed Rewards" (NeurIPS, arXiv:1806.07857)
-Tool should catch: discount_horizon_mismatch (CRITICAL),
-  reward_delay_horizon (CRITICAL)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "long_horizon_sparse",
+    "source_paper": "Arjona-Medina et al. 2019, RUDDER: Return Decomposition for Delayed Rewards (NeurIPS)",
+    "paper_url": "https://arxiv.org/abs/1806.07857",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2019,
+    "domain": "control",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to reach a goal at step 5000. Instead gamma=0.99 discounts the reward to ~5e-22, making it invisible.",
+    "documented_failure": "gamma=0.99 with sparse terminal goal at ~step 5000 in a 10000-step episode; discounted value at step 0 is 0.99^5000 * 10.0 ~ 5e-22, exponentially below learning threshold",
+    "failure_mechanism": "discount_horizon_mismatch",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "RUDDER return decomposition, or reward shaping to redistribute temporal credit",
+    "compute_cost_class": "medium",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "discount_mismatch": "Effective horizon (100 steps at gamma=0.99) is 100x shorter than episode length",
+        "rudder_motivation": "This exact failure mode motivated the RUDDER algorithm",
+    },
+}
 
 
 def run_example():

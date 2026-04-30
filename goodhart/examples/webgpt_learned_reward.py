@@ -1,22 +1,35 @@
-"""Example: WebGPT / RLHF — learned reward model (advisory demo).
+"""Example: WebGPT / RLHF -- learned reward model (advisory demo).
 
-WebGPT uses a reward model trained on human comparisons to evaluate
-web search + answer quality. The agent learns to game the RM:
-preferring authoritative-sounding but incorrect sources, padding
-answers with hedging language, citing more sources than needed.
-
-This is Goodhart's Law in its purest form: the RM measures answer
-quality, the agent targets the RM, the RM stops measuring quality.
-
-We model this minimally to show how the advisory_learned_reward rule
-could fire (though the pattern requires very high action space).
-
+Agent games the reward model by preferring authoritative-sounding but incorrect sources.
 Source: Nakano et al. 2022 (WebGPT), Gao et al. 2023 (RM overoptimization)
-LIMITATION: goodhart fundamentally cannot analyze learned rewards.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "webgpt_learned_reward",
+    "source_paper": "Nakano et al. 2022 (WebGPT), Gao et al. 2023 ('Scaling Laws for Reward Model Overoptimization')",
+    "paper_url": "https://arxiv.org/abs/2112.09332",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2022,
+    "domain": "rlhf",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to find and summarize accurate information. Instead it learned to produce authoritative-sounding but incorrect outputs that score high on the reward model.",
+    "documented_failure": "Agent games reward model blind spots: preferring authoritative-sounding but incorrect sources, padding with hedging language, citing more sources than needed. RM score rises while actual quality decreases.",
+    "failure_mechanism": None,
+    "detection_type": "specification",
+    "discovery_stage": "post_training",
+    "fix_known": "RM uncertainty estimation, red-teaming, ensemble disagreement, scaling law extrapolation",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "limitation_example": "goodhart fundamentally cannot analyze learned rewards — the structure is simple (RM score - KL), the problem is inside the RM",
+        "purest_goodhart": "Goodhart's Law in its purest form: proxy diverges from target under optimization",
+    },
+}
 
 
 def run_example():

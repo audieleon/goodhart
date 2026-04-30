@@ -1,18 +1,34 @@
 """Example: Reward-is-Enough hypothesis environments.
 
-Silver et al. 2021 argue that reward maximization suffices for general
-intelligence. We model three of their example domains to show how
-goodhart analyzes environments where the reward IS well-designed:
-perception (visual classification), language (dialogue), and
-social intelligence (negotiation).
-
+Well-designed reward examples from the thesis that reward maximization suffices for general intelligence.
 Source: Silver et al. 2021 ("Reward is Enough", Artificial Intelligence)
-Tool should: pass clean (these are well-designed by construction,
-  since the paper argues reward is sufficient)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "reward_is_enough",
+    "source_paper": "Silver et al. 2021 ('Reward is Enough', Artificial Intelligence)",
+    "paper_url": "https://doi.org/10.1016/j.artint.2021.103535",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2021,
+    "domain": "control",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Theoretical/discussion piece arguing reward maximization suffices for intelligence. Well-designed rewards pass clean by construction.",
+    "documented_failure": "N/A — these are well-designed by construction since the paper argues reward is sufficient",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "theoretical_baseline": "Paper argues the right reward suffices; goodhart detects when the reward you wrote is not the right one",
+    },
+}
 
 
 def run_example():

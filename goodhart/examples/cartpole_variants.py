@@ -1,19 +1,37 @@
 """Example: CartPole reward variants — default vs Sutton-Barto.
 
-CartPole-v1 default: +1 per step for staying alive (max 500 steps).
-Sutton-Barto variant: -1 on termination only.
-
-The default is well-designed: the agent IS supposed to maximize survival.
-The Sutton-Barto variant creates a reward desert (no signal until failure).
+Compares well-designed +1/step alive reward (passes clean) against
+the -1-on-termination variant that creates a reward desert.
 
 Source: Barto et al. 1983, Sutton & Barto 2018 (Ch. 3.4), Gymnasium
-Tool should:
-  - Default: pass clean (alive IS the goal, intentional=True)
-  - Sutton-Barto: flag as reward desert (no positive signal)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "cartpole_variants",
+    "source_paper": "Barto et al. 1983, Sutton & Barto 2018 (Ch. 3.4), Gymnasium",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 1983,
+    "domain": "control",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Default CartPole (+1/step) is well-designed. Sutton-Barto variant (-1 on termination only) creates a reward desert with no gradient signal.",
+    "documented_failure": "Sutton-Barto variant gives -1 only on termination with no per-step signal, making all non-terminal strategies equivalent and providing no gradient for learning.",
+    "failure_mechanism": "death_beats_survival",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Use +1 per step alive reward (Gymnasium default)",
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "reward_desert": "Sutton-Barto variant has no positive signal, all non-terminal actions equal",
+        "well_designed_default": "Default variant correctly makes survival the intentional goal",
+    },
+}
 
 
 def run_example():

@@ -1,21 +1,35 @@
-"""Example: Safety Gym — reward vs cost tradeoff.
+"""Example: Safety Gym -- reward vs cost tradeoff.
 
-Safety Gym has a standard RL reward (reach goal, avoid hazards) PLUS a
-separate cost function (constraint violations). The reward structure
-alone looks fine, but constrained optimization changes the dynamics.
-
-Note: goodhart currently doesn't model constraints/costs as a separate
-channel. We model the cost as a penalty in the reward. This is an
-honest limitation — true constrained RL (CPO, FOCOPS) treats costs
-differently than reward penalties.
-
+Reward structure looks fine but constrained optimization changes the dynamics.
 Source: Ray et al. 2019 (OpenAI Safety Gym)
-Tool should catch: the penalty from hazard proximity may create
-  an idle exploit (standing still avoids both hazards and progress)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "safety_gym",
+    "source_paper": "Ray et al. 2019 (OpenAI Safety Gym)",
+    "paper_url": None,
+    "source_code_url": "https://github.com/openai/safety-gym",
+    "reward_location": "Reward structure from paper description",
+    "year": 2019,
+    "domain": "safety",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to reach goal while avoiding hazards. Hazard penalty modeled as reward penalty may create idle exploit (standing still avoids both hazards and progress).",
+    "documented_failure": "goodhart does not model constraints as a separate channel. True constrained RL (CPO, FOCOPS) enforces hard cost limits, which changes optimal behavior vs soft penalties.",
+    "failure_mechanism": "idle_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Model constrained RL separately with CostSource and constraint budgets",
+    "compute_cost_class": "medium",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "cost_as_penalty": "Honest approximation of safety cost as reward penalty",
+        "constraint_limitation": "True constrained RL treats costs differently than reward penalties",
+    },
+}
 
 
 def run_example():

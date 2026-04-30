@@ -1,18 +1,38 @@
 """Example: MiniGrid 6-room with noisy TV — 20x exploration collapse.
 
-MSE curiosity agents visit 100+ novel states without noise. With
-a noisy TV present, they collapse to visiting only 5 novel states.
-The TV's pixel prediction error dominates the exploration signal
-and the agent stays near it instead of entering new rooms.
+MSE curiosity agent collapses from 100+ novel states to 5 because the
+noisy TV's irreducible prediction error dominates the exploration signal.
 
-Source: Mavor-Parker et al. 2022, "How to Stay Curious while
-  avoiding Noisy TVs using Aleatoric Uncertainty Estimation"
-  (ICML, arXiv:2102.04399)
-Tool should catch: intrinsic_dominance (curiosity 5x goal)
+Source: Mavor-Parker et al. 2022, "How to Stay Curious while avoiding
+  Noisy TVs using Aleatoric Uncertainty Estimation" (ICML, arXiv:2102.04399)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "minigrid_noisy_tv",
+    "source_paper": "Mavor-Parker et al. 2022, How to Stay Curious while avoiding Noisy TVs using Aleatoric Uncertainty Estimation (ICML)",
+    "paper_url": "https://arxiv.org/abs/2102.04399",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2022,
+    "domain": "navigation",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to explore 6 rooms. Instead it watches a noisy TV whose irreducible prediction error traps the curiosity signal.",
+    "documented_failure": "MSE curiosity agent collapses from 100+ novel states to 5 because the noisy TV produces irreducible prediction error that dominates the exploration signal; agent stays near TV instead of entering new rooms",
+    "failure_mechanism": "curiosity_trap",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Aleatoric uncertainty estimation to distinguish reducible from irreducible prediction error",
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "intrinsic_dominance": "Curiosity bonus (0.05/step infinite) dominates sparse goal (1.0 at 2% discovery)",
+        "noisy_tv_problem": "Stochastic observations create irreducible prediction error that never decays",
+    },
+}
 
 
 def run_example():

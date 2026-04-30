@@ -1,16 +1,37 @@
 """Example: LunarLander-v2 — well-designed reward (Gymnasium).
 
-LunarLander uses potential-based shaping (distance decrease, velocity
-decrease) plus sparse landing bonus and leg contact rewards. By Ng 1999,
-the shaping component preserves optimal policy. This config should pass
-clean — demonstrating the tool doesn't false-positive on good design.
+Potential-based shaping (distance + velocity decrease) preserves optimal
+policy by Ng 1999. Should pass clean with no structural reward traps.
 
 Source: Brockman et al. 2016 (OpenAI Gym), Ng et al. 1999 (PBRS theory)
-Tool should: pass clean (no structural reward traps)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "lunar_lander",
+    "source_paper": "Brockman et al. 2016 (OpenAI Gym); Ng et al. 1999 (PBRS theory)",
+    "paper_url": "https://arxiv.org/abs/1606.01540",
+    "source_code_url": None,
+    "reward_location": "Gymnasium LunarLander-v2 source code",
+    "year": 2016,
+    "domain": "control",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Well-designed reward with potential-based shaping. Should pass clean with no structural traps.",
+    "documented_failure": "N/A -- well-designed reward. Potential-based shaping (Ng 1999) preserves optimal policy and components are well-balanced",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "positive_example": "Demonstrates that the tool does not false-positive on good reward design",
+        "pbrs_sound": "Distance and velocity shaping are potential-based (cycles net zero)",
+    },
+}
 
 
 def run_example():

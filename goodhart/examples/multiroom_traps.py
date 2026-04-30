@@ -1,12 +1,7 @@
 """Example: MultiRoom-N4-Monster reward traps.
 
-THREE different degenerate equilibria on the same task:
-1. Standing still (default penalty mode)
-2. Dying fast (always penalty mode, -0.01/step)
-3. Dying fast (always penalty mode, -0.001/step, still trapped)
-
-Each trap was mathematically predictable. This example shows all
-three configurations and what the framework catches.
+Three degenerate equilibria (stand still, die fast at -0.01, die fast
+at -0.001) all mathematically predictable before training.
 
 Source: Original experiments by the author on MiniHack
   MultiRoom-N4-Monster (Samvelyan et al. 2021). Three configurations
@@ -17,6 +12,30 @@ from goodhart.models import *
 from goodhart.engine import *
 from goodhart.rules.reward import *
 from goodhart.rules.training import *
+
+METADATA = {
+    "id": "multiroom_traps",
+    "source_paper": "Original experiments by the author on MiniHack MultiRoom-N4-Monster (Samvelyan et al. 2021)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from original experiments",
+    "year": 2021,
+    "domain": "navigation",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to navigate 4 rooms. Instead three different penalty configs all produced degenerate equilibria (stand still, die fast).",
+    "documented_failure": "Three configurations all trapped: (1) default penalty -- agent stands still; (2) always -0.01/step -- dying at step 1 costs -0.01 vs exploring 120 steps costs -1.20; (3) always -0.001/step -- still trapped because p(goal) ~1.1% < required 11.4%",
+    "failure_mechanism": "penalty_dominates_goal",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "penalty <= 0.0001, or RND coeff >= 0.05, or no step penalty at all",
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "triple_failure": "Three configurations all produce mathematically predictable degenerate equilibria",
+        "original_experiments": "Failures predicted by goodhart before training and confirmed empirically",
+    },
+}
 
 
 def run_example():

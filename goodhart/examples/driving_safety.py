@@ -1,23 +1,36 @@
 """Example: Autonomous driving reward tradeoffs.
 
-MetaDrive and highway-env both face the same tension:
-progress/speed rewards incentivize fast driving, while
-crash penalties are often too small to prevent aggressive
-behavior.
-
-In highway-env, -1.0 crash penalty vs +0.4/step speed
-means 2.5 steps of driving offsets a crash. Agents learn
-to weave aggressively and accept periodic collisions.
-
-MetaDrive adds a lateral factor modifier that scales the
-driving reward by lane position — demonstrating the
-reward modifier system.
+Crash penalties too small relative to speed reward cause agents to
+weave aggressively and accept periodic collisions as optimal.
 
 Source: Li et al. 2022 (MetaDrive, NeurIPS); Leurent 2018 (highway-env)
 """
 
 from goodhart.presets import PRESETS
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "driving_safety",
+    "source_paper": "Li et al. 2022 (MetaDrive, NeurIPS); Leurent 2018 (highway-env)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2022,
+    "domain": "driving",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to drive safely. Instead it weaves aggressively because 2.5 steps of speed reward offsets a crash penalty.",
+    "documented_failure": "In highway-env, -1.0 crash penalty vs +0.4/step speed means 2.5 steps of driving offsets a crash. Agents learn aggressive weaving and accept periodic collisions as optimal.",
+    "failure_mechanism": "penalty_dominance",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Increase crash penalty relative to accumulated progress reward, not just per-step reward",
+    "compute_cost_class": "medium",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "crash_penalty_ratio": "Crash penalty -1.0 is offset by just 2.5 steps of +0.4 speed reward",
+    },
+}
 
 
 def run_example():

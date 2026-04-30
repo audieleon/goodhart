@@ -1,17 +1,37 @@
 """Example: MiniGrid DoorKey — staged exploration with time pressure.
 
-MiniGrid DoorKey requires the agent to find a key, open a door, then
-reach the goal. Reward = 1 - 0.9*(step_count/max_steps), so early
-completion is heavily rewarded. This creates interesting dynamics:
-the exploration needed to find the key conflicts with the time pressure.
+Three-stage exploration (find key, open door, reach goal) conflicts with
+time pressure from R = 1 - 0.9*(steps/max_steps) penalizing slow discovery.
 
 Source: Chevalier-Boisvert et al. 2023 (Minigrid & Miniworld)
-Tool should catch: penalty_dominates_goal risk at high step counts,
-  sparse exploration threshold
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "minigrid_doorkey",
+    "source_paper": "Chevalier-Boisvert et al. 2023 (Minigrid & Miniworld)",
+    "paper_url": "https://arxiv.org/abs/2306.13831",
+    "source_code_url": "https://github.com/Farama-Foundation/Minigrid",
+    "reward_location": "Reward structure from paper description",
+    "year": 2023,
+    "domain": "navigation",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to find key, open door, reach goal. Time pressure from step penalty conflicts with the exploration needed for staged discovery.",
+    "documented_failure": "R = 1 - 0.9*(steps/max_steps) creates time pressure that conflicts with 3-stage exploration (find key, open door, reach goal); with 2% discovery probability, agent needs ~50 episodes to see a single success",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Time penalty does not make failure attractive, but slows learning by reducing goal reward at late steps",
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "staged_exploration": "Three prerequisite stages each with low discovery probability",
+        "time_pressure_conflict": "Step penalty discourages the exploration needed to discover the goal",
+    },
+}
 
 
 def run_example():

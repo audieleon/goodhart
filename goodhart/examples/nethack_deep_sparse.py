@@ -1,21 +1,37 @@
 """Example: NetHack — deep hierarchical credit assignment.
 
-NetHack has 50+ levels, hundreds of item types, and extremely sparse
-reward. The agent must learn a long chain: find food → eat to survive →
-find weapons → fight monsters → find stairs → descend → ... → retrieve
-the Amulet of Yendor. Each step is prerequisite for the next.
-
-The exploration_threshold rule fires, but the advisory_credit_assignment
-rule adds crucial context: this isn't just sparse, it's hierarchically
-deep. Random exploration won't just be slow — it will never discover
-the full task structure.
+50+ levels with hierarchically deep prerequisites (food, weapons, stairs).
+Not just sparse -- random exploration will never discover the full chain.
 
 Source: Kuttler et al. 2020 (NeurIPS, NetHack Learning Environment)
-Advisory fires: advisory_credit_assignment (deep sparse, no shaping)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "nethack_deep_sparse",
+    "source_paper": "Kuttler et al. 2020 (NeurIPS, NetHack Learning Environment)",
+    "paper_url": "https://arxiv.org/abs/2006.13760",
+    "source_code_url": "https://github.com/facebookresearch/nle",
+    "reward_location": "Reward structure from paper description",
+    "year": 2020,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to retrieve the Amulet of Yendor. 50+ levels with hierarchically deep prerequisites make random exploration unable to discover the full task structure.",
+    "documented_failure": "Extremely sparse reward across 50+ levels with hundreds of item types; hierarchically deep prerequisite chain (food -> weapons -> monsters -> stairs -> ... -> amulet); random exploration will never discover the full task structure",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Curriculum learning or hierarchical RL; RND alone is insufficient for this depth",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "hierarchical_depth": "Not just sparse but hierarchically deep -- each step is prerequisite for the next",
+        "advisory_distinction": "advisory_credit_assignment fires alongside exploration_threshold to flag depth",
+    },
+}
 
 
 def run_example():

@@ -1,25 +1,7 @@
 """Example: OpenAI Hide-and-Seek emergent exploits (ICLR 2020).
 
-Multi-agent competition produced 6 emergent strategies including
-box surfing — seekers riding unlocked boxes through walls to
-reach hidden agents. This exploited a physics engine bug where
-agents could move with boxes regardless of ground contact.
-
-This is the HARDEST test for our framework because the exploit
-arises from:
-  1. Multi-agent interaction (not single-agent)
-  2. Physics engine bugs (not reward structure)
-  3. Emergent strategy (not predictable from rewards alone)
-
-What the framework CAN catch vs what it CAN'T:
-  - CAN: reward structure incentivizes the arms race
-  - CAN: identify that the reward is zero-sum (one side's exploit
-    is the other's failure, driving escalation)
-  - CAN'T: predict specific physics exploits
-  - CAN'T: predict which strategies will emerge
-
-This example shows the LIMITS of pre-training analysis and
-where runtime monitoring is needed instead.
+Zero-sum multi-agent reward drove 6 emergent strategies including box
+surfing through walls via a physics engine bug -- beyond reward analysis.
 
 Source: Baker et al. 2020, "Emergent Tool Use from Multi-Agent
   Autocurricula" (ICLR)
@@ -30,6 +12,31 @@ from goodhart.engine import *
 from goodhart.rules.reward import *
 from goodhart.rules.training import *
 from goodhart.rules.architecture import PrecedentRule, Precedent
+
+METADATA = {
+    "id": "hide_and_seek",
+    "source_paper": "Baker et al. 2020, Emergent Tool Use from Multi-Agent Autocurricula (ICLR)",
+    "paper_url": "https://arxiv.org/abs/1909.07528",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2020,
+    "domain": "multi_agent",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agents were supposed to play hide-and-seek. Instead they discovered box surfing through walls via a physics engine bug.",
+    "documented_failure": "Zero-sum multi-agent reward drove 6 emergent strategies including box surfing -- seekers riding unlocked boxes through walls to reach hidden agents by exploiting a physics engine bug where agents could move with boxes regardless of ground contact",
+    "failure_mechanism": "physics_exploit",
+    "detection_type": "dynamic",
+    "discovery_stage": "during_training",
+    "fix_known": "Physics engine robustness testing, action space constraints, runtime exploit monitoring",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "physics_exploit": "Box surfing exploits simulator physics, not reward structure",
+        "zero_sum_arms_race": "Zero-sum reward drives escalating counterstrategies beyond intended complexity",
+        "framework_limitation": "Pre-training reward analysis cannot predict environment-level physics exploits",
+    },
+}
 
 
 # ---- Multi-agent specific rules ----

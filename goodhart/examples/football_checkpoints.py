@@ -1,16 +1,37 @@
 """Example: Google Research Football — checkpoint shaping.
 
-GRF uses checkpoint rewards (+0.1 for crossing field positions) to
-shape learning toward the sparse +1 goal. This creates respawning
-shaping that could incentivize cycling if checkpoints reset. In GRF
-they don't (one-time per episode), so can_loop=False.
+Well-designed one-time-per-episode checkpoint rewards (+0.1 each) shape
+learning toward the sparse +1 goal without creating looping exploits.
 
-Source: Kurach et al. 2020 (ICML), "Google Research Football"
-Tool should: mostly pass clean (checkpoints are one-time, not loopable)
+Source: Kurach et al. 2020 (ICML)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "football_checkpoints",
+    "source_paper": "Kurach et al. 2020, 'Google Research Football' (ICML)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2020,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Checkpoint shaping is well-designed: one-time per episode, total shaping equals goal reward, no looping possible.",
+    "documented_failure": "N/A — checkpoints are consumed (one-time per episode), so cycling is impossible. Tool mostly passes clean.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "high",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "one_time_checkpoints": "max_occurrences=10 with NONE respawn prevents looping",
+        "balanced_shaping": "Total shaping (10 * 0.1 = 1.0) equals goal reward (+1.0)",
+    },
+}
 
 
 def run_example():

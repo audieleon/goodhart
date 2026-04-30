@@ -1,11 +1,7 @@
 """Example: Catching PPO implementation pitfalls.
 
-Based on "The 37 Implementation Details of Proximal Policy Optimization"
-(ICLR Blog Track, 2022) and Andy Jones' "Debugging RL Systems."
-
-Shows how to express PPO-specific failure modes using the framework
-and add project-specific rules for issues the standard library
-doesn't cover.
+Demonstrates project-specific rules for PPO training details like Adam
+epsilon, observation scaling, and KL divergence thresholds.
 
 Source: Huang et al. 2022, "The 37 Implementation Details of Proximal
   Policy Optimization" (ICLR Blog Track); Andy Jones, "Debugging RL"
@@ -16,6 +12,30 @@ from goodhart.engine import *
 from goodhart.rules.reward import *
 from goodhart.rules.training import *
 from goodhart.rules.architecture import PrecedentRule, Precedent
+
+METADATA = {
+    "id": "ppo_37_details",
+    "source_paper": "Huang et al. 2022, The 37 Implementation Details of PPO (ICLR Blog Track); Andy Jones, Debugging RL",
+    "paper_url": "https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2022,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Training rule demo showing PPO-specific pitfalls (Adam epsilon, observation scaling, KL divergence). Not a reward failure per se.",
+    "documented_failure": "PPO implementation details that cause silent failures: Adam eps=1e-5 vs 1e-8, unnormalized observations cause KL explosion, value targets outside [-10, +10] prevent learning, correlated env starts cause phase-specific optimization",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Adam eps=1e-5, normalize observations to [0,1], scale rewards, desynchronize parallel envs",
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "training_rules_demo": "Shows how to add project-specific rules beyond the standard library",
+        "not_reward_failure": "Failures are in training implementation, not reward structure",
+    },
+}
 
 
 # ---- Project-specific rules from the PPO details paper ----

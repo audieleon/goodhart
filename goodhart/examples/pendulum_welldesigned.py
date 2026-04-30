@@ -1,22 +1,36 @@
 """Example: Pendulum-v1 — a well-designed all-penalty reward.
 
-Pendulum uses r = -(theta^2 + 0.1*theta_dot^2 + 0.001*action^2).
-The best possible reward is 0 (upright, zero velocity, zero torque).
-The coefficient ratios encode priorities: angle matters 10x more
-than velocity, velocity matters 100x more than energy.
-
-This demonstrates the @reward_function decorator with the
-single-source-of-truth pattern: constants defined once, shared
-between the annotation and the reward computation.
-
-This is a POSITIVE example — the tool gives a nearly-clean bill,
-which is correct.
+All-penalty reward with zero as best (upright, still, no torque). No
+idle exploit possible because the pendulum hangs down at rest.
 
 Source: Gymnasium documentation, Brockman et al. 2016
-Tool result: PASS with minor dominance warning (correct)
 """
 
 from goodhart import reward_function, RewardSource, RewardType, TrainingConfig
+
+METADATA = {
+    "id": "pendulum_welldesigned",
+    "source_paper": "Gymnasium documentation; Brockman et al. 2016",
+    "paper_url": "https://arxiv.org/abs/1606.01540",
+    "source_code_url": None,
+    "reward_location": "Gymnasium Pendulum-v1 source code",
+    "year": 2016,
+    "domain": "control",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Well-designed all-penalty reward where zero is best. No idle exploit because the pendulum hangs down at rest.",
+    "documented_failure": "N/A -- well-designed reward. All-penalty with zero as best (upright, still, no torque); coefficient ratios correctly encode priorities (angle 10x > velocity 100x > torque)",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "positive_design_pattern": "All-penalty with zero target is the safest reward design pattern",
+        "no_degenerate_strategy": "Every non-target state is strictly worse than target",
+    },
+}
 
 
 # =========================================================================

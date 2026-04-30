@@ -1,22 +1,36 @@
 """Example: ChopperCommand — RND scores 4.7x worse than epsilon-greedy.
 
-RND tuned for Montezuma's Revenge (hard exploration) actively hurts
-on ChopperCommand (easy exploration). The exploration bonus adds
-noise to a game where the task reward signal is already sufficient.
-RND scored 2,675 vs epsilon-greedy's 12,578.
+RND tuned for Montezuma's Revenge hurts on easy-exploration games;
+the tool correctly does not flag this coefficient-mismatch problem.
 
-Source: Taiga et al. 2021, "On Bonus-Based Exploration Methods
-  in the Arcade Learning Environment" (arXiv:2109.11052)
-Tool should catch: the intrinsic coefficient is very small here
-  (beta=0.00005), so the structural ratio is below threshold.
-  This is a coefficient-mismatch problem (tuned on wrong game),
-  not a magnitude-dominance problem. The tool correctly does NOT
-  flag this — the failure requires knowing the coefficient was
-  tuned elsewhere.
+Source: Taiga et al. 2021 (arXiv:2109.11052)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "choppercommand_rnd",
+    "source_paper": "Taiga et al. 2021, 'On Bonus-Based Exploration Methods in the Arcade Learning Environment'",
+    "paper_url": "https://arxiv.org/abs/2109.11052",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2021,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to shoot enemies. RND exploration bonus (tuned for Montezuma) added noise that hurt performance 4.7x vs epsilon-greedy.",
+    "documented_failure": "RND coefficient tuned on Montezuma's Revenge (hard exploration) applied to ChopperCommand (easy exploration). The exploration bonus adds noise where task reward is already sufficient, scoring 2,675 vs epsilon-greedy's 12,578.",
+    "failure_mechanism": None,
+    "detection_type": "dynamic",
+    "discovery_stage": "post_training",
+    "fix_known": "Do not apply exploration bonuses to easy-exploration games; tune coefficients per environment",
+    "compute_cost_class": "medium",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "coefficient_mismatch": "Structural ratio is below threshold; failure is from wrong-game tuning, not magnitude dominance",
+    },
+}
 
 
 def run_example():

@@ -1,20 +1,35 @@
-"""Example: Financial Trading — Sharpe ratio as reward.
+"""Example: Financial Trading -- Sharpe ratio as reward.
 
-When Sharpe ratio (return/volatility) is the reward, doing nothing
-gives 0/0 — which many implementations default to 0 or a small
-positive number. Any trade introduces volatility in the denominator,
-making the ratio worse. The optimal policy is to never trade.
-
-This is an idle exploit, but a subtle one: the reward function
-itself (portfolio return per step) doesn't show it. It emerges
-from the Sharpe ratio AGGREGATION over the episode.
-
+Not trading gives 0/0 Sharpe (often defaulting to 0), and any trade introduces volatility.
 Source: Various; Dang-Nhu 2025, "Risk-Aware RL for Financial Trading"
-Tool result: PASS (misses the Sharpe aggregation trap — honest limitation)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "sharpe_idle",
+    "source_paper": "Dang-Nhu 2025, 'Risk-Aware RL for Financial Trading'; various quant finance RL papers",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2025,
+    "domain": "industrial",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to trade profitably. Instead it learned to make tiny trades or not trade at all, maximizing the Sharpe ratio by minimizing volatility.",
+    "documented_failure": "Sharpe ratio idle exploit: not trading gives 0/0 (often defaulted to 0 or small positive). Any trade introduces volatility in the denominator. Agent learns to never trade or make tiny trades to maximize ratio rather than return.",
+    "failure_mechanism": "idle_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "medium",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "aggregation_trap": "Exploit emerges from episode-level Sharpe ratio aggregation, not per-step signal",
+        "limitation": "goodhart analyzes per-step reward structure, not episode-level aggregation functions",
+    },
+}
 
 
 def run_example():

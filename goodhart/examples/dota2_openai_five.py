@@ -1,23 +1,10 @@
 """Example: OpenAI Five Dota 2 reward complexity (2019).
 
-Dota 2 has one of the most complex reward functions ever used in RL:
-  - Win/loss (sparse, delayed ~45 minutes)
-  - Gold advantage (shaped)
-  - XP advantage (shaped)
-  - Kill/death rewards (event-based)
-  - Tower damage (event-based)
-  - Creep last-hit rewards (event-based, respawning)
+7-component reward with 100x magnitude range required multiple rounds
+of 'surgery' to rebalance, producing degenerate strategies at wrong weights.
 
-OpenAI needed "surgery" — continuing training across reward
-function changes — because getting the reward weights wrong
-produced degenerate strategies.
-
-This example pushes the framework's expressiveness by modeling
-a multi-component, multi-timescale reward function and showing
-which interactions it catches.
-
-Source: Berner et al. 2019, "Dota 2 with Large Scale Deep Reinforcement
-  Learning" (OpenAI); reward structure from technical report Section 4.3
+Source: Berner et al. 2019, "Dota 2 with Large Scale Deep RL" (OpenAI);
+  Section 4.3
 """
 
 from goodhart.models import *
@@ -25,6 +12,30 @@ from goodhart.engine import *
 from goodhart.rules.reward import *
 from goodhart.rules.training import *
 from goodhart.rules.architecture import PrecedentRule, Precedent
+
+METADATA = {
+    "id": "dota2_openai_five",
+    "source_paper": "Berner et al. 2019, 'Dota 2 with Large Scale Deep Reinforcement Learning' (OpenAI)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Section 4.3",
+    "year": 2019,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to win Dota 2 games. Wrong reward weights caused ignoring creeps, suicidal tower diving, and passive play.",
+    "documented_failure": "7-component reward function with 100x magnitude range required multiple rounds of 'surgery' to rebalance. Wrong weights caused degenerate strategies: ignoring creep farming (reward too low), suicidal tower diving (kill reward too high), passive play (death penalty too high).",
+    "failure_mechanism": "penalty_dominance",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Reward surgery — iterative rebalancing of component weights during training",
+    "compute_cost_class": "high",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "multi_component": "7 reward components with different magnitudes and timescales",
+        "respawning_creeps": "Creep last-hit reward respawns every 30 steps, creating farming incentive",
+    },
+}
 
 
 class RewardComponentInteraction(PrecedentRule):

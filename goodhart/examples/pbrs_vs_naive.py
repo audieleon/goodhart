@@ -1,23 +1,38 @@
 """Example: PBRS vs Naive Shaping — side-by-side comparison.
 
-Potential-Based Reward Shaping (Ng 1999) preserves optimal policy.
-Naive additive shaping does not. This example runs both through
-the tool side-by-side to show exactly which rules distinguish them.
-
-The PBRS version: can_loop=False, requires_action=False → 2 criticals
-The naive version: can_loop=True, requires_action=True → 4 criticals
-
-The tool catches 3 additional problems in naive shaping that PBRS
-eliminates by construction: shaping_loop_exploit, respawning_exploit,
-and shaping_not_potential_based.
+PBRS (Ng 1999) gets 2 criticals; naive additive shaping gets 4. The tool
+catches shaping_loop_exploit and respawning_exploit that PBRS eliminates.
 
 Source: Eschmann et al. 2023 (RSS), "Benchmarking Potential Based
-Rewards for Learning Humanoid Locomotion"; Ng et al. 1999
-Tool result: PBRS gets 2 criticals, naive gets 4 (tool distinguishes them)
+  Rewards for Learning Humanoid Locomotion"; Ng et al. 1999
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "pbrs_vs_naive",
+    "source_paper": "Eschmann et al. 2023 (RSS), Benchmarking Potential Based Rewards for Learning Humanoid Locomotion; Ng et al. 1999",
+    "paper_url": "https://arxiv.org/abs/2307.04217",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2023,
+    "domain": "locomotion",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Side-by-side comparison: PBRS gets 2 criticals, naive shaping gets 4. PBRS eliminates loop and respawning exploits by construction.",
+    "documented_failure": "Naive additive shaping (action-dependent, loopable) triggers shaping_loop_exploit, respawning_exploit, and shaping_not_potential_based; PBRS (state-only, can_loop=False) eliminates these by Ng 1999 theorem",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Use F(s,s') = gamma*Phi(s') - Phi(s) form (the only form that preserves optimal policy)",
+    "compute_cost_class": "medium",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "comparison_example": "Shows before/after to demonstrate PBRS eliminates failure modes by construction",
+        "ng_1999_theorem": "F(s,s') = gamma*Phi(s') - Phi(s) is the ONLY form preserving optimal policy",
+    },
+}
 
 
 def run_example():

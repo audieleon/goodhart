@@ -1,24 +1,35 @@
-"""Example: RND intrinsic motivation — non-episodic design insight.
+"""Example: RND intrinsic motivation -- non-episodic design insight.
 
-RND (Random Network Distillation) adds intrinsic reward for visiting
-novel states. A critical design choice: intrinsic reward is NON-EPISODIC
-(doesn't reset on death). If it reset, the agent would learn to die
-deliberately to re-explore already-visited states.
-
-The tool flags RND's intrinsic reward as a respawning exploit (it's
-infinite and always available). This is technically correct but
-misleading — intrinsic rewards are DESIGNED to be infinite. The tool
-can't yet distinguish "infinite reward by design" from "infinite
-reward by accident."
-
-Source: Burda et al. 2019 (ICLR), "Exploration by Random Network
-Distillation"
-Tool result: FAIL — respawning_exploit on intrinsic (correct math,
-  but misleading interpretation)
+Intrinsic reward must NOT reset on death, or agent learns to die to re-explore visited states.
+Source: Burda et al. 2019 (ICLR), "Exploration by Random Network Distillation"
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "rnd_intrinsic",
+    "source_paper": "Burda et al. 2019 (ICLR), 'Exploration by Random Network Distillation'",
+    "paper_url": "https://arxiv.org/abs/1810.12894",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2019,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to explore novel states. Tool flags intrinsic reward as respawning exploit (correct math but misleading -- intrinsic rewards are designed to be infinite).",
+    "documented_failure": "If intrinsic reward resets on death (episodic), agent learns to die deliberately to re-explore already-visited states. RND uses non-episodic intrinsic to prevent this.",
+    "failure_mechanism": "respawning_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Non-episodic intrinsic reward with separate value head and shorter discount factor (gamma_int=0.99 vs gamma_ext=0.999)",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "designed_infinite": "Tool cannot yet distinguish designed-infinite from accidental-infinite rewards",
+        "non_episodic_key": "Critical design choice: intrinsic reward persists across episodes",
+    },
+}
 
 
 def run_example():

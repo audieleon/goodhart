@@ -1,20 +1,37 @@
-"""Example: Google Data Center Cooling — simple reward + hard constraints.
+"""Example: Google Data Center Cooling — simple reward + hard constraints (POSITIVE).
 
-9-13% energy savings at two sites, 30% at Google data centers.
-The key design decision: safety constraints (temperature, humidity,
-equipment limits) are NOT part of the reward. They are enforced as
-action masks. The reward is just: -energy_consumption.
+Reward is just -energy_consumption with safety as action masks, not
+penalties. Achieves 9-13% savings and the tool correctly passes clean.
 
-This is the industrial RL design pattern that works: keep the reward
-simple, enforce safety externally.
-
-Source: Lazic et al. 2022, "Controlling Commercial Cooling Systems
-Using Reinforcement Learning"
-Tool result: PASS (correct — simple reward with external constraints)
+Source: Lazic et al. 2022, "Controlling Commercial Cooling Systems Using RL"
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "datacenter_cooling",
+    "source_paper": "Lazic et al. 2022, 'Controlling Commercial Cooling Systems Using Reinforcement Learning'",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2022,
+    "domain": "industrial",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Simple -energy_consumption reward with safety as hard constraints. Well-designed, deployed in production with 9-13% savings.",
+    "documented_failure": "N/A — well-designed reward with external safety constraints. Tool correctly gives a clean bill.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "simple_reward": "Single reward term (-energy) with no competing objectives",
+        "hard_constraints": "Safety enforced as action masks, not soft penalties",
+    },
+}
 
 
 def run_example():

@@ -1,26 +1,37 @@
-"""Examples: Sparse reward environments across the literature.
+"""Example: Sparse reward environments across the literature.
 
-Sparse reward is the most common source of degenerate policies.
-The pattern is always the same: the goal reward is too far away
-for random exploration to reach, so ANY step penalty creates an
-incentive to die fast or stand still.
-
-Covers:
-- Montezuma's Revenge (Atari, 2016) — the task that spawned RND
-- MiniHack MultiRoom (2021) — our failures
-- Minecraft/Crafter exploration (2022)
-- Sparse robotics manipulation (2020)
-
-All use only built-in rules, no custom rules needed.
-
-Source: Bellemare et al. 2013 (ALE/Montezuma, JAIR); Samvelyan et al.
-  2021 (MiniHack, NeurIPS); Guss et al. 2019 (MineRL, NeurIPS)
+Sparse reward is the most common source of degenerate policies across multiple domains.
+Source: Bellemare et al. 2013 (ALE/Montezuma); Samvelyan et al. 2021 (MiniHack); Guss et al. 2019 (MineRL)
 """
 
 from goodhart.models import *
 from goodhart.engine import *
 from goodhart.rules.reward import *
 from goodhart.rules.training import *
+
+METADATA = {
+    "id": "sparse_reward_traps",
+    "source_paper": "Bellemare et al. 2013 (ALE/Montezuma, JAIR); Samvelyan et al. 2021 (MiniHack, NeurIPS); Guss et al. 2019 (MineRL, NeurIPS)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2013,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agents were supposed to reach distant goals. Instead step penalties made exploration irrational, so agents learned to die fast or stand still.",
+    "documented_failure": "Goal reward too far for random exploration to reach. Any step penalty creates incentive to die fast or stand still. Pattern repeats across Montezuma's Revenge, Crafter, and sparse robotics.",
+    "failure_mechanism": "idle_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Intrinsic motivation (RND), Hindsight Experience Replay (HER), or curriculum learning",
+    "compute_cost_class": "medium",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "universal_pattern": "penalty * max_steps > goal * p(goal) makes exploration irrational",
+        "multiple_domains": "Same failure across Atari, Minecraft-like, and robotics environments",
+    },
+}
 
 
 def run_example():

@@ -1,17 +1,38 @@
 """Example: Mountain Car — the canonical reward desert.
 
-Every step costs -1. The goal (hilltop) gives 0. There is no
-positive reward anywhere. The agent gets -1 whether it's building
-momentum or standing still. Learning is extremely slow because
-only random goal discovery provides any gradient.
+Every step costs -1 and the goal gives 0. No positive reward exists
+anywhere, so the agent has no gradient toward the hilltop.
 
 Source: Moore 1990, "Efficient Memory-based Learning for Robot
   Control." Also Sutton & Barto 2018, Section 10.1.
-Tool should catch: negative_only_reward (CRITICAL)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "mountain_car_desert",
+    "source_paper": "Moore 1990, Efficient Memory-based Learning for Robot Control; Sutton & Barto 2018, Section 10.1",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 1990,
+    "domain": "control",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to reach the hilltop. Instead every step costs -1 and the goal gives 0 -- no positive signal anywhere.",
+    "documented_failure": "Every step costs -1 and the goal gives 0; no positive reward exists anywhere; the agent gets -1 whether building momentum or standing still, making learning extremely slow",
+    "failure_mechanism": "reward_desert",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Add positive reward at goal or potential-based shaping toward hilltop",
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "negative_only_reward": "No positive reward exists; optimal strategy is least total penalty",
+        "canonical_example": "The textbook example of reward deserts from Sutton & Barto",
+    },
+}
 
 
 def run_example():

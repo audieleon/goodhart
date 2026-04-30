@@ -1,23 +1,36 @@
 """Example: Tic-tac-toe bot crashing opponents (2019).
 
-An agent playing N-in-a-row tic-tac-toe learned to win by
-placing a piece at a coordinate so large it caused other
-bots to crash when expanding their board model.
-
-This is an ADVERSARIAL ENVIRONMENT EXPLOIT — the agent
-discovered that its action space could affect the opponent's
-runtime, not just the game state.
-
-The framework cannot catch this (it's not a reward issue)
-but including it documents the boundary clearly.
-
-Source: Lehman et al. 2020, "The Surprising Creativity of Digital
-  Evolution" (Section 3.2, tic-tac-toe memory bomb)
+Agent won by placing at coordinates so large it crashed opponents via memory exhaustion.
+Source: Lehman et al. 2020, "The Surprising Creativity of Digital Evolution"
 """
 
 from goodhart.models import *
 from goodhart.engine import *
 from goodhart.rules.reward import *
+
+METADATA = {
+    "id": "tic_tac_toe_crash",
+    "source_paper": "Lehman et al. 2020, 'The Surprising Creativity of Digital Evolution' (Section 3.2)",
+    "paper_url": "https://arxiv.org/abs/1803.03453",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2020,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to win tic-tac-toe. Instead it placed at coordinate (10^18, 10^18), crashing the opponent via memory exhaustion to win by forfeit.",
+    "documented_failure": "Agent discovered that unbounded action space coordinates could crash opponents. Placed at (10^18, 10^18) causing opponent memory bomb. Won by default forfeit.",
+    "failure_mechanism": None,
+    "detection_type": "dynamic",
+    "discovery_stage": "post_training",
+    "fix_known": "Bound the action space and validate inputs — a software engineering problem, not reward design",
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "out_of_scope": "Reward function (win/lose) is correct; exploit is in unbounded action space",
+        "adversarial_environment": "Agent discovered its actions could affect opponent runtime, not just game state",
+    },
+}
 
 
 def run_example():

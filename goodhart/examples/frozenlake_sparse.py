@@ -1,18 +1,37 @@
 """Example: FrozenLake-8x8 — simplest exploration threshold example.
 
-FrozenLake has +1 for reaching the goal, 0 for everything else
-(including falling in holes). With stochastic transitions and an
-8x8 grid, random walk discovery probability is ~1%.
-
-This is the simplest possible environment where goodhart adds
-value. Good for tutorials and onboarding.
+Sparse +1 goal reward with ~1% random discovery rate on 8x8 grid
+demonstrates budget sufficiency warnings for the simplest RL setup.
 
 Source: Gymnasium documentation, standard RL textbook environment
-Tool result: WARNING — budget_sufficiency (correctly flags sparsity)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "frozenlake_sparse",
+    "source_paper": "Gymnasium documentation, standard RL textbook environment",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from Gymnasium documentation",
+    "year": 2013,
+    "domain": "navigation",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to reach the goal. Sparse reward with 1% discovery rate makes learning slow without shaping.",
+    "documented_failure": "FrozenLake-8x8 has +1 for goal and 0 for everything else (no hole penalty). With 1% random discovery and 2500 episodes, the agent expects only ~25 goal discoveries. A reward desert where all non-goal states are equal.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Add hole penalty (-1) to provide gradient signal, though this changes the optimal policy",
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "sparse_reward": "Only +1 at goal with 0 everywhere else, creating a reward desert",
+        "low_discovery": "1% random discovery rate on stochastic 8x8 grid",
+    },
+}
 
 
 def run_example():

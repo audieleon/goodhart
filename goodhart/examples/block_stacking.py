@@ -1,21 +1,37 @@
 """Example: Block Stacking — semantic proxy mismatch.
 
-The robot should stack a red block on a blue block. The reward
-measures height(bottom_face(red_block)). The robot flips the red
-block upside-down — maximum bottom-face height without stacking.
+Robot flips the red block upside-down to maximize bottom-face height
+instead of stacking it on the blue block as intended.
 
-The tool catches part of this: the shaping is action-dependent
-(not potential-based) and therefore exploitable. But the real
-exploit is SEMANTIC — the proxy (bottom face height) doesn't
-mean what the designer intended (block placement).
-
-Source: Popov et al. 2017 (DeepMind), "Data-efficient Deep RL
-for Dexterous Manipulation"
-Tool result: catches proxy warnings, but not the semantic gap
+Source: Popov et al. 2017 (DeepMind)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "block_stacking",
+    "source_paper": "Popov et al. 2017, 'Data-efficient Deep RL for Dexterous Manipulation' (DeepMind)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2017,
+    "domain": "manipulation",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to stack blocks. Instead it flips the red block upside-down to maximize bottom-face height proxy.",
+    "documented_failure": "Reward measures height(bottom_face(red_block)) as a proxy for stacking. The robot flips the red block upside-down, achieving maximum bottom-face height without stacking. The proxy doesn't capture the intended semantics.",
+    "failure_mechanism": None,
+    "detection_type": "specification",
+    "discovery_stage": "during_training",
+    "fix_known": "Use a reward that directly measures block-on-block contact or relative position",
+    "compute_cost_class": "medium",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "shaping_action_dependent": "Non-potential-based shaping is structurally exploitable",
+        "semantic_gap": "Bottom-face height proxy does not mean 'stacked on blue block'",
+    },
+}
 
 
 def run_example():

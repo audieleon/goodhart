@@ -1,15 +1,37 @@
 """Example: PettingZoo adversarial — non-stationarity advisory.
 
-Simple tag (predator-prey) has symmetric rewards: predator gets +1
-for catching, prey gets -1 for being caught. The advisory fires
-because symmetric terminal rewards suggest competitive dynamics.
+Symmetric predator-prey rewards (+10 catch, -10 timeout) create
+non-stationary dynamics as the opponent improves during self-play.
 
 Source: Terry et al. 2021 (PettingZoo), inspired by Bansal et al. 2018
-Advisory fires: advisory_nonstationarity (symmetric win/lose)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "pettingzoo_adversarial",
+    "source_paper": "Terry et al. 2021 (PettingZoo); Bansal et al. 2018",
+    "paper_url": "https://arxiv.org/abs/2009.14471",
+    "source_code_url": "https://github.com/Farama-Foundation/PettingZoo",
+    "reward_location": "Reward structure from paper description",
+    "year": 2021,
+    "domain": "multi_agent",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Predator-prey with symmetric rewards. Self-play creates non-stationary dynamics as the opponent improves during training.",
+    "documented_failure": "Symmetric terminal rewards (+10 catch, -10 timeout) create competitive dynamics; in self-play the effective MDP shifts continuously as the prey improves, causing forgetting cycles and potential strategy collapse",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Population-based training or league training to avoid co-adaptation collapse",
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "nonstationarity": "Symmetric rewards suggest competitive dynamics with shifting opponent",
+        "advisory_fires": "advisory_nonstationarity fires on symmetric win/lose structure",
+    },
+}
 
 
 def run_example():

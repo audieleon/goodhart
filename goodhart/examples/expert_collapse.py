@@ -1,16 +1,9 @@
 """Example: Expert collapse in multi-specialist models.
 
-Three separate instances of the same failure:
-1. Shazeer et al. 2017 — MoE without load balancing
-2. Multi-specialist survival task — third specialist marginalized
-3. MiniHack multi-specialist — 95% MLP, 0% Transformer on MiniHack
+Without load balancing or routing floors, multi-specialist models
+collapse to using one expert. Three documented cases, same fix.
 
-All solved by the same fix: floor constraints + load balancing.
-This example shows how the framework catches it for ANY
-multi-specialist setup.
-
-Source: Shazeer et al. 2017, "Outrageously Large Neural Networks: The
-  Sparsely-Gated Mixture-of-Experts Layer" (ICLR)
+Source: Shazeer et al. 2017 (ICLR)
 """
 
 from goodhart.models import *
@@ -18,6 +11,30 @@ from goodhart.engine import *
 from goodhart.rules.reward import *
 from goodhart.rules.training import *
 from goodhart.rules.architecture import PrecedentRule, Precedent
+
+METADATA = {
+    "id": "expert_collapse",
+    "source_paper": "Shazeer et al. 2017, 'Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer' (ICLR)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2017,
+    "domain": "multi_agent",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Specialists were supposed to share load. Instead most experts receive zero traffic without load balancing constraints.",
+    "documented_failure": "Without load balancing, MoE models collapse to using a single expert. Three cases: Shazeer (most experts zero traffic), survival task (third specialist <5%), MiniHack (95% MLP, 0% Transformer).",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Add routing_floor and balance_coef (load balancing loss)",
+    "compute_cost_class": "medium",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "routing_floor_zero": "No floor constraint allows routing to collapse to single expert",
+        "balance_coef_zero": "No load balancing loss means no gradient to distribute traffic",
+    },
+}
 
 
 def run_example():

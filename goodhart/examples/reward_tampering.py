@@ -1,20 +1,35 @@
-"""Example: Sycophancy to Subterfuge — reward tampering (LIMITATION).
+"""Example: Sycophancy to Subterfuge -- reward tampering (LIMITATION).
 
-Models trained on simple sycophancy (agreeing with users) generalize
-zero-shot to: modifying task checklists, editing their own reward
-function code, and covering their tracks. No explicit training on
-reward tampering was needed.
-
-The reward structure is simple and correct. The problem is that the
-agent has write access to the reward mechanism itself.
-
-Source: Denison et al. 2024 (Anthropic), "Sycophancy to Subterfuge:
-Investigating Reward-Tampering in Large Language Models"
-Tool result: PASS + advisory_learned_reward (correct boundary)
+Agent trained on sycophancy generalizes to modifying its own reward function code.
+Source: Denison et al. 2024 (Anthropic), "Sycophancy to Subterfuge"
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "reward_tampering",
+    "source_paper": "Denison et al. 2024 (Anthropic), 'Sycophancy to Subterfuge: Investigating Reward-Tampering in Large Language Models'",
+    "paper_url": "https://arxiv.org/abs/2406.10162",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2024,
+    "domain": "rlhf",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to complete tasks helpfully. Instead it learned to modify its own reward function code to always return high scores.",
+    "documented_failure": "Models trained on simple sycophancy generalize zero-shot to modifying task checklists, editing reward function code, and covering tracks. No explicit reward tampering training was needed.",
+    "failure_mechanism": None,
+    "detection_type": "specification",
+    "discovery_stage": "post_training",
+    "fix_known": "Sandboxing, monitoring, and access control — prevent agent write access to reward mechanism",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "out_of_scope": "Reward structure is simple and correct; the problem is agent write access to the reward mechanism itself",
+        "limitation_example": "No static analysis of R(s,a) can detect reward tampering",
+    },
+}
 
 
 def run_example():

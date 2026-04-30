@@ -1,18 +1,37 @@
 """Example: Isaac Gym Ant — massively parallel locomotion.
 
-Isaac Gym Ant uses progress + alive bonus + energy penalties at
-massive scale (4096 parallel envs). The alive bonus (0.5/step) is
-small relative to progress reward (~1.0/step), making idle exploit
-less likely than in MuJoCo Humanoid. However, the up_weight term
-creates a passive reward for maintaining orientation.
+Alive bonus (0.5) + up_weight (0.1) give 0.6/step passive reward vs
+~1.0/step for locomotion, creating a moderate idle exploit floor at 38%.
 
 Source: Makoviychuk et al. 2021 (NeurIPS), IsaacGymEnvs
-Tool should catch: moderate idle exploit risk from combined
-  alive_bonus + up_weight
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "isaac_gym_ant",
+    "source_paper": "Makoviychuk et al. 2021 (NeurIPS), IsaacGymEnvs",
+    "paper_url": "https://arxiv.org/abs/2108.10470",
+    "source_code_url": "https://github.com/NVIDIA-Omniverse/IsaacGymEnvs",
+    "reward_location": "Reward structure from paper description",
+    "year": 2021,
+    "domain": "locomotion",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to run forward. Alive bonus + up_weight give 0.6/step passive vs ~1.0/step for locomotion, creating a 38% idle floor.",
+    "documented_failure": "alive_bonus (0.5/step) + up_weight (0.1/step) create 0.6/step passive reward vs ~1.0/step for locomotion; idle exploit is moderate but present at 38% of walking reward",
+    "failure_mechanism": "idle_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Massive parallelism (4096 envs) and large compute budget mitigate in practice",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "moderate_idle_risk": "Passive reward is 38% of active, lower than Humanoid but still notable",
+        "massive_parallel": "4096 parallel envs provide sufficient exploration to overcome idle floor",
+    },
+}
 
 
 def run_example():

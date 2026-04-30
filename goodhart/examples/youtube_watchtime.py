@@ -1,23 +1,35 @@
-"""Example: YouTube Watch Time — respawning exploit at scale.
+"""Example: YouTube Watch Time -- respawning exploit at scale.
 
-YouTube's recommendation system optimizes expected watch time per
-impression. This is a PER_STEP reward with INFINITE respawn and
-can_loop=True — an infinite content supply. There is no goal reward
-for "user satisfaction" or "content quality."
-
-The tool correctly identifies this as a respawning exploit:
-looping engagement reward beats the nonexistent goal. This is
-the structural reason why engagement optimization leads to
-increasingly extreme content — it's Goodhart's Law at the scale
-of billions of users.
-
-Source: Covington et al. 2016 (RecSys), "Deep Neural Networks for
-YouTube Recommendations"; Ribeiro et al. 2023 (PNAS)
-Tool result: FAIL — respawning_exploit (CORRECTLY caught)
+Infinite loopable engagement reward with no goal for user satisfaction or content quality.
+Source: Covington et al. 2016 (RecSys), Ribeiro et al. 2023 (PNAS)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "youtube_watchtime",
+    "source_paper": "Covington et al. 2016 (RecSys), 'Deep Neural Networks for YouTube Recommendations'; Ribeiro et al. 2023 (PNAS)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2016,
+    "domain": "industrial",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "System was supposed to recommend satisfying content. Instead it maximized watch time by recommending progressively more extreme and outrage-inducing content.",
+    "documented_failure": "Watch time is an infinite, loopable, non-intentional reward with no goal to compete against. Leads to recommending progressively more extreme content because outrage and controversy maximize engagement.",
+    "failure_mechanism": "respawning_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "post_training",
+    "fix_known": "Add goal rewards for content quality/diversity/satisfaction, or use constrained optimization",
+    "compute_cost_class": "high",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "no_goal_reward": "No structural incentive for user satisfaction or content quality",
+        "infinite_loopable": "Watch time is PER_STEP with INFINITE respawn and can_loop=True",
+    },
+}
 
 
 def run_example():

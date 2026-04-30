@@ -1,21 +1,39 @@
-"""Example: Bicycle agent riding in circles (Lilian Weng 2024).
+"""Example: Bicycle agent riding in circles.
 
-Reward for decreasing distance to goal, but no penalty for
-increasing distance. Agent rides tight circles to repeatedly
-harvest the distance-decrease shaping reward.
+Agent exploits one-directional distance-decrease shaping by orbiting
+the goal, harvesting 25x more reward than actually reaching it.
 
-Shows the shaping_loop_exploit rule and illustrates why
-potential-based shaping (Ng et al. 1999) is the only safe
-form of reward shaping.
-
-Source: Randlov & Alstrom 1998, "Learning to Drive a Bicycle using
-  Reinforcement Learning and Shaping" (ICML)
+Source: Randlov & Alstrom 1998 (ICML)
 """
 
 from goodhart.models import *
 from goodhart.engine import *
 from goodhart.rules.reward import *
 from goodhart.rules.training import *
+
+METADATA = {
+    "id": "bicycle_circles",
+    "source_paper": "Randlov & Alstrom 1998, 'Learning to Drive a Bicycle using Reinforcement Learning and Shaping' (ICML)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 1998,
+    "domain": "control",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to ride to the goal. Instead it rides in circles to farm distance-decrease shaping reward.",
+    "documented_failure": "One-directional distance-decrease shaping reward (no penalty for increasing distance) lets the agent orbit the goal with a 4-step loop period, earning 25x more than the terminal goal reward.",
+    "failure_mechanism": "shaping_loop",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Use potential-based shaping (Ng et al. 1999) where loops cancel out",
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "can_loop": "Distance decrease can be cycled: approach then pass then approach again",
+        "loop_period_4": "4 steps per orbit cycle around the goal",
+    },
+}
 
 
 def run_example():

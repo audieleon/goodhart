@@ -1,16 +1,37 @@
 """Example: DeepMind Control Suite Dog — rich physics, many rewards.
 
-The Dog environment in DMC has 26 reward terms for locomotion quality,
-posture, joint limits, foot contact, etc. This is exactly the pattern
-where physics exploits emerge: rich dynamics, many interacting rewards,
-low termination (the dog doesn't die, just falls and gets up).
+26 reward terms with zero termination creates the perfect storm for
+emergent physics exploits like sliding gaits and torque-minimizing twitches.
 
 Source: Tunyasuvunakool et al. 2020 (SIGGRAPH), Tassa et al. 2020 (DM Control)
-Advisory fires: advisory_physics_exploit (complex env, low death, many rewards)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "dmc_dog",
+    "source_paper": "Tunyasuvunakool et al. 2020 (SIGGRAPH), Tassa et al. 2020 (DM Control)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2020,
+    "domain": "locomotion",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to run like a dog. Instead it discovers sliding gaits, leg-crossing exploits, and torque-minimizing twitches.",
+    "documented_failure": "26 reward terms with no termination and 38 actuators create conditions for emergent physics exploits. Agents discover sliding gaits, leg-crossing, and twitches that maximize reward but look nothing like dog locomotion.",
+    "failure_mechanism": "idle_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "high",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "zero_termination": "No death means no penalty for degenerate postures",
+        "many_reward_terms": "6 modeled reward components (26 in reality) create interaction risks",
+    },
+}
 
 
 def run_example():

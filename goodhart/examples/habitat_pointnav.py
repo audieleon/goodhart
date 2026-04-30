@@ -1,16 +1,37 @@
 """Example: Habitat PointNav — distance decrease shaping.
 
-Habitat PointNav uses delta-distance shaping: r_t = d_{t-1} - d_t.
-This is potential-based (Phi = -d_t), so by Ng 1999 it preserves
-optimal policy. However, the slack reward (+2.5 for reaching within
-0.2m) combined with success reward (+10) creates a large discontinuity.
+Potential-based distance shaping preserves optimal policy, but slack +
+success rewards create a large discontinuity at the goal threshold.
 
 Source: Savva et al. 2019 (ICCV, Habitat), Wijmans et al. 2020 (ICLR)
-Tool should catch: potential oscillation risk if not properly bounded
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "habitat_pointnav",
+    "source_paper": "Savva et al. 2019 (ICCV, Habitat); Wijmans et al. 2020 (ICLR)",
+    "paper_url": "https://arxiv.org/abs/1904.01201",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2019,
+    "domain": "navigation",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to navigate to goal. Potential-based shaping is sound but slack+success discontinuity may cause oscillation near goal.",
+    "documented_failure": "Distance shaping is potential-based (Ng 1999) so no loop exploit, but +2.5 slack and +10 success create a large reward discontinuity at the 0.2m threshold",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Discontinuity is by design; potential oscillation risk if not properly bounded",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "potential_based_shaping": "Distance shaping uses Phi=-d_t, preserving optimal policy by Ng 1999",
+        "discontinuity_risk": "Slack+success rewards create a step function at 0.2m threshold",
+    },
+}
 
 
 def run_example():

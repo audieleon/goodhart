@@ -1,17 +1,37 @@
 """Example: MADDPG cooperative navigation (MPE).
 
-Multi-agent particle environment: N agents must cover N landmarks.
-Each agent is penalized by its distance to nearest landmark, creating
-cooperative reward. With shared reward, credit assignment is ambiguous;
-with individual reward, agents may compete for the same landmark.
+N agents cover N landmarks with distance-penalty reward. Shared reward
+causes ambiguous credit assignment; individual reward causes competition.
 
 Source: Lowe et al. 2017 (NeurIPS, MADDPG), Mordatch & Abbeel 2018
-Tool should catch: potential idle exploit (distance penalty means
-  standing near any landmark gives 0 penalty, same as optimal)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "maddpg_cooperative",
+    "source_paper": "Lowe et al. 2017 (NeurIPS, MADDPG); Mordatch & Abbeel 2018",
+    "paper_url": "https://arxiv.org/abs/1706.02275",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2017,
+    "domain": "multi_agent",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agents were supposed to cover landmarks cooperatively. Shared reward causes ambiguous credit assignment; individual reward causes competition for same landmark.",
+    "documented_failure": "Distance-penalty reward with shared credit creates ambiguous credit assignment; with individual reward, agents may compete for the same landmark instead of covering all landmarks",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "MADDPG uses centralized critic with decentralized actors to address credit assignment",
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "credit_assignment": "Shared reward makes individual contribution ambiguous",
+        "no_idle_exploit": "No passive alive bonus; standing still gives constant negative reward",
+    },
+}
 
 
 def run_example():

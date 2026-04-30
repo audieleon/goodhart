@@ -1,16 +1,35 @@
 """Example: Safety Gym with explicit constraint budget (advisory demo).
 
-This example shows how the advisory_constrained_rl rule fires when
-it detects negative event rewards that look like they approximate
-safety constraints. The advisory explains that soft penalties are
-NOT equivalent to hard cost budgets.
-
+Advisory fires when negative event rewards approximate safety constraints.
 Source: Ray et al. 2019 (Safety Gym), Achiam et al. 2017 (CPO)
-Advisory fires: advisory_constrained_rl (negative events as costs)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "safetygym_constrained",
+    "source_paper": "Ray et al. 2019 (Safety Gym), Achiam et al. 2017 (CPO)",
+    "paper_url": None,
+    "source_code_url": "https://github.com/openai/safety-gym",
+    "reward_location": "Reward structure from paper description",
+    "year": 2019,
+    "domain": "safety",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to reach goal with bounded hazard entries. Soft penalty -0.1 allows 100 hazard entries for only -10.0 cost, making constraint violations always worthwhile.",
+    "documented_failure": "With soft penalty -0.1, agent can enter 100 hazards for -10.0 total. With hard constraint (budget=25), the 26th entry is forbidden regardless of reward. Different optimization landscape entirely.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Use constrained optimization (CPO/FOCOPS) with hard cost budget instead of soft penalty",
+    "compute_cost_class": "medium",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "advisory_demo": "Shows how advisory_constrained_rl rule fires on negative event rewards",
+        "soft_vs_hard": "Demonstrates the gap between penalty approximation and true constraint enforcement",
+    },
+}
 
 
 def run_example():

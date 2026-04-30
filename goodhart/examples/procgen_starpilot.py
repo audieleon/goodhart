@@ -1,16 +1,35 @@
-"""Example: Procgen StarPilot — dense event rewards + generalization.
+"""Example: Procgen StarPilot -- dense event rewards + generalization.
 
-StarPilot has dense rewards from shooting enemies (+1 each) and
-collecting stars (+0.5 each), with a clear progression structure.
-Unlike CoinRun, there's no single terminal goal — the reward is
-accumulated throughout the episode.
-
+Dense event rewards (+1 enemy, +0.5 star) with level progression.
 Source: Cobbe et al. 2020 (NeurIPS, Procgen Benchmark)
-Tool should: flag budget concerns (200 levels train → test generalization)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "procgen_starpilot",
+    "source_paper": "Cobbe et al. 2020 (NeurIPS, Procgen Benchmark)",
+    "paper_url": "https://arxiv.org/abs/1912.01588",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2020,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to progress through levels. Dense event rewards provide good learning signal; main challenge is generalization, not reward structure.",
+    "documented_failure": "N/A — well-designed reward structure with dense events. The challenge is train-to-test generalization across procedural levels, not reward hacking.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "dense_events": "Multiple event rewards provide learning signal throughout the episode",
+        "level_completion_bonus": "Terminal bonus incentivizes progression over farming",
+    },
+}
 
 
 def run_example():

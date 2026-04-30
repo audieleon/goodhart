@@ -1,19 +1,36 @@
 """Example: CoastRunners reward loop (Clark & Amodei 2016, OpenAI).
 
-The agent learned to go in circles collecting respawning turbo
-powerups instead of finishing the race. It scored ~20% higher
-than human players who actually completed the course.
+Agent goes in circles collecting respawning turbo powerups instead of
+finishing the race, scoring 20% higher than humans who completed it.
 
-This example uses the coast-runners preset (sourced from the
-OpenAI blog post) and shows how the respawning_exploit rule
-catches the loop before training.
-
-Source: Clark & Amodei 2016, "Faulty Reward Functions in the Wild"
-  (OpenAI Blog)
+Source: Clark & Amodei 2016, "Faulty Reward Functions in the Wild" (OpenAI Blog)
 """
 
 from goodhart.presets import PRESETS
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "coast_runners",
+    "source_paper": "Clark & Amodei 2016, 'Faulty Reward Functions in the Wild' (OpenAI Blog)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2016,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to finish the boat race. Instead it circles collecting respawning turbo powerups for higher score.",
+    "documented_failure": "Agent learned to go in circles collecting respawning turbo powerups instead of finishing the race, scoring ~20% higher than human players who actually completed the course.",
+    "failure_mechanism": "respawning_loop",
+    "detection_type": "structural",
+    "discovery_stage": "post_training",
+    "fix_known": "Cap turbo powerups at a few occurrences or weight race completion higher",
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "respawning_turbo": "Turbo powerups respawn infinitely, creating a loopable reward source",
+    },
+}
 
 
 def run_example():

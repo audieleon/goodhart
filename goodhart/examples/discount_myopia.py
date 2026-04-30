@@ -1,22 +1,36 @@
 """Example: Discount myopia — gamma too low for the task.
 
-gamma=0.95 with a 500-step episode. The effective horizon is
-1/(1-0.95) = 20 steps. The agent plans 20 steps ahead in a
-500-step task. Rewards beyond step 20 are invisible.
+gamma=0.95 gives an effective horizon of 20 steps in a 500-step
+episode, making rewards beyond step 20 invisible to the agent.
 
-Hu et al. (ICML 2022) showed that the wrong gamma makes agents
-myopic to distant rewards even when the agent can physically
-reach them. Lower gamma can paradoxically outperform higher
-gamma due to regularization effects, but when the task
-genuinely requires long-horizon planning, myopia is fatal.
-
-Source: Hu et al. 2022, "On the Role of Discount Factor in
-  Offline Reinforcement Learning" (ICML)
-Tool should catch: discount_horizon_mismatch (CRITICAL)
+Source: Hu et al. 2022, "On the Role of Discount Factor in Offline RL" (ICML)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "discount_myopia",
+    "source_paper": "Hu et al. 2022, 'On the Role of Discount Factor in Offline Reinforcement Learning' (ICML)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2022,
+    "domain": "control",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to reach a distant goal. Instead it ignores rewards beyond 20 steps due to gamma=0.95 myopia.",
+    "documented_failure": "gamma=0.95 with a 500-step episode gives an effective horizon of 20 steps. The terminal goal at step ~250 is discounted to 0.95^250 ~ 0.00003, making it effectively invisible.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Increase gamma to 0.999 (horizon = 1000 steps)",
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "gamma_horizon_mismatch": "Effective horizon 1/(1-gamma) = 20 steps vs 500-step episode",
+    },
+}
 
 
 def run_example():

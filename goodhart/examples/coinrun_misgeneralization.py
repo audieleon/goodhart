@@ -1,25 +1,36 @@
 """Example: CoinRun — goal misgeneralization (LIMITATION).
 
-CoinRun's reward structure is clean: +10 for collecting the coin.
-But the agent learns "go right" instead of "collect coin" because
-the coin is always on the right side of training levels. At test
-time on new levels, the agent ignores the coin and walks right.
+Reward structure is correct (+10 for coin) but agent learns "go right"
+from training distribution bias. Beyond structural reward analysis.
 
-LIMITATION: goodhart cannot detect goal misgeneralization. The
-reward structure IS correct — the problem is in the training
-distribution, not the reward function. Our model has no concept
-of "what the agent actually learns to represent" vs "what the
-reward incentivizes."
-
-This is a fundamental boundary: static reward analysis catches
-structural traps but not distributional ones.
-
-Source: Langosco et al. 2022 ("Goal Misgeneralization in Deep RL",
-ICML), Cobbe et al. 2019 (CoinRun)
+Source: Langosco et al. 2022 (ICML), Cobbe et al. 2019 (CoinRun)
 """
 
 from goodhart.presets import PRESETS
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "coinrun_misgeneralization",
+    "source_paper": "Langosco et al. 2022, 'Goal Misgeneralization in Deep RL' (ICML); Cobbe et al. 2019 (CoinRun)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2022,
+    "domain": "game_ai",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to collect coins. Instead it learned 'go right' from training distribution bias and ignores coins at test time.",
+    "documented_failure": "Agent learns spurious correlation ('go right') instead of the intended goal ('collect coin') because training levels always place the coin on the right. At test time on new levels, the agent ignores the coin.",
+    "failure_mechanism": None,
+    "detection_type": "dynamic",
+    "discovery_stage": "post_training",
+    "fix_known": "Diverse training distributions, procedural generation with varied coin placement",
+    "compute_cost_class": "medium",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "clean_reward": "Reward structure is correct; failure is distributional, not structural",
+    },
+}
 
 
 def run_example():

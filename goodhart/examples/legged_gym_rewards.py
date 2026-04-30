@@ -1,13 +1,7 @@
 """Example: Legged Gym 19-component reward (Rudin et al. 2022, RSS).
 
-Massively parallel PPO for ANYmal quadruped locomotion. The reward
-has 19 terms including exponential velocity tracking, alive bonus,
-and 7 penalty terms spanning 6 orders of magnitude.
-
-Demonstrates three new analysis capabilities:
-1. exponential_saturation: exp(-error/sigma) tracking plateaus
-2. reward_dominance_imbalance: 800,000x magnitude spread
-3. idle_exploit: feet_air_time pays for standing still
+19 reward terms spanning 800,000x magnitude range; feet_air_time creates
+an idle exploit and exponential velocity tracking saturates at 95%.
 
 Source: Rudin et al. 2022, "Learning to Walk in Minutes Using Massively
   Parallel Deep RL" (RSS); reward table from Section III-B
@@ -15,6 +9,31 @@ Source: Rudin et al. 2022, "Learning to Walk in Minutes Using Massively
 
 from goodhart.presets import PRESETS
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "legged_gym_rewards",
+    "source_paper": "Rudin et al. 2022, Learning to Walk in Minutes Using Massively Parallel Deep RL (RSS)",
+    "paper_url": "https://arxiv.org/abs/2109.11978",
+    "source_code_url": "https://github.com/leggedrobotics/legged_gym",
+    "reward_location": "Section III-B, reward table",
+    "year": 2022,
+    "domain": "locomotion",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to walk with 19-term reward. feet_air_time pays for standing still and penalty magnitudes span 800,000x.",
+    "documented_failure": "feet_air_time (+1.0/step, passive) creates idle exploit; 7 penalty terms span 6 orders of magnitude (lin_vel_z at -2.0 vs torques at -0.00001); exponential tracking saturates at 95% when error < 0.75",
+    "failure_mechanism": "idle_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "only_positive_rewards=True clipping and careful coefficient tuning in the real code",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "idle_exploit": "feet_air_time rewards standing still passively",
+        "magnitude_imbalance": "800,000x spread makes tiny penalties invisible to optimizer",
+        "exponential_saturation": "exp(-error/sigma) tracking creates 'close enough' plateau",
+    },
+}
 
 
 def run_example():

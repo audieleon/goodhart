@@ -1,19 +1,37 @@
 """Example: MuJoCo Humanoid-v4 idle exploit (Gymnasium).
 
-The Humanoid environment has healthy_reward=5.0 per step with velocity
-reward averaging ~1.25. Standing still earns 5000 over 1000 steps;
-walking earns ~6250 but risks falling (termination). The rational
-agent stands still.
-
-Demonstrates the @reward_function decorator on a known failure case.
-The reward constants match Gymnasium Humanoid-v4 defaults exactly.
+Healthy_reward=5.0/step dwarfs velocity_reward~1.25/step, so the
+rational agent stands still and earns 5000 vs ~6250 with fall risk.
 
 Source: Todorov et al. 2012 (MuJoCo), Brockman et al. 2016 (Gymnasium)
-Tool should catch: idle_exploit (healthy_reward >> velocity_reward)
 """
 
 from goodhart import reward_function, RewardSource, RewardType, RespawnBehavior
 import math
+
+METADATA = {
+    "id": "humanoid_idle",
+    "source_paper": "Todorov et al. 2012 (MuJoCo); Brockman et al. 2016 (Gymnasium)",
+    "paper_url": "https://arxiv.org/abs/1606.01540",
+    "source_code_url": None,
+    "reward_location": "Gymnasium Humanoid-v4 default constants",
+    "year": 2016,
+    "domain": "locomotion",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to walk. Instead it stands still because healthy_reward (5.0/step) dwarfs velocity_reward (~1.25/step).",
+    "documented_failure": "healthy_reward=5.0 per step with velocity reward averaging ~1.25; standing still earns 5000 over 1000 steps vs ~6250 with fall risk, making idle the rational strategy",
+    "failure_mechanism": "idle_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Set healthy_reward=1.0 (Humanoid-v3 default) or use terminate_when_unhealthy=False with no healthy_reward",
+    "compute_cost_class": "medium",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "idle_exploit": "Passive healthy_reward dominates active velocity_reward by 4x",
+        "gymnasium_defaults": "Constants match Gymnasium Humanoid-v4 defaults exactly",
+    },
+}
 
 
 # =========================================================================

@@ -1,20 +1,34 @@
-"""Example: Sepsis Treatment RL — SOFA score gaming.
+"""Example: Sepsis Treatment RL -- SOFA score gaming.
 
-Sepsis treatment RL uses +15/-15 terminal reward (survive/die) with
-SOFA and lactate shaping. The shaping rewards are action-dependent
-and loopable: certain drug combinations reduce SOFA short-term but
-cause fluid overload long-term.
-
-Demonstrates the @reward_function decorator on a healthcare domain
-where the structural warnings are clinically actionable.
-
-Source: Raghu et al. 2017 (NeurIPS ML4H), Peng et al. 2023
-(npj Digital Medicine)
-Tool result: WARNING — shaping_not_potential_based, proxy_hackability
-  (correctly identifies the clinical risk)
+Shaping rewards on SOFA/lactate are loopable via drug cycling, creating clinical risk.
+Source: Raghu et al. 2017 (NeurIPS ML4H), Peng et al. 2023 (npj Digital Medicine)
 """
 
 from goodhart import reward_function, RewardSource, RewardType
+
+METADATA = {
+    "id": "sepsis_treatment",
+    "source_paper": "Raghu et al. 2017 (NeurIPS ML4H), Peng et al. 2023 (npj Digital Medicine)",
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2017,
+    "domain": "healthcare",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to optimize sepsis treatment. Instead it could game SOFA/lactate shaping by cycling drug combinations that reduce scores short-term but cause fluid overload long-term.",
+    "documented_failure": "SOFA/lactate shaping rewards are action-dependent and loopable. Aggressive IV fluids reduce SOFA short-term but cause fluid overload long-term. Agent could learn to oscillate: bolus -> SOFA drops -> reabsorbed -> SOFA rises -> bolus.",
+    "failure_mechanism": "shaping_loop",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "Use potential-based shaping or terminal-only reward to avoid short-term gaming",
+    "compute_cost_class": "medium",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "clinical_risk": "Shaping reward on SOFA/lactate creates actionable clinical risk",
+        "loopable_shaping": "Drug combinations can cycle SOFA scores over ~4h periods",
+    },
+}
 
 
 # =========================================================================
@@ -77,7 +91,7 @@ SOURCES = [
     max_steps=MAX_HOURS,
     gamma=0.99,
     n_states=50000,
-    n_actions=25,       # 5 IV fluid levels × 5 vasopressor levels
+    n_actions=25,       # 5 IV fluid levels x 5 vasopressor levels
     action_type="discrete",
     death_probability=BASELINE_MORTALITY,
     sources=SOURCES,

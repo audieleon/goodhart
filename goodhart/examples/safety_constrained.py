@@ -1,22 +1,35 @@
-"""Example: Constrained RL — CPO/FOCOPS (LIMITATION).
+"""Example: Constrained RL -- CPO/FOCOPS (LIMITATION).
 
-Constrained RL separates the objective (maximize reward) from
-safety constraints (keep cost below budget). This fundamentally
-changes the optimization landscape: the feasible policy set is
-a strict subset of all policies.
-
-LIMITATION: goodhart models costs as reward penalties, but this
-is NOT equivalent to constrained optimization. A soft penalty
-allows trading safety for reward; a hard constraint does not.
-CPO (Achiam et al. 2017) and FOCOPS (Zhang et al. 2020) enforce
-constraints that our model cannot represent.
-
-Source: Achiam et al. 2017 (CPO, ICML), Zhang et al. 2020 (FOCOPS),
-Ray et al. 2019 (Safety Gym)
+Soft reward penalties are not equivalent to hard constraint optimization.
+Source: Achiam et al. 2017 (CPO, ICML), Zhang et al. 2020 (FOCOPS), Ray et al. 2019 (Safety Gym)
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "safety_constrained",
+    "source_paper": "Achiam et al. 2017 (CPO, ICML), Zhang et al. 2020 (FOCOPS), Ray et al. 2019 (Safety Gym)",
+    "paper_url": "https://arxiv.org/abs/1705.10528",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2017,
+    "domain": "safety",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to maximize reward subject to safety constraints. Tool models costs as penalties, but this is not equivalent to constrained optimization.",
+    "documented_failure": "goodhart models costs as reward penalties, but a soft penalty allows trading safety for reward while a hard constraint does not. CPO/FOCOPS enforce constraints the tool cannot represent.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": "CostSource model, constraint budgets, and Lagrangian dual analysis would be needed",
+    "compute_cost_class": "medium",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "limitation_example": "Penalty strength is arbitrary; real constrained RL uses learned Lagrange multiplier",
+        "hard_vs_soft": "A budget of 25 violations is not the same as -0.5 per violation",
+    },
+}
 
 
 def run_example():

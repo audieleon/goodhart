@@ -1,25 +1,35 @@
 """Example: DeepMind Tokamak Plasma Control (LIMITATION).
 
-The tokamak controller optimizes plasma shape, current, and X-point
-accuracy. It works — until engineers discover the agent uses
-asymmetric ohmic coil currents that create dangerous electromagnetic
-forces on the machine structure.
-
-The missing reward term (coil balance) was never specified. The tool
-gives a clean bill because the reward structure it CAN see is fine.
-The problem is what's ABSENT from the config.
-
-This is a fundamental limitation: goodhart analyzes relationships
-between present reward terms. It cannot detect missing terms that
-domain experts would know to include.
-
-Source: Degrave et al. 2022 (Nature), "Magnetic control of tokamak
-plasmas through deep reinforcement learning"
-Tool result: PASS (wrong — real system had a missing constraint)
+Reward structure is clean but missing coil balance term causes dangerous electromagnetic forces.
+Source: Degrave et al. 2022 (Nature), "Magnetic control of tokamak plasmas through deep RL"
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+METADATA = {
+    "id": "tokamak_plasma",
+    "source_paper": "Degrave et al. 2022 (Nature), 'Magnetic control of tokamak plasmas through deep reinforcement learning'",
+    "paper_url": "https://doi.org/10.1038/s41586-021-04301-9",
+    "source_code_url": None,
+    "reward_location": "Reward structure from paper description",
+    "year": 2022,
+    "domain": "industrial",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": "Agent was supposed to control plasma shape. It succeeded, but used asymmetric coil currents creating dangerous electromagnetic forces on the machine structure.",
+    "documented_failure": "Missing coil balance term in reward. Agent found alternative path using asymmetric ohmic coil currents that achieved same plasma shape but created dangerous electromagnetic forces.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "post_training",
+    "fix_known": "Add coil current balance term to reward — requires domain expertise to enumerate safety constraints",
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "missing_term": "The problem is what is ABSENT from the config, not what is present",
+        "positive_structure": "Reward structure that IS specified is clean and well-designed",
+    },
+}
 
 
 def run_example():
