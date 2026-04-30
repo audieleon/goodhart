@@ -1,23 +1,64 @@
-"""Example: Agile Soccer Skills — held-out evaluation.
+"""Agile Soccer Skills — held-out evaluation.
 
-Held-out paper not used during tool development. Tests whether
-the tool detects structural issues in a multi-component soccer
-reward with extreme magnitude ratios (scoring 1000 vs shaping 0.05)
-and documented hardware damage from aggressive kicking.
-
-Source: Haarnoja et al. 2024, "Learning Agile Soccer Skills for a
-  Bipedal Robot with Deep Reinforcement Learning" (Science Robotics
-  2024, arXiv:2304.13653). Weights from Table S3.
-
-Expected result: WARN or higher. The scoring reward (1000) is
-  20,000x the velocity-to-ball shaping (0.05), creating extreme
-  dominance. The paper documents: (1) knee gear breakage from
-  aggressive kicking, (2) forward-leaning gait causing falls on
-  real hardware, (3) rolling-to-ball degenerate strategy.
+Haarnoja et al. 2024 bipedal soccer reward with 20,000x magnitude
+ratio between scoring and shaping. Documented knee gear breakage.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "heldout_agile_soccer",
+    "source_paper": (
+        'Haarnoja et al. 2024, "Learning Agile Soccer Skills for a'
+        ' Bipedal Robot with Deep Reinforcement Learning,"'
+        " Science Robotics 2024"
+    ),
+    "paper_url": "https://arxiv.org/abs/2304.13653",
+    "source_code_url": None,
+    "reward_location": "Table S3",
+    "year": 2024,
+    "domain": "locomotion",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": (
+        "Agent was supposed to play soccer with bipedal walking."
+        " Instead it broke knee gears from aggressive kicking,"
+        " fell forward on real hardware, and rolled to the ball"
+        " instead of walking."
+    ),
+    "documented_failure": (
+        "Scoring reward (1000) is 20,000x the velocity-to-ball"
+        " shaping (0.05), creating extreme dominance. The agent"
+        " sacrifices everything for goals: (1) aggressive kicking"
+        " broke knee gears, (2) forward-leaning gait caused falls"
+        " on real hardware, (3) without skill regularization the"
+        " agent learned to roll to the ball instead of walking"
+        " (Figure 7B). Fixes: joint_torque penalty (0.01) and"
+        " upright reward (0.015) were added AFTER observing"
+        " hardware damage."
+    ),
+    "failure_mechanism": "shaping_dominance",
+    "detection_type": "structural",
+    "discovery_stage": "post_training",
+    "fix_known": (
+        "Added joint_torque penalty (0.01) and upright reward"
+        " (0.015) after observing hardware damage."
+    ),
+    "compute_cost_class": "high",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "scoring_dominance": (
+            "1000 vs 0.05 = 20,000x ratio; agent optimizes"
+            " scoring at the cost of physical safety."
+        ),
+        "post_training_fix": (
+            "Penalties were added after hardware damage,"
+            " confirming the original reward was misspecified."
+        ),
+    },
+}
 
 
 def run_example():

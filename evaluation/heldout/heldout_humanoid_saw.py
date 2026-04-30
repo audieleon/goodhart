@@ -1,23 +1,51 @@
-"""Example: Humanoid SaW — held-out evaluation.
+"""Humanoid SaW — held-out evaluation (negative example).
 
-Held-out paper not used during tool development. Tests whether
-the tool passes structurally sound locomotion rewards while
-firing physics exploit advisories for continuous control.
-
-Source: van Marum et al. 2024, "Revisiting Reward Design and
-  Evaluation for Robust Humanoid Standing and Walking" (IROS 2024)
-
-Expected result: PASS structurally. Alive bonus (0.5) is small
-  relative to velocity tracking (1.0) and marked intentional
-  (survival IS the goal in locomotion). Physics exploit advisory
-  should fire since this is locomotion with continuous control.
-  The paper's actual issues (hopping gaits, exploitation of
-  physics simulator) are the kind of thing blind-spot advisories
-  warn about but cannot detect structurally.
+van Marum et al. 2024 humanoid standing and walking. Structurally
+sound; physics exploit advisory should fire but passes structurally.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "heldout_humanoid_saw",
+    "source_paper": (
+        'van Marum et al. 2024, "Revisiting Reward Design and'
+        ' Evaluation for Robust Humanoid Standing and Walking,"'
+        " IROS 2024"
+    ),
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "N/A",
+    "year": 2024,
+    "domain": "locomotion",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": (
+        "Structurally sound locomotion reward. Alive bonus (0.5)"
+        " is moderate relative to velocity tracking (1.0). Physics"
+        " exploits (hopping gaits) are beyond structural detection."
+    ),
+    "documented_failure": "None — reward is well-designed.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "unknown",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "physics_advisory": (
+            "Paper's actual issues (hopping gaits, simulator"
+            " exploitation) are blind-spot advisories, not"
+            " structural failures."
+        ),
+        "alive_bonus_intentional": (
+            "Alive bonus marked intentional because survival"
+            " IS the goal in locomotion."
+        ),
+    },
+}
 
 
 def run_example():

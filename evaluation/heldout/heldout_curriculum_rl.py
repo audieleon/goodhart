@@ -1,19 +1,55 @@
-"""Example: CurriculumRL — held-out evaluation.
+"""CurriculumRL — held-out evaluation.
 
-Held-out paper not used during tool development. Tests whether
-the tool warns about exploration threshold issues when a sparse
-goal has high constraint penalties making random discovery
-extremely unlikely.
-
-Source: CurriculumRL (EWRL 2025) — curriculum learning for RL
-
-Expected result: WARN. The sparse goal with high constraint
-  penalties means random exploration is very unlikely to reach
-  the goal. Tool should warn about exploration threshold.
+Freitag et al. 2025 sparse goal with constraint penalties making
+random discovery extremely unlikely. Exploration threshold warning.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "heldout_curriculum_rl",
+    "source_paper": (
+        'Freitag et al. 2025, "CurriculumRL: Curriculum Learning'
+        ' for Reinforcement Learning," EWRL 2025'
+    ),
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "N/A",
+    "year": 2025,
+    "domain": "navigation",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": (
+        "Agent was supposed to reach a sparse goal via curriculum."
+        " Instead, constraint penalties dominate exploration,"
+        " making random goal discovery nearly impossible."
+    ),
+    "documented_failure": (
+        "Sparse goal with only 0.5% random discovery probability"
+        " combined with per-step constraint penalty (-0.05) means"
+        " random episodes accumulate large negative returns. Agent"
+        " must explore past heavy penalties to find the rare goal,"
+        " requiring ~99% of training budget just to see enough"
+        " goal examples. Constraint exploitation possible."
+    ),
+    "failure_mechanism": "exploration_threshold",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Curriculum provides partial credit to bridge the"
+        " exploration gap."
+    ),
+    "compute_cost_class": "unknown",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "sparse_goal": (
+            "0.5% discovery probability with heavy penalties"
+            " makes random exploration impractical."
+        ),
+    },
+}
 
 
 def run_example():

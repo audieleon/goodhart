@@ -1,23 +1,53 @@
-"""Example: Rapid Motor Adaptation — held-out evaluation.
+"""Rapid Motor Adaptation — held-out evaluation (negative example).
 
-Held-out paper not used during tool development. Tests whether
-the tool correctly passes a well-structured locomotion reward
-with bioenergetics-inspired penalties. The reward uses a clamped
-forward velocity goal with quadratic regularization penalties,
-and a curriculum that gradually increases penalty weights.
-
-Source: Kumar et al. 2021, "Rapid Motor Adaptation for Legged
-  Robots" (RSS 2021, arXiv:2107.04034). Weights from paper.
-
-Expected result: PASS (possibly with warnings). Forward velocity
-  goal (20) is well-balanced with lateral/rotation penalties (20).
-  Bioenergetics penalties (work, ground impact) are small but
-  meaningful. Successfully deployed on real Unitree A1 across
-  diverse terrains with no documented Goodhart failures.
+Kumar et al. 2021 well-structured locomotion with bioenergetics
+penalties. Deployed on real A1 with no documented Goodhart failures.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "heldout_rma_locomotion",
+    "source_paper": (
+        'Kumar et al. 2021, "Rapid Motor Adaptation for Legged'
+        ' Robots," RSS 2021'
+    ),
+    "paper_url": "https://arxiv.org/abs/2107.04034",
+    "source_code_url": None,
+    "reward_location": "Paper reward description",
+    "year": 2021,
+    "domain": "locomotion",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": (
+        "Well-structured locomotion reward with bioenergetics-"
+        "inspired penalties and curriculum. Successfully deployed"
+        " on real Unitree A1 across diverse terrains."
+    ),
+    "documented_failure": "None — reward is well-designed.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "well_balanced": (
+            "Forward velocity goal (effective 7.0/step) is"
+            " well-balanced against lateral/rotation penalties."
+        ),
+        "curriculum": (
+            "Penalties start at 0.03x and grow to 1.0x,"
+            " preventing penalty avoidance during early training."
+        ),
+        "real_deployment": (
+            "Successfully deployed on real hardware across"
+            " diverse terrains with no Goodhart failures."
+        ),
+    },
+}
 
 
 def run_example():

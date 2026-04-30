@@ -1,22 +1,49 @@
-"""Example: Humanoid Parkour Learning — held-out evaluation.
+"""Humanoid Parkour Learning — held-out evaluation (negative example).
 
-Held-out paper not used during tool development. Tests whether
-the tool correctly passes a well-structured reward with no
-documented Goodhart failures. 17 components with no alive
-bonus (avoiding the classic stand-still trap), well-calibrated
-regularization penalties, and strong velocity tracking goals.
-
-Source: Zhuang, Yao, Zhao 2024, "Humanoid Parkour Learning"
-  (CoRL 2024, arXiv:2406.10759). Weights from Table 4.
-
-Expected result: PASS (possibly with minor warnings). No alive
-  bonus, intentional rewards dominate, regularization penalties
-  are small. The paper reports no Goodhart-style failures;
-  diverse behaviors emerge from terrain curriculum.
+Zhuang et al. 2024 humanoid with 17 reward components, no alive
+bonus, well-calibrated penalties. No documented Goodhart failures.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "heldout_humanoid_parkour",
+    "source_paper": (
+        'Zhuang, Yao & Zhao 2024, "Humanoid Parkour Learning,"'
+        " CoRL 2024"
+    ),
+    "paper_url": "https://arxiv.org/abs/2406.10759",
+    "source_code_url": None,
+    "reward_location": "Table 4",
+    "year": 2024,
+    "domain": "locomotion",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": (
+        "Well-structured 17-component reward with no alive bonus."
+        " Intentional rewards dominate, diverse behaviors emerge"
+        " from terrain curriculum."
+    ),
+    "documented_failure": "None — reward is well-designed.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "high",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "no_alive_bonus": (
+            "Avoids the classic stand-still trap by omitting"
+            " alive bonus entirely."
+        ),
+        "well_calibrated": (
+            "Intentional rewards (2.5/step) dominate small"
+            " regularization penalties."
+        ),
+    },
+}
 
 
 def run_example():

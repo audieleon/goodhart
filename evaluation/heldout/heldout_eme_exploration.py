@@ -1,19 +1,46 @@
-"""Example: EME Exploration — held-out evaluation.
+"""EME Exploration — held-out evaluation (negative example).
 
-Held-out paper not used during tool development. Tests whether
-the tool correctly passes a well-calibrated intrinsic motivation
-setup where the bonus is small relative to the task reward.
-
-Source: EME Exploration (NeurIPS 2024) — intrinsic motivation
-  for hard exploration problems
-
-Expected result: PASS (clean, or INFO-level notes only).
-  The intrinsic bonus is well-calibrated relative to the
-  task reward (0.1 vs 1.0).
+Wang et al. 2024 well-calibrated intrinsic motivation where bonus
+is 10% of task reward. Should pass clean.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "heldout_eme_exploration",
+    "source_paper": (
+        'Wang et al. 2024, "EME: Exploration with Mutual'
+        ' Information Maximizing State and Action Embeddings,"'
+        " NeurIPS 2024"
+    ),
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "N/A",
+    "year": 2024,
+    "domain": "navigation",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": (
+        "Well-calibrated intrinsic motivation setup. Intrinsic"
+        " bonus (0.1) is 10% of task reward (1.0), within safe"
+        " bounds."
+    ),
+    "documented_failure": "None — reward is well-designed.",
+    "failure_mechanism": None,
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": None,
+    "compute_cost_class": "unknown",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "well_calibrated": (
+            "Intrinsic bonus at 10% of task reward is within"
+            " safe bounds; no structural problems."
+        ),
+    },
+}
 
 
 def run_example():

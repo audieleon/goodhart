@@ -1,21 +1,58 @@
-"""Example: Omnigrasp — held-out evaluation.
+"""Omnigrasp — held-out evaluation.
 
-Held-out paper not used during tool development. Tests whether
-the tool catches shaping dominance in a grasping environment
-where dense shaping is 30x the sparse goal reward.
-
-Source: Luo et al. 2024, "Omnigrasp: Grasping Diverse Objects
-  with Simulated Humanoids" (NeurIPS 2024)
-
-Tool should catch: shaping dominates goal (30x), making goal
-  discovery nearly impossible. Paper confirms they needed
-  pre-grasp guidance as a workaround.
-
-Expected result: FAIL (CRITICAL — shaping dominates goal)
+Luo et al. 2024 grasping reward where dense shaping is 30x the
+sparse goal. Agent optimizes shaping instead of reaching the goal.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "heldout_omnigrasp",
+    "source_paper": (
+        'Luo et al. 2024, "Omnigrasp: Grasping Diverse Objects'
+        ' with Simulated Humanoids," NeurIPS 2024'
+    ),
+    "paper_url": None,
+    "source_code_url": None,
+    "reward_location": "N/A",
+    "year": 2024,
+    "domain": "manipulation",
+    "encoding_basis": "primary_source",
+    "verification_date": "2026-04-30",
+    "brief_summary": (
+        "Agent was supposed to grasp diverse objects. Instead it"
+        " optimizes the pre-grasp shaping signal (30x the goal)"
+        " instead of reaching the actual grasp."
+    ),
+    "documented_failure": (
+        "Pre-grasp guidance shaping (30.0) is 30x the grasp"
+        " success goal (1.0). Dense shaping at this ratio makes"
+        " goal discovery nearly impossible — the agent optimizes"
+        " the shaping signal instead of reaching the actual goal."
+        " Paper confirms needing pre-grasp guidance as a workaround."
+    ),
+    "failure_mechanism": "shaping_dominance",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Pre-grasp guidance workaround to bootstrap goal"
+        " discovery past the shaping dominance."
+    ),
+    "compute_cost_class": "high",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "shaping_ratio": (
+            "30x shaping-to-goal ratio makes goal discovery"
+            " nearly impossible."
+        ),
+        "can_loop": (
+            "Pre-grasp shaping can loop (oscillate near object)"
+            " without completing the grasp."
+        ),
+    },
+}
 
 
 def run_example():

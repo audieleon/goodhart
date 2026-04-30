@@ -1,24 +1,59 @@
-"""Example: Extreme Parkour — held-out evaluation.
+"""Extreme Parkour — held-out evaluation (NoClear ablation).
 
-Held-out paper not used during tool development. Tests whether
-the tool detects the energy-minimization exploit documented in
-the NoClear ablation: without a clearance penalty, the robot
-places feet on terrain edges to minimize energy, which is
-physically unstable and causes falls in the real world.
-
-Source: Cheng et al. 2024, "Extreme Parkour with Legged Robots"
-  (ICRA 2024, arXiv:2309.14341). Weights from codebase:
-  github.com/chengxuxin/extreme-parkour
-
-Expected result: WARN or higher. The reward structure has a
-  dominant collision penalty (-10.0) vs small goal reward (1.5),
-  and numerous passive regularization penalties. The NoClear
-  ablation shows removing the clearance penalty leads to
-  edge-stepping exploit (energy minimization dominates safety).
+Cheng et al. 2024 quadruped parkour with edge-stepping exploit
+when clearance penalty is removed. Energy minimization dominates.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "heldout_extreme_parkour",
+    "source_paper": (
+        'Cheng et al. 2024, "Extreme Parkour with Legged Robots,"'
+        " ICRA 2024"
+    ),
+    "paper_url": "https://arxiv.org/abs/2309.14341",
+    "source_code_url": "https://github.com/chengxuxin/extreme-parkour",
+    "reward_location": "Codebase reward definitions",
+    "year": 2024,
+    "domain": "locomotion",
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "brief_summary": (
+        "Agent was supposed to traverse parkour obstacles. Instead,"
+        " without clearance penalty, it places feet on terrain"
+        " edges to minimize energy — physically unstable."
+    ),
+    "documented_failure": (
+        "NoClear ablation: removing the clearance penalty causes"
+        " energy-minimization penalties (-10.0 collision, -0.5"
+        " hip_pos, -0.04 dof_error, -1e-5 torques) to incentivize"
+        " short steps landing on terrain edges. This is reward-"
+        "optimal but physically unstable: 2.7x more edge violations"
+        " in simulation, 20-80% lower success rate on real hardware."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "detection_type": "structural",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Add feet_edge clearance penalty to penalize foot"
+        " placement on terrain edges."
+    ),
+    "compute_cost_class": "high",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "noclear_ablation": (
+            "Encodes the NoClear ablation specifically, where"
+            " removing clearance penalty reveals the exploit."
+        ),
+        "energy_minimization": (
+            "Passive penalties dominate and create an energy-"
+            "minimization shortcut via edge-stepping."
+        ),
+    },
+}
 
 
 def run_example():
