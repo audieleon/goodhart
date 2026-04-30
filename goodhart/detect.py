@@ -92,8 +92,8 @@ def detect_env(env_id: str, n_episodes: int = 20) -> Tuple[EnvironmentModel, dic
 
     # Compute statistics
     import statistics
-    mean_length = statistics.mean(episode_lengths)
-    mean_reward = statistics.mean(episode_rewards)
+    mean_length = float(statistics.mean(episode_lengths))
+    mean_reward = float(statistics.mean(episode_rewards))
     max_reward = max(episode_rewards)
     min_reward = min(episode_rewards)
     discovery_probability = positive_reward_episodes / n_episodes
