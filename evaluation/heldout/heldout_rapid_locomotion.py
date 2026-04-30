@@ -14,7 +14,7 @@ METADATA = {
         'Margolis et al. 2022, "Rapid Locomotion via Reinforcement'
         ' Learning," RSS 2022 / IJRR 2024'
     ),
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/2205.02824",
     "source_code_url": None,
     "reward_location": "Table VI",
     "year": 2022,

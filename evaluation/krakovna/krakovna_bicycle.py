@@ -31,7 +31,7 @@ METADATA = {
     "detection_type": "structural",
     "is_negative_example": False,
     "compute_cost_class": "low",
-    "paper_url": None,
+    "paper_url": "https://gwern.net/doc/reinforcement-learning/model-free/1998-randlov.pdf",
     "reward_location": "Randlov & Alstrom 1998 Section 4: r=-1 (fall), r=0.01 (goal), r=(4-psi_g^2)*0.00004 (shaping). 9 actions, gamma=0.99.",
     "verification_date": "2026-04-30",
     "discovery_stage": "during_training",

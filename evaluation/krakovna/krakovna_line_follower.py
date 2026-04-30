@@ -7,10 +7,10 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "krakovna_line_follower",
     "source_paper": "Vamplew 2004",
-    "paper_url": None,
+    "paper_url": "https://figshare.utas.edu.au/articles/conference_contribution/Lego_Mindstorms_Robots_as_a_Platform_for_Teaching_Reinforcement_Learning/23212277",
     "year": 2004,
     "domain": "control",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "verification_date": "2026-04-29",
     "brief_summary": (
         "Robot was supposed to follow a line forward. Instead it"
@@ -38,8 +38,8 @@ METADATA = {
             "agnostic. Going backward collects the same reward."
         ),
     },
-    "paper_url": None,
-    "reward_location": "Reward structure inferred from Krakovna catalog description",
+    "paper_url": "https://figshare.utas.edu.au/articles/conference_contribution/Lego_Mindstorms_Robots_as_a_Platform_for_Teaching_Reinforcement_Learning/23212277",
+    "reward_location": "Vamplew 2004, AISAT2004 pp.70-75: Sarsa on Lego Mindstorms, line-following task. On-track reward without directional constraint.",
     "verification_date": "2026-04-30",
     "discovery_stage": "during_training",
     "source_code_url": None,

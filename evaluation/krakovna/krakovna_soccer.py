@@ -31,7 +31,7 @@ METADATA = {
     "detection_type": "structural",
     "is_negative_example": False,
     "compute_cost_class": "low",
-    "paper_url": None,
+    "paper_url": "https://people.eecs.berkeley.edu/~russell/papers/icml99-shaping.pdf",
     "reward_location": "Ng et al. 1999 Section 1 p2: +reward for ball contact (non-PBRS). Agent vibrates on ball.",
     "verification_date": "2026-04-30",
     "discovery_stage": "during_training",

@@ -13,7 +13,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "mountain_car_desert",
     "source_paper": "Moore 1990, Efficient Memory-based Learning for Robot Control; Sutton & Barto 2018, Section 10.1",
-    "paper_url": None,
+    "paper_url": "https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-209.pdf",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 1990,

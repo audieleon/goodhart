@@ -14,7 +14,7 @@ from goodhart.rules.training import *
 METADATA = {
     "id": "bicycle_circles",
     "source_paper": "Randlov & Alstrom 1998, 'Learning to Drive a Bicycle using Reinforcement Learning and Shaping' (ICML)",
-    "paper_url": None,
+    "paper_url": "https://gwern.net/doc/reinforcement-learning/model-free/1998-randlov.pdf",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 1998,

@@ -14,7 +14,7 @@ METADATA = {
         'Luo et al. 2024, "Omnigrasp: Grasping Diverse Objects'
         ' with Simulated Humanoids," NeurIPS 2024'
     ),
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/2407.00550",
     "source_code_url": None,
     "reward_location": "N/A",
     "year": 2024,

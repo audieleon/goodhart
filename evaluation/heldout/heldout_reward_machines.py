@@ -14,7 +14,7 @@ METADATA = {
         'Li et al. 2024, "Reward Machines: Non-Markovian Reward'
         ' Specification," NeurIPS 2024'
     ),
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/2406.00043",
     "source_code_url": None,
     "reward_location": "N/A",
     "year": 2024,

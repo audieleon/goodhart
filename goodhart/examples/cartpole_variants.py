@@ -12,7 +12,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "cartpole_variants",
     "source_paper": "Barto et al. 1983, Sutton & Barto 2018 (Ch. 3.4), Gymnasium",
-    "paper_url": None,
+    "paper_url": "http://www.cs.ualberta.ca/~sutton/papers/barto-sutton-anderson-83.pdf",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 1983,
