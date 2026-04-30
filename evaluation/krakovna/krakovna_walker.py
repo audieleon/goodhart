@@ -10,7 +10,7 @@ METADATA = {
     "paper_url": None,
     "year": 2021,
     "domain": "locomotion",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "unverified_folklore",
     "verification_date": "2026-04-29",
     "brief_summary": (
         "Walker was supposed to walk with a natural gait. Instead"

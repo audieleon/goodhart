@@ -10,7 +10,7 @@ METADATA = {
     "paper_url": None,
     "year": 2018,
     "domain": "control",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "unverified_folklore",
     "verification_date": "2026-04-29",
     "brief_summary": (
         "Roomba was supposed to drive forward and clean. Instead it"

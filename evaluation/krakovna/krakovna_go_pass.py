@@ -10,7 +10,7 @@ METADATA = {
     "paper_url": None,
     "year": 2019,
     "domain": "game_ai",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "unverified_folklore",
     "verification_date": "2026-04-29",
     "brief_summary": (
         "Go agent was supposed to play and win. Instead it passes"
