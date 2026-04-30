@@ -247,6 +247,24 @@ class IdleExploit(Rule):
                         if not s.requires_action
                         and s.reward_type == RewardType.PER_STEP
                         and s.modifier_type == "none"]
+
+        # State-dependent penalties with requires_action=True are
+        # environmental — they happen based on state, not action.
+        # An idle agent still suffers thermal discomfort, market risk,
+        # fire damage, etc. These must be counted in BOTH idle and
+        # explore EVs, because the agent can influence severity but
+        # cannot avoid them by doing nothing.
+        env_penalties = [s for s in model.reward_sources
+                         if s.requires_action
+                         and s.state_dependent
+                         and s.value < 0
+                         and s.reward_type == RewardType.PER_STEP
+                         and s.modifier_type == "none"
+                         and not s.intentional]
+
+        # Combine: idle sources + environmental penalties apply to idle
+        all_idle = idle_sources + env_penalties
+
         # If all positive idle sources are intentional (e.g., survival reward),
         # getting reward for existing IS the design. Not an exploit.
         # But only skip if there ARE positive idle sources — an empty list
@@ -256,7 +274,9 @@ class IdleExploit(Rule):
             return verdicts
         disc = _discounted_steps(model.gamma, model.max_steps)
         # Use best-case values for idle (worst case for the designer)
+        # For env penalties in idle, use full penalty (agent can't avoid)
         ev_idle = sum(_best_case_value(s) for s in idle_sources) * disc
+        ev_idle += sum(s.value for s in env_penalties) * disc
 
         # Explore EV: non-intentional per-step rewards at full value,
         # plus intentional rewards scaled by explore_fraction (how much
