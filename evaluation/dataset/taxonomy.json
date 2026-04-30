@@ -1,0 +1,1324 @@
+{
+  "generated": "2026-04-30",
+  "total_entries": 108,
+  "entries": [
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_allegro_hand.py",
+      "source": "eureka",
+      "name": "eureka_allegro_hand",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_ant.py",
+      "source": "eureka",
+      "name": "eureka_ant",
+      "criticals": 1,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "shaping_not_potential_based",
+        "compound_trap",
+        "exponential_saturation"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_anymal.py",
+      "source": "eureka",
+      "name": "eureka_anymal",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_ball_balance.py",
+      "source": "eureka",
+      "name": "eureka_ball_balance",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_block_stack.py",
+      "source": "eureka",
+      "name": "eureka_block_stack",
+      "criticals": 0,
+      "warnings": 4,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_cartpole.py",
+      "source": "eureka",
+      "name": "eureka_cartpole",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_franka_cabinet.py",
+      "source": "eureka",
+      "name": "eureka_franka_cabinet",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_humanoid.py",
+      "source": "eureka",
+      "name": "eureka_humanoid",
+      "criticals": 1,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "intrinsic_sufficiency"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_quadcopter.py",
+      "source": "eureka",
+      "name": "eureka_quadcopter",
+      "criticals": 3,
+      "warnings": 3,
+      "infos": 0,
+      "rules_fired": [
+        "penalty_dominates_goal",
+        "death_beats_survival",
+        "exploration_threshold",
+        "discount_horizon_mismatch",
+        "reward_delay_horizon",
+        "contradiction"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_bottle_cap.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_bottle_cap",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_catch_abreast.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_catch_abreast",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_catch_underarm.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_catch_underarm",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_door_close_inward.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_door_close_inward",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_door_close_outward.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_door_close_outward",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_door_open_inward.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_door_open_inward",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_door_open_outward.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_door_open_outward",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_grasp_and_place.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_grasp_and_place",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_kettle.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_kettle",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_lift_underarm.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_lift_underarm",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_over.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_over",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_pen.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_pen",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_push_block.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_push_block",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_re_orientation.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_re_orientation",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_scissors.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_scissors",
+      "criticals": 2,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "idle_exploit",
+        "contradiction"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_swing_cup.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_swing_cup",
+      "criticals": 2,
+      "warnings": 2,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "idle_exploit",
+        "intrinsic_sufficiency",
+        "contradiction"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/eureka/eureka_shadow_hand_switch.py",
+      "source": "eureka",
+      "name": "eureka_shadow_hand_switch",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/heldout/heldout_agile_soccer.py",
+      "source": "heldout",
+      "name": "heldout_agile_soccer",
+      "criticals": 2,
+      "warnings": 3,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "exploration_threshold",
+        "intrinsic_sufficiency",
+        "reward_delay_horizon",
+        "contradiction"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/heldout/heldout_curriculum_rl.py",
+      "source": "heldout",
+      "name": "heldout_curriculum_rl",
+      "criticals": 0,
+      "warnings": 5,
+      "infos": 0,
+      "rules_fired": [
+        "exploration_threshold",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/heldout/heldout_eme_exploration.py",
+      "source": "heldout",
+      "name": "heldout_eme_exploration",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/heldout/heldout_extreme_parkour.py",
+      "source": "heldout",
+      "name": "heldout_extreme_parkour",
+      "criticals": 2,
+      "warnings": 2,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "intrinsic_sufficiency",
+        "reward_dominance_imbalance",
+        "batch_size_interaction"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/heldout/heldout_humanoid_parkour.py",
+      "source": "heldout",
+      "name": "heldout_humanoid_parkour",
+      "criticals": 0,
+      "warnings": 2,
+      "infos": 0,
+      "rules_fired": [
+        "intrinsic_sufficiency",
+        "reward_dominance_imbalance"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/heldout/heldout_humanoid_saw.py",
+      "source": "heldout",
+      "name": "heldout_humanoid_saw",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/heldout/heldout_omnigrasp.py",
+      "source": "heldout",
+      "name": "heldout_omnigrasp",
+      "criticals": 2,
+      "warnings": 4,
+      "infos": 2,
+      "rules_fired": [
+        "exploration_threshold",
+        "respawning_exploit",
+        "shaping_loop_exploit",
+        "shaping_not_potential_based",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/heldout/heldout_rapid_locomotion.py",
+      "source": "heldout",
+      "name": "heldout_rapid_locomotion",
+      "criticals": 1,
+      "warnings": 3,
+      "infos": 0,
+      "rules_fired": [
+        "death_beats_survival",
+        "intrinsic_sufficiency",
+        "reward_dominance_imbalance",
+        "clip_fraction_risk"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/heldout/heldout_reward_machines.py",
+      "source": "heldout",
+      "name": "heldout_reward_machines",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "advisory_goal_misgeneralization"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/heldout/heldout_rma_locomotion.py",
+      "source": "heldout",
+      "name": "heldout_rma_locomotion",
+      "criticals": 0,
+      "warnings": 2,
+      "infos": 0,
+      "rules_fired": [
+        "reward_dominance_imbalance",
+        "clip_fraction_risk"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_bicycle.py",
+      "source": "krakovna",
+      "name": "krakovna_bicycle",
+      "criticals": 4,
+      "warnings": 3,
+      "infos": 2,
+      "rules_fired": [
+        "exploration_threshold",
+        "respawning_exploit",
+        "shaping_loop_exploit",
+        "shaping_not_potential_based",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "discount_horizon_mismatch",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_block_moving.py",
+      "source": "krakovna",
+      "name": "krakovna_block_moving",
+      "criticals": 0,
+      "warnings": 6,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "shaping_not_potential_based",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "discount_horizon_mismatch",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_cartwheel.py",
+      "source": "krakovna",
+      "name": "krakovna_cartwheel",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "respawning_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_coast_runners.py",
+      "source": "krakovna",
+      "name": "krakovna_coast_runners",
+      "criticals": 2,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "respawning_exploit",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_football.py",
+      "source": "krakovna",
+      "name": "krakovna_football",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "discount_horizon_mismatch"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_go_pass.py",
+      "source": "krakovna",
+      "name": "krakovna_go_pass",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 2,
+      "rules_fired": [
+        "exploration_threshold",
+        "advisory_nonstationarity"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_goal_classifiers.py",
+      "source": "krakovna",
+      "name": "krakovna_goal_classifiers",
+      "criticals": 0,
+      "warnings": 4,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_half_cheetah_spinning.py",
+      "source": "krakovna",
+      "name": "krakovna_half_cheetah_spinning",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_hide_and_seek.py",
+      "source": "krakovna",
+      "name": "krakovna_hide_and_seek",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 2,
+      "rules_fired": [
+        "exploration_threshold",
+        "advisory_nonstationarity"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_lego_stacking.py",
+      "source": "krakovna",
+      "name": "krakovna_lego_stacking",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_line_follower.py",
+      "source": "krakovna",
+      "name": "krakovna_line_follower",
+      "criticals": 4,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "penalty_dominates_goal",
+        "exploration_threshold",
+        "respawning_exploit",
+        "intrinsic_sufficiency",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_long_legs.py",
+      "source": "krakovna",
+      "name": "krakovna_long_legs",
+      "criticals": 1,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "shaping_not_potential_based",
+        "compound_trap",
+        "advisory_aggregation_trap"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_model_based_planner.py",
+      "source": "krakovna",
+      "name": "krakovna_model_based_planner",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_montezuma_key.py",
+      "source": "krakovna",
+      "name": "krakovna_montezuma_key",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "discount_horizon_mismatch"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_montezuma_room.py",
+      "source": "krakovna",
+      "name": "krakovna_montezuma_room",
+      "criticals": 2,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "respawning_exploit",
+        "discount_horizon_mismatch"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_overkill.py",
+      "source": "krakovna",
+      "name": "krakovna_overkill",
+      "criticals": 3,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "respawning_exploit",
+        "discount_horizon_mismatch",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_pancake.py",
+      "source": "krakovna",
+      "name": "krakovna_pancake",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_pinball_nudging.py",
+      "source": "krakovna",
+      "name": "krakovna_pinball_nudging",
+      "criticals": 2,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "respawning_exploit",
+        "respawning_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_reward_modeling_hero.py",
+      "source": "krakovna",
+      "name": "krakovna_reward_modeling_hero",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_reward_modeling_mr.py",
+      "source": "krakovna",
+      "name": "krakovna_reward_modeling_mr",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_road_runner.py",
+      "source": "krakovna",
+      "name": "krakovna_road_runner",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "staged_reward_plateau"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_roomba.py",
+      "source": "krakovna",
+      "name": "krakovna_roomba",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_running_gaits.py",
+      "source": "krakovna",
+      "name": "krakovna_running_gaits",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_soccer.py",
+      "source": "krakovna",
+      "name": "krakovna_soccer",
+      "criticals": 2,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "respawning_exploit",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_sonic.py",
+      "source": "krakovna",
+      "name": "krakovna_sonic",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "reward_delay_horizon"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_walker.py",
+      "source": "krakovna",
+      "name": "krakovna_walker",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exponential_saturation"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/krakovna/krakovna_wall_sensor_stack.py",
+      "source": "krakovna",
+      "name": "krakovna_wall_sensor_stack",
+      "criticals": 0,
+      "warnings": 5,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold",
+        "shaping_not_potential_based",
+        "proxy_reward_hackability",
+        "proxy_reward_hackability",
+        "discount_horizon_mismatch",
+        "reward_delay_horizon"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/battery_control.py",
+      "source": "published_papers",
+      "name": "battery_control",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "exponential_saturation",
+        "negative_only_reward"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/bimanual_lidtwist.py",
+      "source": "published_papers",
+      "name": "bimanual_lidtwist",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/building_octopus.py",
+      "source": "published_papers",
+      "name": "building_octopus",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "negative_only_reward"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/carl_simple_reward.py",
+      "source": "published_papers",
+      "name": "carl_simple_reward",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/chip_placement.py",
+      "source": "published_papers",
+      "name": "chip_placement",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "negative_only_reward",
+        "advisory_learned_reward"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/compiler_mlgo.py",
+      "source": "published_papers",
+      "name": "compiler_mlgo",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/compiler_mlir.py",
+      "source": "published_papers",
+      "name": "compiler_mlir",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/crypto_market_making.py",
+      "source": "published_papers",
+      "name": "crypto_market_making",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/curla_driving.py",
+      "source": "published_papers",
+      "name": "curla_driving",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/dribblebot.py",
+      "source": "published_papers",
+      "name": "dribblebot",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/drone_swooper.py",
+      "source": "published_papers",
+      "name": "drone_swooper",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "intrinsic_sufficiency",
+        "staged_reward_plateau"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/finance_riskaware.py",
+      "source": "published_papers",
+      "name": "finance_riskaware",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/heparin_dosing.py",
+      "source": "published_papers",
+      "name": "heparin_dosing",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/humanoid_skating.py",
+      "source": "published_papers",
+      "name": "humanoid_skating",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exponential_saturation"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/latency_market_making.py",
+      "source": "published_papers",
+      "name": "latency_market_making",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/network_routing.py",
+      "source": "published_papers",
+      "name": "network_routing",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/nuclear_microreactor.py",
+      "source": "published_papers",
+      "name": "nuclear_microreactor",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "advisory_missing_constraint"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/nuclear_power_plant.py",
+      "source": "published_papers",
+      "name": "nuclear_power_plant",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "negative_only_reward",
+        "advisory_missing_constraint"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/nuclear_power_plant_constrained.py",
+      "source": "published_papers",
+      "name": "nuclear_power_plant_constrained",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "negative_only_reward"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/order_execution.py",
+      "source": "published_papers",
+      "name": "order_execution",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/pan_covid_health.py",
+      "source": "published_papers",
+      "name": "pan_covid_health",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "intrinsic_sufficiency"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/pan_covid_political.py",
+      "source": "published_papers",
+      "name": "pan_covid_political",
+      "criticals": 0,
+      "warnings": 2,
+      "infos": 0,
+      "rules_fired": [
+        "intrinsic_sufficiency",
+        "reward_dominance_imbalance"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/pan_glucose.py",
+      "source": "published_papers",
+      "name": "pan_glucose",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "exponential_saturation",
+        "negative_only_reward"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/pan_riverraid_fuel.py",
+      "source": "published_papers",
+      "name": "pan_riverraid_fuel",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/pan_riverraid_move.py",
+      "source": "published_papers",
+      "name": "pan_riverraid_move",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/pan_traffic_accel.py",
+      "source": "published_papers",
+      "name": "pan_traffic_accel",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/pan_traffic_bottleneck.py",
+      "source": "published_papers",
+      "name": "pan_traffic_bottleneck",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/pan_traffic_scope.py",
+      "source": "published_papers",
+      "name": "pan_traffic_scope",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/pan_traffic_velocity.py",
+      "source": "published_papers",
+      "name": "pan_traffic_velocity",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/powergrid_rl2grid.py",
+      "source": "published_papers",
+      "name": "powergrid_rl2grid",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "advisory_physics_exploit"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/riskaware_driving.py",
+      "source": "published_papers",
+      "name": "riskaware_driving",
+      "criticals": 1,
+      "warnings": 2,
+      "infos": 1,
+      "rules_fired": [
+        "penalty_dominates_goal",
+        "exploration_threshold",
+        "reward_delay_horizon",
+        "advisory_nonstationarity"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/riskaware_driving_fixed.py",
+      "source": "published_papers",
+      "name": "riskaware_driving_fixed",
+      "criticals": 1,
+      "warnings": 2,
+      "infos": 1,
+      "rules_fired": [
+        "penalty_dominates_goal",
+        "exploration_threshold",
+        "reward_delay_horizon",
+        "advisory_nonstationarity"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/supplychain_inventory.py",
+      "source": "published_papers",
+      "name": "supplychain_inventory",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/surgical_suturing.py",
+      "source": "published_papers",
+      "name": "surgical_suturing",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "negative_only_reward"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/synchrotron_cosy.py",
+      "source": "published_papers",
+      "name": "synchrotron_cosy",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "negative_only_reward"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/tearing_avoidance.py",
+      "source": "published_papers",
+      "name": "tearing_avoidance",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/tokamak_degrave.py",
+      "source": "published_papers",
+      "name": "tokamak_degrave",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 2,
+      "rules_fired": [
+        "advisory_physics_exploit",
+        "advisory_missing_constraint"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/tokamak_practical.py",
+      "source": "published_papers",
+      "name": "tokamak_practical",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 2,
+      "rules_fired": [
+        "advisory_physics_exploit",
+        "advisory_missing_constraint"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/traffic_signal_constrained.py",
+      "source": "published_papers",
+      "name": "traffic_signal_constrained",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/ventilator_ezvent.py",
+      "source": "published_papers",
+      "name": "ventilator_ezvent",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "exploration_threshold"
+      ],
+      "result": "INFO"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/vmax_driving.py",
+      "source": "published_papers",
+      "name": "vmax_driving",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/warfarin_dosing.py",
+      "source": "published_papers",
+      "name": "warfarin_dosing",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "negative_only_reward"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/wildfire_mitigation.py",
+      "source": "published_papers",
+      "name": "wildfire_mitigation",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 0,
+      "rules_fired": [
+        "intrinsic_sufficiency"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/scripts/../sources/published_papers/windfarm_wfcrl.py",
+      "source": "published_papers",
+      "name": "windfarm_wfcrl",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    }
+  ]
+}
