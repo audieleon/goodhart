@@ -30,6 +30,12 @@ METADATA = {
     "detection_type": "structural",
     "is_negative_example": False,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1704.03073",
+    "reward_location": "Popov et al. 2017 Table I: Reach (0.125), Grasp (0.25), Stack (1.0) + distance shaping. Jaco 9-DOF, 150 steps.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

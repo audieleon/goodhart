@@ -32,6 +32,12 @@ METADATA = {
     "detection_type": "structural",
     "is_negative_example": False,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1902.10178",
+    "reward_location": "Lapuschkin et al. 2019 Appendix D: ALE Pinball score. Nudge activates multiplier switch.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

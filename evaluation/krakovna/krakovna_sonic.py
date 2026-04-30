@@ -31,6 +31,12 @@ METADATA = {
     "detection_type": "dynamic",
     "is_negative_example": True,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1804.03720",
+    "reward_location": "Nichol et al. 2018 Retro Contest: reward = rightward progress in pixels. Wall clip via ROM collision bug.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

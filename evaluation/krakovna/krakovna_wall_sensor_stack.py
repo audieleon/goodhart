@@ -51,6 +51,12 @@ METADATA = {
             " Structural reward analysis cannot detect this failure."
         ),
     },
+    "paper_url": "https://arxiv.org/abs/1909.01387",
+    "reward_location": "Paine et al. 2019 (R2D3): sparse reward for sensor activation. Sensor shortcut exploit.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

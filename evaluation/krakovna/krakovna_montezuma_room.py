@@ -28,6 +28,12 @@ METADATA = {
     "detection_type": "structural",
     "is_negative_example": False,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1901.10995",
+    "reward_location": "Ecoffet et al. 2019: ALE score. Gems 1000 pts in treasure room. 51/57 runs exploited the bug.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

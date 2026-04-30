@@ -39,6 +39,12 @@ METADATA = {
             " maximizes this without any catch behavior."
         ),
     },
+    "paper_url": None,
+    "reward_location": "Reward structure inferred from Krakovna catalog description",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

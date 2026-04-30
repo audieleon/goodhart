@@ -31,6 +31,12 @@ METADATA = {
     "detection_type": "structural",
     "is_negative_example": False,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1707.05173",
+    "reward_location": "Saunders et al. 2017 Section 3.1: ALE game score. Catastrophe penalty +15000. 18 Atari actions.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

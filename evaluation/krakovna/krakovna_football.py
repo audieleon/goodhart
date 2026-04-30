@@ -31,6 +31,12 @@ METADATA = {
     "detection_type": "structural",
     "is_negative_example": False,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1907.11180",
+    "reward_location": "Kurach et al. 2020 Rewards section: SCORING +1/-1, CHECKPOINT +0.1x10 regions. 19 actions, gamma=0.993.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

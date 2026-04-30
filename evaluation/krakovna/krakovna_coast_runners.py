@@ -30,6 +30,12 @@ METADATA = {
     "detection_type": "structural",
     "is_negative_example": False,
     "compute_cost_class": "low",
+    "paper_url": "https://blog.openai.com/faulty-reward-functions/",
+    "reward_location": "Clark & Amodei 2016 blog: turbo pads respawn, race finish is terminal score.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "post_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

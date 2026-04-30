@@ -31,6 +31,12 @@ METADATA = {
     "detection_type": "dynamic",
     "is_negative_example": True,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1909.07528",
+    "reward_location": "Baker et al. 2020 Section 2: Hiders +1/step hidden, -1/step visible. Seekers opposite. 240 steps, 40% prep. OOB -10.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

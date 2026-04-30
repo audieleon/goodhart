@@ -31,6 +31,12 @@ METADATA = {
     "detection_type": "dynamic",
     "is_negative_example": True,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1812.03381",
+    "reward_location": "Salimans & Chen 2018: ALE game score. Key respawns via emulator bug.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

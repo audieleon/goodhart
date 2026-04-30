@@ -32,6 +32,12 @@ METADATA = {
     "detection_type": "specification",
     "is_negative_example": True,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1703.04070",
+    "reward_location": "Mishra et al. 2017: task reward env-specific. Exploit in learned dynamics model.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

@@ -32,6 +32,12 @@ METADATA = {
     "detection_type": "specification",
     "is_negative_example": True,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1811.06521",
+    "reward_location": "Ibarz et al. 2018 Section 3: same RM. Agent approaches key without collecting.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

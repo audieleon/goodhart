@@ -31,6 +31,12 @@ METADATA = {
     "detection_type": "specification",
     "is_negative_example": True,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1904.07854",
+    "reward_location": "Singh et al. 2019 Section III: reward = log p_g(y=1|s), binary classifier on state-success pairs.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 

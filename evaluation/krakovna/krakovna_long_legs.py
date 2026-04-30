@@ -31,6 +31,12 @@ METADATA = {
     "detection_type": "structural",
     "is_negative_example": False,
     "compute_cost_class": "low",
+    "paper_url": "https://arxiv.org/abs/1810.03779",
+    "reward_location": "Ha 2018 Section 4.2: Gym defaults + body augment reward*(1+log(orig/new area)). 192 population.",
+    "verification_date": "2026-04-30",
+    "discovery_stage": "during_training",
+    "source_code_url": None,
+    "fix_known": None,
 }
 
 
