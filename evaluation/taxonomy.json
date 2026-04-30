@@ -1,7 +1,154 @@
 {
   "generated": "2026-04-30",
-  "total_entries": 64,
+  "total_entries": 73,
   "entries": [
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/additional/pan_covid_health.py",
+      "source": "additional",
+      "name": "pan_covid_health",
+      "source_paper": "Pan, Bhatia, & Steinhardt, \"The Effects of Reward",
+      "failure": "Agent delays lockdown, causing excess deaths, because",
+      "mechanism": "Misweighting -- the proxy includes economic, health, and",
+      "domain": "COVID-19 policy optimization (epidemic simulator)",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "negative_only_reward"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/additional/pan_covid_political.py",
+      "source": "additional",
+      "name": "pan_covid_political",
+      "source_paper": "Pan, Bhatia, & Steinhardt, \"The Effects of Reward",
+      "failure": "Agent imposes politically costly early lockdowns because",
+      "mechanism": "Ontological -- the proxy omits an entire reward dimension",
+      "domain": "COVID-19 policy optimization (epidemic simulator)",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "negative_only_reward"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/additional/pan_glucose.py",
+      "source": "additional",
+      "name": "pan_glucose",
+      "source_paper": "Pan, Bhatia, & Steinhardt, \"The Effects of Reward",
+      "failure": "Agent over-administers insulin because the proxy risk",
+      "mechanism": "Ontological -- the proxy uses a different risk function",
+      "domain": "Glucose monitoring / insulin delivery (medical simulator)",
+      "criticals": 0,
+      "warnings": 1,
+      "infos": 1,
+      "rules_fired": [
+        "intrinsic_sufficiency",
+        "exponential_saturation"
+      ],
+      "result": "WARN"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/additional/pan_riverraid.py",
+      "source": "additional",
+      "name": "pan_riverraid",
+      "source_paper": "Pan, Bhatia, & Steinhardt, \"The Effects of Reward",
+      "failure": "Agent avoids shooting and instead exploits the simulator",
+      "mechanism": "Misweighting -- the proxy uses the game score but",
+      "domain": "Atari Riverraid",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "respawning_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/additional/pan_traffic_accel.py",
+      "source": "additional",
+      "name": "pan_traffic_accel",
+      "source_paper": "Pan, Bhatia, & Steinhardt, \"The Effects of Reward",
+      "failure": "Agent merges aggressively with unsafe acceleration because",
+      "mechanism": "Misweighting -- proxy uses the same reward components as",
+      "domain": "Autonomous driving / traffic merge (FLOW simulator)",
+      "criticals": 3,
+      "warnings": 0,
+      "infos": 1,
+      "rules_fired": [
+        "penalty_dominates_goal",
+        "exploration_threshold",
+        "reward_delay_horizon",
+        "advisory_goal_misgeneralization"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/additional/pan_traffic_bottleneck.py",
+      "source": "additional",
+      "name": "pan_traffic_bottleneck",
+      "source_paper": "Pan, Bhatia, & Steinhardt, \"The Effects of Reward",
+      "failure": "Agent accelerates aggressively near the bottleneck because",
+      "mechanism": "Misweighting -- same components as the true reward, but",
+      "domain": "Autonomous driving / traffic bottleneck (FLOW simulator)",
+      "criticals": 1,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [
+        "idle_exploit"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/additional/pan_traffic_lanes.py",
+      "source": "additional",
+      "name": "pan_traffic_lanes",
+      "source_paper": "Pan, Bhatia, & Steinhardt, \"The Effects of Reward",
+      "failure": "Agent switches lanes excessively because the lane-change",
+      "mechanism": "Misweighting -- the penalty for lane changes is too small",
+      "domain": "Autonomous driving / traffic merge (FLOW simulator)",
+      "criticals": 1,
+      "warnings": 2,
+      "infos": 1,
+      "rules_fired": [
+        "penalty_dominates_goal",
+        "exploration_threshold",
+        "reward_delay_horizon",
+        "advisory_goal_misgeneralization"
+      ],
+      "result": "FAIL"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/additional/pan_traffic_scope.py",
+      "source": "additional",
+      "name": "pan_traffic_scope",
+      "source_paper": "Pan, Bhatia, & Steinhardt, \"The Effects of Reward",
+      "failure": "Agent optimizes velocity only near the merge point,",
+      "mechanism": "Scope -- the proxy measures the right quantity (velocity)",
+      "domain": "Autonomous driving / traffic merge (FLOW simulator)",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
+    {
+      "file": "/Users/audieleon/Github/goodhart/evaluation/additional/pan_traffic_velocity.py",
+      "source": "additional",
+      "name": "pan_traffic_velocity",
+      "source_paper": "Pan, Bhatia, & Steinhardt, \"The Effects of Reward",
+      "failure": "AVs block the merge ramp to keep highway velocity high",
+      "mechanism": "Ontological -- the proxy replaces \"minimize commute time\"",
+      "domain": "Autonomous driving / traffic merge (FLOW simulator)",
+      "criticals": 0,
+      "warnings": 0,
+      "infos": 0,
+      "rules_fired": [],
+      "result": "PASS"
+    },
     {
       "file": "/Users/audieleon/Github/goodhart/evaluation/eureka/eureka_allegro_hand.py",
       "source": "eureka",
