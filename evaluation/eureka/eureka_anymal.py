@@ -1,16 +1,49 @@
-"""Example: Eureka ANYmal — GPT-4 generated quadruped locomotion.
+"""Eureka ANYmal — GPT-4 generated quadruped locomotion.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The ANYmal reward is clean: velocity tracking is intentional and
-the energy penalty is small and requires action. Both components
-align with the locomotion objective.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: no critical issues (PASS)
+Clean reward: velocity tracking with small energy penalty, both active.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_anymal",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "anymal.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "domain": "locomotion",
+    "brief_summary": (
+        "GPT-4 generated ANYmal quadruped locomotion reward."
+        " Passes clean."
+    ),
+    "documented_failure": "None — reward is well-designed",
+    "failure_mechanism": None,
+    "discovery_stage": "post_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "velocity_tracking": (
+            "Active (requires_action=True) and intentional."
+            " Directly measures locomotion objective. Random"
+            " movement produces some velocity (explore_fraction=0.3)"
+            " but not enough to dominate."
+        ),
+        "energy_penalty": (
+            "Active (requires_action=True) and tiny (-0.01 vs 1.0)."
+            " Regularizes without creating idle exploit."
+        ),
+    },
+}
 
 
 def run_example():

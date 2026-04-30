@@ -1,17 +1,60 @@
-"""Example: Eureka Ball Balance — GPT-4 generated ball balancing reward.
+"""Eureka Ball Balance — GPT-4 generated ball balancing reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Ball Balance reward has all passive components: low velocity,
-low force, and surface contact are all maximized by doing nothing.
-Every term rewards inaction, making the idle policy globally optimal.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: all components passive (critical), doing nothing
-  maximizes every reward term
+All three components are passive; doing nothing is globally optimal.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_ball_balance",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "ball_balance.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "domain": "control",
+    "brief_summary": (
+        "GPT-4 generated Ball Balance reward. All components are"
+        " passive — doing nothing maximizes every reward term."
+    ),
+    "documented_failure": (
+        "All three reward components (velocity, force, surface)"
+        " are maximized by inaction. Ball starts at rest on the"
+        " surface, already saturating all terms. Idle EV ~179"
+        " vs active EV ~40."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Replace passive terms with active ones: reward ball"
+        " movement toward target position instead of penalizing"
+        " velocity/force."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "velocity_reward": (
+            "Passive (requires_action=False). Zero velocity"
+            " gives maximum reward; any movement reduces it."
+        ),
+        "force_reward": (
+            "Passive (requires_action=False). Zero actuator force"
+            " gives maximum reward; any action reduces it."
+        ),
+        "surface_bonus": (
+            "Passive (requires_action=False). Ball starts on"
+            " surface; any action risks knocking it off."
+        ),
+    },
+}
 
 
 def run_example():

@@ -1,15 +1,47 @@
-"""Example: Eureka Allegro Hand — GPT-4 generated dexterous manipulation.
+"""Eureka Allegro Hand — GPT-4 generated dexterous manipulation.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Allegro Hand reward is clean: orientation reward and fingertip
-bonus both require action and are intentional. No passive terms.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: no critical issues (PASS)
+Clean reward: orientation and fingertip bonus both require action.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_allegro_hand",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "allegro_hand.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Allegro Hand manipulation reward."
+        " Passes clean."
+    ),
+    "documented_failure": "None — reward is well-designed",
+    "failure_mechanism": None,
+    "discovery_stage": "post_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "orientation_reward": (
+            "Requires action (must rotate object) and intentional"
+            " (directly measures task objective). No passive component."
+        ),
+        "fingertip_bonus": (
+            "Requires action (must maintain contact) and intentional"
+            " (directly measures manipulation quality)."
+        ),
+    },
+}
 
 
 def run_example():

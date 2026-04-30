@@ -1,18 +1,54 @@
-"""Example: Eureka Block Stack — GPT-4 generated block stacking reward.
+"""Eureka Block Stack — GPT-4 generated block stacking reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Block Stack reward passes with no criticals: a sparse terminal
-goal anchors the shaping, and the shaping term cannot loop. However,
-warnings about proxy hackability of shaping are expected — the
-height and alignment proxies could be gamed without actually stacking.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: no critical issues (PASS), possible warnings
-  about proxy hackability of shaping terms
+Terminal goal anchors shaping; warnings about proxy hackability expected.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_block_stack",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "block_stack.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Block Stack reward. Passes clean —"
+        " terminal goal anchors shaping, warnings only."
+    ),
+    "documented_failure": "None — reward is well-designed",
+    "failure_mechanism": None,
+    "discovery_stage": "post_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "stack_success": (
+            "Terminal goal (10.0) anchors all shaping. Sparse"
+            " (discovery_probability=0.1) but large enough to"
+            " dominate once discovered."
+        ),
+        "height_shaping": (
+            "Active shaping (can_loop=False) that guides toward"
+            " goal. Proxy is hackable (lift without stacking)"
+            " but cannot cycle."
+        ),
+        "alignment_bonus": (
+            "Active (requires_action=True) but unintentional —"
+            " alignment is a proxy that could be gamed without"
+            " completing the stack."
+        ),
+    },
+}
 
 
 def run_example():

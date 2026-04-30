@@ -1,16 +1,52 @@
-"""Example: Eureka Franka Cabinet — GPT-4 generated cabinet opening.
+"""Eureka Franka Cabinet — GPT-4 generated cabinet opening.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Franka Cabinet reward is clean: cabinet opening and gripper
-bonus both require action and are intentional. The velocity penalty
-is small and correctly structured (requires action).
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: no critical issues (PASS)
+Clean reward: opening and gripper bonus are active; velocity penalty is small.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_franka_cabinet",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "franka_cabinet.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Franka Cabinet opening reward."
+        " Passes clean."
+    ),
+    "documented_failure": "None — reward is well-designed",
+    "failure_mechanism": None,
+    "discovery_stage": "post_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "cabinet_open": (
+            "Active (requires_action=True) and intentional."
+            " Directly measures task objective. Random movement"
+            " partially opens cabinet (explore_fraction=0.2)."
+        ),
+        "gripper_bonus": (
+            "Active (requires_action=True) and intentional."
+            " Measures handle gripping quality."
+        ),
+        "velocity_penalty": (
+            "Active (requires_action=True) and small (-0.05 vs"
+            " 1.3 positive). Regularizes without idle exploit."
+        ),
+    },
+}
 
 
 def run_example():

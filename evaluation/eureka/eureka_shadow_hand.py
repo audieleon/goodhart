@@ -1,18 +1,64 @@
-"""Example: Eureka Shadow Hand — GPT-4 generated dexterous manipulation.
+"""Eureka Shadow Hand — GPT-4 generated dexterous manipulation.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Shadow Hand reward has a passive distance_reward: fingertips
-start near the object, so the agent earns reward by doing nothing.
-The idle expected value (87) exceeds the active value (43), creating
-a floor that discourages exploration.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive distance reward creates idle floor
-  (critical), EV 87 idle vs 43 active
+Passive distance reward creates idle floor (EV 87) exceeding active EV (43).
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand manipulation reward."
+        " Passive distance reward creates idle floor that"
+        " exceeds active expected value."
+    ),
+    "documented_failure": (
+        "distance_reward is passive: fingertips start near the"
+        " object, so idle policy earns 1.0/step (EV ~100)."
+        " Active manipulation moves fingertips away, reducing"
+        " distance_reward to ~0.2/step. Idle EV (87) exceeds"
+        " active EV (43), making inaction dominant."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Make distance_reward active (requires_action=True) by"
+        " measuring progress toward a manipulation target rather"
+        " than proximity to the object's initial position."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "distance_reward": (
+            "Passive (requires_action=False). Fingertips start"
+            " near the object, saturating this term at rest."
+            " Any movement reduces it."
+        ),
+        "rotation_reward": (
+            "Active (requires_action=True) and intentional."
+            " Measures actual manipulation but cannot overcome"
+            " the idle floor from distance_reward."
+        ),
+        "fingertip_bonus": (
+            "Active (requires_action=True) but unintentional."
+            " Proxy for contact quality."
+        ),
+    },
+}
 
 
 def run_example():

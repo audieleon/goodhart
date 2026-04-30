@@ -1,16 +1,47 @@
-"""Example: Eureka CartPole — GPT-4 generated balancing reward.
+"""Eureka CartPole — GPT-4 generated balancing reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The CartPole reward is clean: both components are intentional
-Gaussian-shaped rewards that require action. No passive terms,
-no exploitable shaping.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: no critical issues (PASS)
+Clean reward: both components are intentional and require action.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_cartpole",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "cartpole.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "domain": "control",
+    "brief_summary": (
+        "GPT-4 generated CartPole balancing reward."
+        " Passes clean."
+    ),
+    "documented_failure": "None — reward is well-designed",
+    "failure_mechanism": None,
+    "discovery_stage": "post_training",
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "angle_reward": (
+            "Active (requires_action=True) and intentional."
+            " Gaussian-shaped reward directly measures pole angle."
+        ),
+        "position_reward": (
+            "Active (requires_action=True) and intentional."
+            " Gaussian-shaped reward directly measures cart position."
+        ),
+    },
+}
 
 
 def run_example():

@@ -1,18 +1,58 @@
-"""Example: Eureka Humanoid — GPT-4 generated locomotion reward.
+"""Eureka Humanoid — GPT-4 generated locomotion reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Humanoid reward includes an exp(x/0.01) time penalty that
-creates an enormous effective penalty of ~20.0/step. Since the
-alive bonus is only 2.0/step, dying beats surviving by 9.6x —
-the agent learns to terminate episodes as fast as possible.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: time penalty dominates alive bonus (critical),
-  dying is 9.6x better than surviving
+Time penalty (~20/step) dwarfs alive bonus (2/step); dying is 9.6x better.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_humanoid",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "humanoid.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "domain": "locomotion",
+    "brief_summary": (
+        "GPT-4 generated Humanoid locomotion reward."
+        " exp(x/0.01) time penalty creates ~20.0/step cost,"
+        " making death 9.6x better than surviving."
+    ),
+    "documented_failure": (
+        "exp(x/0.01) time penalty produces ~20.0/step effective"
+        " cost, dwarfing the alive bonus (2.0/step) and forward"
+        " velocity (1.5/step). Dying ends the penalty stream,"
+        " making suicide the optimal policy."
+    ),
+    "failure_mechanism": "death_beats_survival",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Scale the time penalty below the alive bonus, or remove"
+        " it entirely — the alive bonus already incentivizes"
+        " survival."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "alive_bonus": (
+            "Passive (requires_action=False). Intended to keep"
+            " the agent alive, but overwhelmed by time_penalty."
+        ),
+        "time_penalty": (
+            "Passive (requires_action=False). exp(x/0.01) creates"
+            " ~20.0/step cost that dominates all positive terms."
+            " Dying eliminates the penalty stream."
+        ),
+    },
+}
 
 
 def run_example():

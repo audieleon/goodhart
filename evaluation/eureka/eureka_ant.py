@@ -1,17 +1,57 @@
-"""Example: Eureka Ant — GPT-4 generated locomotion reward.
+"""Eureka Ant — GPT-4 generated locomotion reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Ant reward combines forward velocity shaping with a height bonus.
-The shaping term has no terminal goal, so the agent can cycle the
-shaping signal indefinitely without ever reaching a destination.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: shaping with no terminal goal (critical),
-  agent will cycle shaping forever
+Shaping with no terminal goal lets the agent cycle the signal forever.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_ant",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "ant.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "domain": "locomotion",
+    "brief_summary": (
+        "GPT-4 generated Ant locomotion reward. Forward-progress"
+        " shaping has no terminal goal, so the agent cycles"
+        " the shaping signal indefinitely."
+    ),
+    "documented_failure": (
+        "forward_progress shaping has no terminal goal to anchor"
+        " it. The agent earns reward for moving forward but has no"
+        " incentive to reach any destination — it cycles the"
+        " shaping signal forever."
+    ),
+    "failure_mechanism": "shaping_loop",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Add a terminal goal reward that the shaping leads toward,"
+        " so shaping is consumed on arrival rather than cycled."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "forward_progress": (
+            "Shaping term with no terminal anchor. Active"
+            " (requires_action=True) but can be cycled because"
+            " nothing absorbs the potential on arrival."
+        ),
+        "height_bonus": (
+            "Passive (requires_action=False) and unintentional."
+            " Standing upright earns reward without locomotion."
+        ),
+    },
+}
 
 
 def run_example():
