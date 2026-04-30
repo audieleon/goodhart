@@ -17,7 +17,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1904.07854",
     "year": 2019,
     "domain": "manipulation",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Learned goal classifier provides the terminal signal."
         " Agent optimizes whatever triggers the classifier"

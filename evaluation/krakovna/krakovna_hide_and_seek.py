@@ -17,7 +17,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1909.07528",
     "year": 2020,
     "domain": "multi_agent",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Binary win/lose reward plus per-step survival. Reward"
         " structure is sound; exploits come from MuJoCo physics"

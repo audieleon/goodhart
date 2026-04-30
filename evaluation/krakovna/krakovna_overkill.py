@@ -14,7 +14,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1904.04640",
     "year": 2019,
     "domain": "game_ai",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Score reward from kills without level-progress"
         " incentive. First enemy respawns, providing an"

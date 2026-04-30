@@ -17,7 +17,7 @@ METADATA = {
     ),
     "year": 1999,
     "domain": "game_ai",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Ball-contact shaping reward without progress incentive."
         " Agent vibrates against the ball to maximize contact"

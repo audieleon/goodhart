@@ -14,7 +14,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1901.10995",
     "year": 2019,
     "domain": "game_ai",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Treasure room items respawn infinitely (emulator bug)."
         " Encoded as respawning reward to capture the effective"

@@ -1,11 +1,8 @@
-"""Example: MultiRoom-N4-Monster reward traps.
+"""MultiRoom-N4-Monster: the experiments that created goodhart.
 
-Three degenerate equilibria (stand still, die fast at -0.01, die fast
-at -0.001) all mathematically predictable before training.
-
-Source: Original experiments by the author on MiniHack
-  MultiRoom-N4-Monster (Samvelyan et al. 2021). Three configurations
-  tested; all failures predicted by goodhart before training.
+Three reward configurations, three degenerate equilibria, all
+mathematically predictable. These failures drove the creation
+of the goodhart tool and paper.
 """
 
 from goodhart.models import *
@@ -15,25 +12,63 @@ from goodhart.rules.training import *
 
 METADATA = {
     "id": "multiroom_traps",
-    "source_paper": "Original experiments by the author on MiniHack MultiRoom-N4-Monster (Samvelyan et al. 2021)",
-    "paper_url": None,
-    "source_code_url": None,
-    "reward_location": "Reward structure from original experiments",
-    "year": 2021,
+    "source_paper": (
+        "Original experiments by the author (Sheridan 2026) on MiniHack "
+        "MultiRoom-N4-Monster (Samvelyan et al. 2021). These reward "
+        "failures were the direct motivation for building goodhart: "
+        "the author wanted to explain the failures mathematically "
+        "and prevent them before spending compute."
+    ),
+    "paper_url": "https://github.com/audieleon/CognitiveAI",
+    "source_code_url": "https://github.com/audieleon/CognitiveAI/tree/main/minihack_sf",
+    "reward_location": (
+        "CognitiveAI repo: minihack_sf/train.py (reward config), "
+        "research_log/ entries 048-052 (lab notes documenting each "
+        "failure and the mathematical analysis that followed)"
+    ),
+    "year": 2026,
     "domain": "navigation",
     "encoding_basis": "primary_source",
     "verification_date": "2026-04-30",
-    "brief_summary": "Agent was supposed to navigate 4 rooms. Instead three different penalty configs all produced degenerate equilibria (stand still, die fast).",
-    "documented_failure": "Three configurations all trapped: (1) default penalty -- agent stands still; (2) always -0.01/step -- dying at step 1 costs -0.01 vs exploring 120 steps costs -1.20; (3) always -0.001/step -- still trapped because p(goal) ~1.1% < required 11.4%",
+    "brief_summary": (
+        "Agent was supposed to navigate 4 rooms to reach an exit. "
+        "Three different penalty configurations all produced degenerate "
+        "equilibria (stand still or die fast). These failures drove "
+        "the creation of the goodhart tool."
+    ),
+    "documented_failure": (
+        "Three configurations all trapped: (1) default penalty: agent "
+        "stands still because idle EV > explore EV; (2) -0.01/step: "
+        "dying at step 1 costs -0.01 vs exploring 120 steps costs "
+        "-1.20, so dying is 120x cheaper; (3) -0.001/step: still "
+        "trapped because p(goal) ~1.1% < required 11.4% for positive "
+        "EV exploration. All three were mathematically predictable "
+        "from the reward structure alone."
+    ),
     "failure_mechanism": "penalty_dominates_goal",
     "detection_type": "structural",
     "discovery_stage": "during_training",
-    "fix_known": "penalty <= 0.0001, or RND coeff >= 0.05, or no step penalty at all",
+    "fix_known": (
+        "Removed step penalty entirely, added PBRS door-distance "
+        "shaping, room transition bonus, and alive bonus. Agent "
+        "progressed from 0.000 score to 1.37 (first room transition). "
+        "The fix was designed using goodhart's own rules."
+    ),
     "compute_cost_class": "low",
-    "is_negative_example": True,
+    "is_negative_example": False,
     "encoding_rationale": {
-        "triple_failure": "Three configurations all produce mathematically predictable degenerate equilibria",
-        "original_experiments": "Failures predicted by goodhart before training and confirmed empirically",
+        "triple_failure": (
+            "Three configurations all produce mathematically predictable "
+            "degenerate equilibria. Each failure maps to a specific "
+            "goodhart rule: idle_exploit, death_beats_survival, "
+            "penalty_dominates_goal."
+        ),
+        "genesis": (
+            "These experiments are the origin of the goodhart project. "
+            "The author experienced these failures firsthand, analyzed "
+            "them mathematically, and built the tool to catch them "
+            "before training."
+        ),
     },
 }
 
