@@ -459,13 +459,19 @@ class MissingConstraintAdvisory(Rule):
                 "has many actuators but nothing penalizing unsafe behavior")
 
     def applies_to(self, model):
-        all_positive = all(s.value >= 0 for s in model.reward_sources)
+        # Fire on continuous control with few sources and permissive
+        # termination — regardless of reward sign. The missing
+        # constraint risk is the same whether the reward is all-positive
+        # (tokamak: tracking + no coil constraint) or all-negative
+        # (nuclear: -||error||² + no temperature constraint).
+        no_safety_penalties = not any(
+            s.reward_type == RewardType.ON_EVENT and s.value < 0
+            for s in model.reward_sources
+        )
         rich_state = model.n_states >= 50000
         permissive = model.death_probability < 0.05
         few_sources = len(model.reward_sources) <= 4
-        # Only fire on continuous control — discrete games with few
-        # rewards (CoinRun, Football) are fine by design
-        return (all_positive and model.is_continuous_control
+        return (no_safety_penalties and model.is_continuous_control
                 and rich_state and permissive and few_sources)
 
     def check(self, model, config=None):

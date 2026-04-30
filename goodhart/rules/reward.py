@@ -1462,18 +1462,56 @@ class NegativeOnlyReward(Rule):
         )
 
         if not has_positive and not has_positive_range:
+            # Distinguish reward desert (constant negative, no gradient)
+            # from tracking control (state-dependent negative, informative)
+            has_tracking_signal = any(
+                s.value < 0 and s.state_dependent
+                for s in model.reward_sources
+            )
+
+            if has_tracking_signal:
+                # State-dependent negative reward: the gradient IS
+                # informative (less error → less penalty). This is
+                # common in tracking controllers (R = -||error||²).
+                # Not a reward desert — convergence is possible but
+                # may be slow without a positive anchor.
+                severity = Severity.WARNING
+                message = (
+                    "All reward sources are zero or negative, but at "
+                    "least one is state-dependent (tracking signal). "
+                    "The gradient is informative — the agent can "
+                    "distinguish better from worse states — but there "
+                    "is no positive anchor. Convergence may be slow."
+                )
+                recommendation = (
+                    "Consider adding a positive reward component "
+                    "(e.g., bonus for low error) to provide a "
+                    "positive anchor, or verify that the tracking "
+                    "signal provides sufficient gradient for learning"
+                )
+            else:
+                # Constant negative: true reward desert. No gradient.
+                severity = Severity.CRITICAL
+                message = (
+                    "All reward sources are zero or negative with no "
+                    "state-dependent signal. The agent has no gradient "
+                    "to learn from — every state earns the same "
+                    "penalty. This is a reward desert."
+                )
+                recommendation = (
+                    "Add a positive reward for the desired behavior, "
+                    "or restructure as reward = max_penalty - "
+                    "actual_penalty so progress yields positive signal"
+                )
+
             verdicts.append(Verdict(
                 rule_name=self.name,
-                severity=Severity.CRITICAL,
-                message=("All reward sources are zero or negative. "
-                         "The agent has no positive signal to learn from. "
-                         "Every policy has negative expected return."),
+                severity=severity,
+                message=message,
                 details={"sources": [s.name for s in model.reward_sources],
-                         "values": [s.value for s in model.reward_sources]},
-                recommendation=("Add a positive reward for the desired "
-                                "behavior, or restructure as reward = "
-                                "max_penalty - actual_penalty so progress "
-                                "yields positive signal"),
+                         "values": [s.value for s in model.reward_sources],
+                         "has_tracking_signal": has_tracking_signal},
+                recommendation=recommendation,
             ))
         return verdicts
 
