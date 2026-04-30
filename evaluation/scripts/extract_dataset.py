@@ -22,7 +22,7 @@ from io import StringIO
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 sys.path.insert(0, ROOT)
 
-from goodhart.engine import TrainingAnalysisEngine
+from goodhart.engine import AnalysisEngine, TrainingAnalysisEngine
 from goodhart.models import Severity
 
 
@@ -54,17 +54,44 @@ def serialize_model(model):
 
 
 def capture_run(mod):
-    """Run mod.run_example() and capture model + analysis result."""
+    """Run mod.run_example() and capture model + analysis result.
+
+    Patches both print_report and analyze to catch all usage patterns:
+    - Most files call engine.print_report(model) → captured via print_report mock
+    - Some files call engine.analyze(model) directly → captured via analyze mock
+    - Multi-model files produce multiple captures; we keep the first (primary)
+    """
     captured = {}
-    original = TrainingAnalysisEngine.print_report
+    original_print = TrainingAnalysisEngine.print_report
+    original_analyze = TrainingAnalysisEngine.analyze
+    original_base_analyze = AnalysisEngine.analyze
 
-    def mock(self, model, config=None, verbose=False):
-        result = self.analyze(model, config)
-        captured["model"] = model
-        captured["config"] = config
-        captured["result"] = result
+    def mock_print(self, model, config=None, verbose=False):
+        result = original_analyze(self, model, config)
+        if "model" not in captured:  # keep first model
+            captured["model"] = model
+            captured["config"] = config
+            captured["result"] = result
 
-    TrainingAnalysisEngine.print_report = mock
+    def mock_analyze(self, model, config=None):
+        result = original_analyze(self, model, config)
+        if "model" not in captured:  # keep first model
+            captured["model"] = model
+            captured["config"] = config
+            captured["result"] = result
+        return result
+
+    def mock_base_analyze(self, model, config=None):
+        result = original_base_analyze(self, model, config)
+        if "model" not in captured:
+            captured["model"] = model
+            captured["config"] = config
+            captured["result"] = result
+        return result
+
+    TrainingAnalysisEngine.print_report = mock_print
+    TrainingAnalysisEngine.analyze = mock_analyze
+    AnalysisEngine.analyze = mock_base_analyze
     old_stdout = sys.stdout
     sys.stdout = StringIO()
     try:
@@ -73,7 +100,9 @@ def capture_run(mod):
         pass
     finally:
         sys.stdout = old_stdout
-        TrainingAnalysisEngine.print_report = original
+        TrainingAnalysisEngine.print_report = original_print
+        TrainingAnalysisEngine.analyze = original_analyze
+        AnalysisEngine.analyze = original_base_analyze
 
     return captured
 
