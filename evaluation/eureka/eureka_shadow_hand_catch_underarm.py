@@ -1,19 +1,71 @@
-"""Example: Eureka Shadow Hand Catch Underarm — GPT-4 generated reward.
+"""Eureka Shadow Hand Catch Underarm — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Catch Underarm reward combines position, rotation, fingertip,
-and velocity components with equal weights (0.25 each). The
-fingertip_reward is passive: fingertips start near the object.
-The vel_reward penalizes motion, rewarding stillness. Together
-these create an idle-dominant strategy.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive fingertip_reward (critical), vel_reward
-  rewards idleness (critical)
+Passive fingertip reward and velocity penalty reward stillness,
+creating an idle-dominant strategy.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_catch_underarm",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_catch_underarm.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Catch Underarm reward."
+        " Passive fingertip proximity and velocity penalty"
+        " reward stillness, dominating active components."
+    ),
+    "documented_failure": (
+        "fingertip_reward is passive: fingertips start near the"
+        " object, giving high exp(-dist/0.005) at idle."
+        " vel_reward explicitly rewards zero velocity. Together"
+        " these passive components (0.50/step at idle) compete"
+        " with active pos_reward and rot_reward."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Remove vel_reward or gate it on successful catch."
+        " Make fingertip_reward require contact force."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "pos_reward": (
+            "Active (requires_action=True) and intentional."
+            " Measures position distance to goal."
+        ),
+        "rot_reward": (
+            "Active (requires_action=True) and intentional."
+            " Measures rotation distance to goal."
+        ),
+        "fingertip_reward": (
+            "Passive (requires_action=False). Fingertips start"
+            " near object, saturating at rest."
+        ),
+        "vel_reward": (
+            "Passive (requires_action=False). exp(-(vel)/0.1)"
+            " is maximal at zero velocity, rewarding stillness."
+        ),
+        "catch_bonus": (
+            "Active (requires_action=True) and intentional."
+            " 2x multiplier when pos_dist < 0.05."
+        ),
+    },
+}
 
 
 def run_example():

@@ -1,17 +1,62 @@
-"""Example: Eureka Shadow Hand Pen — GPT-4 generated pen cap removal.
+"""Eureka Shadow Hand Pen — GPT-4 generated pen cap removal.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Pen reward has passive hands_to_handles_reward: hands start
-near pen handles, so sigmoid(-5*(dist-0.1)) is high at idle. The
-pen_handles_pull_reward rewards separation of handles, which also
-requires action. The pen_cap_reward correctly measures cap-to-goal.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive hands_to_handles_reward (critical)
+Passive hands-to-handles reward creates idle floor; sharp pen-cap
+sigmoid is nearly binary.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_pen",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_pen.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Pen reward."
+        " Passive hands-to-handles reward creates idle floor;"
+        " sharp pen-cap sigmoid is nearly binary."
+    ),
+    "documented_failure": (
+        "hands_to_handles_reward is passive: sigmoid(-5*(dist-0.1))"
+        " is high when hands start near pen handles. Idle reward"
+        " from proximity competes with the active pen_cap and"
+        " pen_handles_pull components."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Gate hands_to_handles_reward on actual grasp contact"
+        " rather than proximity."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "hands_to_handles_reward": (
+            "Passive (requires_action=False). Hands start near"
+            " handles, saturating sigmoid at rest."
+        ),
+        "pen_cap_reward": (
+            "Active (requires_action=True) and intentional."
+            " Very sharp sigmoid (temp 50), nearly binary."
+        ),
+        "pen_handles_pull_reward": (
+            "Active (requires_action=True) and intentional."
+            " Requires pulling handles apart."
+        ),
+    },
+}
 
 
 def run_example():

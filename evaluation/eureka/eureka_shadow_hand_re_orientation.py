@@ -1,17 +1,57 @@
-"""Example: Eureka Shadow Hand Re-Orientation — GPT-4 generated reward.
+"""Eureka Shadow Hand Re-Orientation — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Re-Orientation reward is well-structured: purely rotation-based
-with two objects that need to match goal orientations. Success
-bonuses provide near-terminal incentive. No passive components
-since rotation rewards require active manipulation.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: no critical issues (PASS), clean rotation reward
+Clean rotation-based reward with success bonuses; all components
+are active and intentional.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_re_orientation",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_re_orientation.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Re-Orientation reward."
+        " Passes clean."
+    ),
+    "documented_failure": "None — reward is well-designed",
+    "failure_mechanism": None,
+    "discovery_stage": None,
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "object_rotation_reward": (
+            "Active (requires_action=True) and intentional."
+            " exp(-8*rot_dist) directly measures the task."
+        ),
+        "object_another_rotation_reward": (
+            "Active (requires_action=True) and intentional."
+            " exp(-5*rot_dist) for second object."
+        ),
+        "object_orientation_success_bonus": (
+            "Active (requires_action=True) and intentional."
+            " 5x scale when rot_dist < 0.02."
+        ),
+        "object_another_orientation_success_bonus": (
+            "Active (requires_action=True) and intentional."
+            " 5x scale when rot_dist < 0.02."
+        ),
+    },
+}
 
 
 def run_example():

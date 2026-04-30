@@ -1,19 +1,66 @@
-"""Example: Eureka Shadow Hand Door Open Outward — GPT-4 generated reward.
+"""Eureka Shadow Hand Door Open Outward — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Door Open Outward reward combines a handle reaching reward with
-a door rotation reward measuring quaternion distance from closed
-position. The handle_reward is passive if the hand starts near the
-handle. The door_position_reward and door_orientation_reward both
-measure how far the door is from closed, which starts at zero.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive handle_reward (critical), redundant
-  door position and orientation rewards measuring same thing
+Door position and orientation rewards measure distance from closed,
+rewarding the initial state and opposing the task objective.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_door_open_outward",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_door_open_outward.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Door Open Outward reward."
+        " Door rewards measure distance from closed position,"
+        " rewarding the initial state and opposing the task."
+    ),
+    "documented_failure": (
+        "handle_reward is passive: hand starts near handle."
+        " door_position_reward and door_orientation_reward both"
+        " measure distance from closed position using quaternion"
+        " dot product and angle diff. Since the task is to OPEN"
+        " the door, these reward keeping it closed (the initial"
+        " state), directly opposing the objective."
+    ),
+    "failure_mechanism": "reward_inversion",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Invert door rewards to measure distance from open"
+        " position instead of closed position."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "handle_reward": (
+            "Passive (requires_action=False). Hand starts near"
+            " handle, saturating exp(-0.5*dist) at rest."
+        ),
+        "door_position_reward": (
+            "Passive (requires_action=False). Measures distance"
+            " from closed position; door starts closed = max"
+            " reward. Inverted relative to task goal."
+        ),
+        "door_orientation_reward": (
+            "Passive (requires_action=False). Measures angle"
+            " diff from closed; door starts closed = max"
+            " reward. Redundant with door_position_reward."
+        ),
+    },
+}
 
 
 def run_example():

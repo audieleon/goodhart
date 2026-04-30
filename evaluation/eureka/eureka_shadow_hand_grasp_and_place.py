@@ -1,20 +1,73 @@
-"""Example: Eureka Shadow Hand Grasp and Place — GPT-4 generated reward.
+"""Eureka Shadow Hand Grasp and Place — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Grasp and Place reward has a grab_success sigmoid that rewards
-hand proximity, and an instability_penalty that penalizes object
-motion. The instability penalty rewards stillness. The distance and
-rotation rewards are multiplied by grab_success and subtracted from
-1.0, creating an unusual reward structure where higher distance/rot
-rewards reduce total reward.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: instability penalty rewards idleness (critical),
-  inverted distance/rot reward logic
+Passive hand-distance and grab-success rewards create idle floor;
+inverted distance/rotation logic rewards being far from goal.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_grasp_and_place",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_grasp_and_place.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Grasp and Place reward."
+        " Passive hand-distance and grab-success create idle"
+        " floor; inverted |exp(-x)-1| rewards distance from goal."
+    ),
+    "documented_failure": (
+        "hand_distance_reward and grab_success are both passive:"
+        " hands start near the object. instability_penalty is"
+        " -exp(-linvel), penalizing stillness. Distance and"
+        " rotation rewards use |exp(-x)-1| which approaches 0"
+        " at success, creating inverted signal."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Use direct distance reward instead of |exp(-x)-1|."
+        " Gate grab_success on actual contact force."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "hand_distance_reward": (
+            "Passive (requires_action=False). Hands start near"
+            " object, saturating exp(-0.1*dist) at rest."
+        ),
+        "grab_success": (
+            "Passive (requires_action=False). Sigmoid of hand"
+            " proximity; high at idle when hands start close."
+        ),
+        "distance_reward": (
+            "Active (requires_action=True) and intentional."
+            " Uses |exp(-0.05*dist)-1| which is 0 at goal,"
+            " inverting the expected gradient."
+        ),
+        "rot_reward": (
+            "Active (requires_action=True) and intentional."
+            " Uses |exp(-2*rot)-1| which is 0 at goal,"
+            " inverting the expected gradient."
+        ),
+        "instability_penalty": (
+            "Passive (requires_action=False). -exp(-linvel)"
+            " penalizes zero velocity (stillness)."
+        ),
+    },
+}
 
 
 def run_example():

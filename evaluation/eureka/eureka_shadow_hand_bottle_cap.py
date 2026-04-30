@@ -1,18 +1,61 @@
-"""Example: Eureka Shadow Hand Bottle Cap — GPT-4 generated reward.
+"""Eureka Shadow Hand Bottle Cap — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Bottle Cap reward has a passive hand-distance component: hands
-start near the bottle/cap, so exp(-dist/50) is near 1.0 at idle.
-The cap-goal distance reward requires action but is not temperature-
-scaled, making it linearly negative and hard to optimize.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive hand_distance_transformed_reward creates
-  idle floor (critical), raw negative cap_goal_distance_reward
+Passive hand-distance reward creates idle floor; raw negative cap-goal
+distance is unscaled and hard to optimize.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_bottle_cap",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_bottle_cap.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Bottle Cap reward."
+        " Passive hand-distance component saturates at idle;"
+        " raw negative cap-goal distance lacks exp scaling."
+    ),
+    "documented_failure": (
+        "hand_distance_transformed_reward is passive: hands start"
+        " near the bottle/cap, so exp(-dist/50) is ~1.0 at idle."
+        " cap_goal_distance_reward is raw negative distance with"
+        " no exponential transform, making it hard to balance."
+        " Idle strategy dominates."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Make hand_distance_transformed_reward active by measuring"
+        " grasp progress, and apply exp transform to cap-goal"
+        " distance for balanced gradient."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "hand_distance_transformed_reward": (
+            "Passive (requires_action=False). Hands start near"
+            " bottle/cap, saturating exp(-dist/50) at rest."
+        ),
+        "cap_goal_distance_reward": (
+            "Active (requires_action=True) and intentional."
+            " Raw negative distance without exp scaling makes"
+            " gradient hard to follow."
+        ),
+    },
+}
 
 
 def run_example():

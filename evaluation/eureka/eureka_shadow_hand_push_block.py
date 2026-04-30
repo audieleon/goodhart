@@ -1,18 +1,67 @@
-"""Example: Eureka Shadow Hand Push Block — GPT-4 generated reward.
+"""Eureka Shadow Hand Push Block — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Push Block reward has passive hand-to-block proximity rewards:
-hands start near the block, so exp(-0.1*dist) is high at idle.
-The block-to-goal proximity rewards require action. All components
-use equal weights (0.25), giving passive components significant
-influence.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive hand proximity rewards (critical)
+Passive hand-to-block proximity rewards at equal weight with active
+block-to-goal rewards create 50% idle floor.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_push_block",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_push_block.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Push Block reward."
+        " Passive hand-proximity rewards at equal weight with"
+        " active block-goal rewards create 50% idle floor."
+    ),
+    "documented_failure": (
+        "Hand proximity rewards are passive: exp(-0.1*dist) is"
+        " high when hands start near the block. With slow decay"
+        " (temp 0.1), even moderate distances yield significant"
+        " reward. Equal weighting (0.25 each) gives passive"
+        " components 50% of total reward."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Gate hand rewards on contact or reduce their weight"
+        " relative to block-goal rewards."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "left_proximity_reward": (
+            "Active (requires_action=True) and intentional."
+            " Measures block-to-left-goal distance."
+        ),
+        "right_proximity_reward": (
+            "Active (requires_action=True) and intentional."
+            " Measures block-to-right-goal distance."
+        ),
+        "left_hand_reward": (
+            "Passive (requires_action=False). Hand starts near"
+            " block, saturating exp(-0.1*dist) at rest."
+        ),
+        "right_hand_reward": (
+            "Passive (requires_action=False). Hand starts near"
+            " block, saturating exp(-0.1*dist) at rest."
+        ),
+    },
+}
 
 
 def run_example():

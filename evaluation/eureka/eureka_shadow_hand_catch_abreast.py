@@ -1,17 +1,67 @@
-"""Example: Eureka Shadow Hand Catch Abreast — GPT-4 generated reward.
+"""Eureka Shadow Hand Catch Abreast — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Catch Abreast reward has a passive grasp_reward: hands start
-near the object, so exp(-dist/0.08) is high at idle. The goal_bonus
-provides a sparse terminal-like signal, but the grasp and contact
-rewards dominate and can be earned passively.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive grasp_reward creates idle floor (critical)
+Passive grasp and contact rewards create idle floor that dominates
+the sparse goal bonus.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_catch_abreast",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_catch_abreast.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Catch Abreast reward."
+        " Passive grasp and contact rewards dominate the"
+        " sparse goal bonus, creating an idle floor."
+    ),
+    "documented_failure": (
+        "grasp_reward is passive: exp(-dist/0.08) is high when"
+        " hands start near the object. smooth_contact_reward is"
+        " also passive: symmetric hand positions at idle yield"
+        " high reward. Together these create an idle floor that"
+        " dominates the goal_reward signal."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Make grasp_reward conditional on active grasping"
+        " (contact force threshold) rather than proximity."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "grasp_reward": (
+            "Passive (requires_action=False). Hands start near"
+            " object, saturating exp(-dist/0.08) at rest."
+        ),
+        "goal_reward": (
+            "Active (requires_action=True) and intentional."
+            " Measures object-goal distance."
+        ),
+        "smooth_contact_reward": (
+            "Passive (requires_action=False). Symmetric hand"
+            " positions at idle yield high reward."
+        ),
+        "goal_bonus": (
+            "Active (requires_action=True) and intentional."
+            " Sparse signal only when dist < 0.03."
+        ),
+    },
+}
 
 
 def run_example():

@@ -1,19 +1,49 @@
-"""Example: Eureka Shadow Hand Lift Underarm — GPT-4 generated reward.
+"""Eureka Shadow Hand Lift Underarm — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Lift Underarm reward has a passive grasping component: hands
-start near pot handles, triggering the grasping threshold. The
-object_goal_reward uses a very high temperature (15.0) making it
-extremely sensitive to small distances. The grasping_reward is
-binary (threshold-based) and can be earned passively.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive grasping_reward (critical), extreme
-  temperature on goal reward
+Binary grasping reward and sharp goal temperature create a functional
+reward structure that passes clean.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_lift_underarm",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_lift_underarm.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Lift Underarm reward."
+        " Passes clean."
+    ),
+    "documented_failure": "None — reward is well-designed",
+    "failure_mechanism": None,
+    "discovery_stage": None,
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "object_goal_reward": (
+            "Active (requires_action=True) and intentional."
+            " exp(-15*dist) with sharp temperature."
+        ),
+        "grasping_reward": (
+            "Binary threshold (0.1) for hand proximity to"
+            " handles. Functional gating signal."
+        ),
+    },
+}
 
 
 def run_example():

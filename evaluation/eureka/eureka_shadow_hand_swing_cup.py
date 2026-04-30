@@ -1,19 +1,73 @@
-"""Example: Eureka Shadow Hand Swing Cup — GPT-4 generated reward.
+"""Eureka Shadow Hand Swing Cup — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Swing Cup reward has passive grasp rewards: hands start near
-cup handles. The object_goal_distance_reward is negative (penalty
-form), creating a confusing signal. The cup_orientation_reward and
-cup_linvel_penalty both discourage motion, rewarding stillness.
-The touch_reward is redundant with grasp_reward.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive grasp_reward (critical), negative
-  distance reward, velocity penalty rewards stillness
+Passive grasp reward, always-negative distance reward, and velocity
+penalty actively discourage task completion.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_swing_cup",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_swing_cup.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Swing Cup reward."
+        " Passive grasp, always-negative distance, and velocity"
+        " penalty actively discourage task completion."
+    ),
+    "documented_failure": (
+        "grasp_reward is passive: hands start near cup handles."
+        " object_goal_distance_reward is always negative"
+        " (-exp(-0.1*dist)*2), so approaching the goal reduces"
+        " total reward. cup_linvel_penalty is zero at rest,"
+        " rewarding stillness. touch_reward duplicates grasp."
+        " The reward structure discourages task completion."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Invert distance reward sign. Remove velocity penalty"
+        " or gate it on successful grasp."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "grasp_reward": (
+            "Passive (requires_action=False). Hands start near"
+            " cup handles, saturating exp at rest."
+        ),
+        "object_goal_distance_reward": (
+            "Active (requires_action=True) and intentional but"
+            " always negative: moving toward goal reduces"
+            " total reward (inverted signal)."
+        ),
+        "cup_orientation_reward": (
+            "Active (requires_action=True) and intentional."
+            " Measures rotation alignment with goal."
+        ),
+        "cup_linvel_penalty": (
+            "Passive (requires_action=False). Zero at rest,"
+            " penalizes motion, rewarding stillness."
+        ),
+        "touch_reward": (
+            "Passive (requires_action=False). Redundant with"
+            " grasp_reward; measures same hand-handle distance."
+        ),
+    },
+}
 
 
 def run_example():

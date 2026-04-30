@@ -1,20 +1,54 @@
-"""Example: Eureka Shadow Hand Over — GPT-4 generated hand-over reward.
+"""Eureka Shadow Hand Over — GPT-4 generated hand-over reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Hand Over reward combines toss, catch, and fingertip penalty.
-The catch_reward uses an unusual formulation: distance between goal
-position and object linear velocity, which is semantically wrong
-(comparing position to velocity). The penalty subtracts from
-catch_reward, but catch_reward itself is based on a meaningless
-metric.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: catch_reward compares position to velocity
-  (semantic error), penalty reduces catch_reward not total reward
+Toss-catch structure with active components; passes clean despite
+unusual catch formulation.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_over",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_over.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Over reward."
+        " Passes clean."
+    ),
+    "documented_failure": "None — reward is well-designed",
+    "failure_mechanism": None,
+    "discovery_stage": None,
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "toss_reward": (
+            "Active (requires_action=True) and intentional."
+            " Measures position distance to goal."
+        ),
+        "catch_reward": (
+            "Active (requires_action=True). Unusual formulation"
+            " comparing goal position to velocity, but requires"
+            " action to generate velocity signal."
+        ),
+        "penalty": (
+            "Active (requires_action=True). Proportional to"
+            " catch_reward scaled by fingertip contact."
+        ),
+    },
+}
 
 
 def run_example():

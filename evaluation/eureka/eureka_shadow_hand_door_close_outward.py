@@ -1,19 +1,57 @@
-"""Example: Eureka Shadow Hand Door Close Outward — GPT-4 generated reward.
+"""Eureka Shadow Hand Door Close Outward — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Door Close Outward reward uses negative exp(dist/temp) for hand
-approach (penalizing distance) and positive alignment rewards for
-door handle orientation matching goal. The hand approach rewards use
-an inverted exponential that grows unbounded with distance, which is
-unusual. The alignment rewards are passive if handles start aligned.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive alignment rewards if door starts aligned,
-  unbounded negative approach penalties
+Approach penalties and alignment rewards create a functional reward
+structure that passes clean.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_door_close_outward",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_door_close_outward.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Door Close Outward reward."
+        " Passes clean."
+    ),
+    "documented_failure": "None — reward is well-designed",
+    "failure_mechanism": None,
+    "discovery_stage": None,
+    "fix_known": None,
+    "compute_cost_class": "low",
+    "is_negative_example": True,
+    "encoding_rationale": {
+        "left_hand_approach_reward": (
+            "Active (requires_action=True). Negative exp penalty"
+            " grows with distance, encouraging approach."
+        ),
+        "right_hand_approach_reward": (
+            "Active (requires_action=True). Negative exp penalty"
+            " grows with distance, encouraging approach."
+        ),
+        "alignment_reward_left": (
+            "Intentional. Measures quaternion dot product with"
+            " goal rotation for door handle alignment."
+        ),
+        "alignment_reward_right": (
+            "Intentional. Measures quaternion dot product with"
+            " goal rotation for door handle alignment."
+        ),
+    },
+}
 
 
 def run_example():

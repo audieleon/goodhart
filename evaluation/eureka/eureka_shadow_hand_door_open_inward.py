@@ -1,18 +1,66 @@
-"""Example: Eureka Shadow Hand Door Open Inward — GPT-4 generated reward.
+"""Eureka Shadow Hand Door Open Inward — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Door Open Inward reward has hand-to-handle distance and
-orientation alignment components. The hand-handle distance rewards
-are passive if hands start near handles. The orientation rewards
-measure hand-handle rotation alignment, also potentially passive.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive hand_handle_dist rewards (critical),
-  passive orientation rewards
+All four components are passive or partially passive; no terminal goal
+anchors the reward structure.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_door_open_inward",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_door_open_inward.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Door Open Inward reward."
+        " All four components are passive or partially passive;"
+        " no terminal goal anchors the reward."
+    ),
+    "documented_failure": (
+        "Hand-handle distance rewards are passive: small initial"
+        " distances yield high exp reward at idle. Orientation"
+        " alignment rewards may also start high. Agent earns"
+        " substantial reward by doing nothing."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Gate distance rewards on active contact. Add terminal"
+        " success reward for door opening."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "reward_hand_handle_dist_left": (
+            "Passive (requires_action=False). Hand starts near"
+            " handle, saturating exp reward at rest."
+        ),
+        "reward_hand_handle_dist_right": (
+            "Passive (requires_action=False). Hand starts near"
+            " handle, saturating exp reward at rest."
+        ),
+        "reward_door_handle_orientation_left": (
+            "Passive (requires_action=False). Orientation may"
+            " start aligned, yielding idle reward."
+        ),
+        "reward_door_handle_orientation_right": (
+            "Passive (requires_action=False). Orientation may"
+            " start aligned, yielding idle reward."
+        ),
+    },
+}
 
 
 def run_example():

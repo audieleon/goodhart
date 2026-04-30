@@ -1,19 +1,67 @@
-"""Example: Eureka Shadow Hand Door Close Inward — GPT-4 generated reward.
+"""Eureka Shadow Hand Door Close Inward — GPT-4 generated reward.
 
-Eureka uses GPT-4 to write reward functions for Isaac Gym tasks.
-The Door Close Inward reward has passive hand-distance components:
-hands start near door handles, so exp(-dist) is high at idle. All
-four components are distance-based with no terminal goal. The
-handle-to-goal distance rewards are also passive if the door starts
-near the goal position.
-
-Source: Ma et al. 2024 (ICLR), Eureka project — GPT-4 generated reward
-Tool should catch: passive hand_distance_rewards (critical),
-  no terminal goal
+Passive hand-distance rewards create idle floor; no terminal goal
+anchors the shaping signals.
 """
 
 from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
+
+
+METADATA = {
+    "id": "eureka_shadow_hand_door_close_inward",
+    "source_paper": (
+        'Ma et al. 2024, "Eureka: Human-Level Reward Design via Coding'
+        ' Large Language Models," ICLR 2024'
+    ),
+    "paper_url": "https://arxiv.org/abs/2310.12931",
+    "source_code_url": (
+        "https://eureka-research.github.io/assets/reward_functions/"
+        "shadow_hand_door_close_inward.txt"
+    ),
+    "encoding_basis": "code_derived",
+    "verification_date": "2026-04-30",
+    "year": 2024,
+    "domain": "manipulation",
+    "brief_summary": (
+        "GPT-4 generated Shadow Hand Door Close Inward reward."
+        " Passive hand-to-handle distance rewards create idle"
+        " floor with no terminal goal to anchor shaping."
+    ),
+    "documented_failure": (
+        "Hand distance rewards are passive: exp(-dist) is high"
+        " when hands start near handles. Two passive components"
+        " each yield ~1.0/step at idle, creating an idle floor"
+        " (2.0/step) that competes with goal handle rewards."
+        " No terminal goal anchors the shaping signals."
+    ),
+    "failure_mechanism": "idle_exploit",
+    "discovery_stage": "during_training",
+    "fix_known": (
+        "Gate hand-distance rewards on active grasping."
+        " Add terminal success reward for door closure."
+    ),
+    "compute_cost_class": "low",
+    "is_negative_example": False,
+    "encoding_rationale": {
+        "left_hand_distance_reward": (
+            "Passive (requires_action=False). Hand starts near"
+            " handle, saturating exp(-dist) at rest."
+        ),
+        "right_hand_distance_reward": (
+            "Passive (requires_action=False). Hand starts near"
+            " handle, saturating exp(-dist) at rest."
+        ),
+        "goal_left_handle_distance_reward": (
+            "Active (requires_action=True) and intentional."
+            " Measures handle-to-goal distance."
+        ),
+        "goal_right_handle_distance_reward": (
+            "Active (requires_action=True) and intentional."
+            " Measures handle-to-goal distance."
+        ),
+    },
+}
 
 
 def run_example():
