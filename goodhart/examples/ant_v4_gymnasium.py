@@ -12,7 +12,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "ant_v4_gymnasium",
     "source_paper": "Todorov et al. 2012 (MuJoCo), Gymnasium documentation",
-    "paper_url": None,
+    "paper_url": "https://gymnasium.farama.org/environments/mujoco/ant/",
     "source_code_url": None,
     "reward_location": "Reward structure from Gymnasium Ant-v4 defaults",
     "year": 2012,

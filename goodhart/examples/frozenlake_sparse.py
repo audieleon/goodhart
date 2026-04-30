@@ -12,7 +12,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "frozenlake_sparse",
     "source_paper": "Gymnasium documentation, standard RL textbook environment",
-    "paper_url": None,
+    "paper_url": "https://gymnasium.farama.org/environments/toy_text/frozen_lake/",
     "source_code_url": None,
     "reward_location": "Reward structure from Gymnasium documentation",
     "year": 2013,

@@ -9,7 +9,7 @@ from goodhart import reward_function, RewardSource, RewardType
 METADATA = {
     "id": "sepsis_treatment",
     "source_paper": "Raghu et al. 2017 (NeurIPS ML4H), Peng et al. 2023 (npj Digital Medicine)",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/1711.09602",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2017,

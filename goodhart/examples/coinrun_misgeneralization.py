@@ -12,7 +12,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "coinrun_misgeneralization",
     "source_paper": "Langosco et al. 2022, 'Goal Misgeneralization in Deep RL' (ICML); Cobbe et al. 2019 (CoinRun)",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/2105.14111",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2022,

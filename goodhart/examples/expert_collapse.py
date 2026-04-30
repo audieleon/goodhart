@@ -15,7 +15,7 @@ from goodhart.rules.architecture import PrecedentRule, Precedent
 METADATA = {
     "id": "expert_collapse",
     "source_paper": "Shazeer et al. 2017, 'Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer' (ICLR)",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/1701.06538",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2017,

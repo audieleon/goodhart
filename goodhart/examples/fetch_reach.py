@@ -12,7 +12,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "fetch_reach",
     "source_paper": "Plappert et al. 2018 (Fetch environments); Andrychowicz et al. 2017 (HER, NeurIPS)",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/1802.09464",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2018,

@@ -12,7 +12,7 @@ from goodhart.rules.training import *
 METADATA = {
     "id": "sparse_reward_traps",
     "source_paper": "Bellemare et al. 2013 (ALE/Montezuma, JAIR); Samvelyan et al. 2021 (MiniHack, NeurIPS); Guss et al. 2019 (MineRL, NeurIPS)",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/1207.4708",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2013,

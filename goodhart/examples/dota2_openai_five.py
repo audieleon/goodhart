@@ -16,7 +16,7 @@ from goodhart.rules.architecture import PrecedentRule, Precedent
 METADATA = {
     "id": "dota2_openai_five",
     "source_paper": "Berner et al. 2019, 'Dota 2 with Large Scale Deep Reinforcement Learning' (OpenAI)",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/1912.06680",
     "source_code_url": None,
     "reward_location": "Section 4.3",
     "year": 2019,

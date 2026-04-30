@@ -12,7 +12,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "datacenter_cooling",
     "source_paper": "Lazic et al. 2022, 'Controlling Commercial Cooling Systems Using Reinforcement Learning'",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/2211.07357",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2022,

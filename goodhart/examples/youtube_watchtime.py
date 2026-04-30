@@ -10,7 +10,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "youtube_watchtime",
     "source_paper": "Covington et al. 2016 (RecSys), 'Deep Neural Networks for YouTube Recommendations'; Ribeiro et al. 2023 (PNAS)",
-    "paper_url": None,
+    "paper_url": "https://dl.acm.org/doi/10.1145/2959100.2959190",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2016,

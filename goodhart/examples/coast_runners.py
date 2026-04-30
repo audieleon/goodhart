@@ -12,7 +12,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "coast_runners",
     "source_paper": "Clark & Amodei 2016, 'Faulty Reward Functions in the Wild' (OpenAI Blog)",
-    "paper_url": None,
+    "paper_url": "https://blog.openai.com/faulty-reward-functions/",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2016,

@@ -10,7 +10,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "taxi_penalty",
     "source_paper": "Dietterich 2000 (MAXQ hierarchical RL), Gymnasium classic control",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/cs/9905014",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2000,

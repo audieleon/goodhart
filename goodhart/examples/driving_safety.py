@@ -12,7 +12,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "driving_safety",
     "source_paper": "Li et al. 2022 (MetaDrive, NeurIPS); Leurent 2018 (highway-env)",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/2109.12674",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2022,

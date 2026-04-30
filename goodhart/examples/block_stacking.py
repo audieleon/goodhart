@@ -12,7 +12,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "block_stacking",
     "source_paper": "Popov et al. 2017, 'Data-efficient Deep RL for Dexterous Manipulation' (DeepMind)",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/1704.03073",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2017,

@@ -12,7 +12,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "dmc_dog",
     "source_paper": "Tunyasuvunakool et al. 2020 (SIGGRAPH), Tassa et al. 2020 (DM Control)",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/2007.01434",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2020,

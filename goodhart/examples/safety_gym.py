@@ -10,7 +10,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "safety_gym",
     "source_paper": "Ray et al. 2019 (OpenAI Safety Gym)",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/1910.01708",
     "source_code_url": "https://github.com/openai/safety-gym",
     "reward_location": "Reward structure from paper description",
     "year": 2019,

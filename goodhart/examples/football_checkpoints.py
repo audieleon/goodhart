@@ -12,7 +12,7 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "football_checkpoints",
     "source_paper": "Kurach et al. 2020, 'Google Research Football' (ICML)",
-    "paper_url": None,
+    "paper_url": "https://arxiv.org/abs/1907.11180",
     "source_code_url": None,
     "reward_location": "Reward structure from paper description",
     "year": 2020,
