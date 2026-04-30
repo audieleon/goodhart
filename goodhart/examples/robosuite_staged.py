@@ -9,6 +9,9 @@ later stages until earlier ones are achieved.
 
 Demonstrates the staged_reward_plateau rule — the first
 example using prerequisite-gated reward sources.
+
+Source: Zhu et al. 2020, "robosuite: A Modular Simulation Framework
+  and Benchmark for Robot Learning" (CoRL)
 """
 
 from goodhart.presets import PRESETS

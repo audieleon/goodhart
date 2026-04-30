@@ -8,6 +8,9 @@ Three separate instances of the same failure:
 All solved by the same fix: floor constraints + load balancing.
 This example shows how the framework catches it for ANY
 multi-specialist setup.
+
+Source: Shazeer et al. 2017, "Outrageously Large Neural Networks: The
+  Sparsely-Gated Mixture-of-Experts Layer" (ICLR)
 """
 
 from goodhart.models import *

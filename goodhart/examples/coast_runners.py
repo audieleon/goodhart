@@ -7,6 +7,9 @@ than human players who actually completed the course.
 This example uses the coast-runners preset (sourced from the
 OpenAI blog post) and shows how the respawning_exploit rule
 catches the loop before training.
+
+Source: Clark & Amodei 2016, "Faulty Reward Functions in the Wild"
+  (OpenAI Blog)
 """
 
 from goodhart.presets import PRESETS

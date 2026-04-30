@@ -7,6 +7,10 @@ THREE different degenerate equilibria on the same task:
 
 Each trap was mathematically predictable. This example shows all
 three configurations and what the framework catches.
+
+Source: Original experiments by the author on MiniHack
+  MultiRoom-N4-Monster (Samvelyan et al. 2021). Three configurations
+  tested; all failures predicted by goodhart before training.
 """
 
 from goodhart.models import *

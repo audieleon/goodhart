@@ -20,6 +20,9 @@ What the framework CAN catch vs what it CAN'T:
 
 This example shows the LIMITS of pre-training analysis and
 where runtime monitoring is needed instead.
+
+Source: Baker et al. 2020, "Emergent Tool Use from Multi-Agent
+  Autocurricula" (ICLR)
 """
 
 from goodhart.models import *

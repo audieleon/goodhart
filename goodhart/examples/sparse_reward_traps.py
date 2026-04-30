@@ -12,6 +12,9 @@ Covers:
 - Sparse robotics manipulation (2020)
 
 All use only built-in rules, no custom rules needed.
+
+Source: Bellemare et al. 2013 (ALE/Montezuma, JAIR); Samvelyan et al.
+  2021 (MiniHack, NeurIPS); Guss et al. 2019 (MineRL, NeurIPS)
 """
 
 from goodhart.models import *

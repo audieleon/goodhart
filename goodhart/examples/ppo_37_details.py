@@ -6,6 +6,9 @@ Based on "The 37 Implementation Details of Proximal Policy Optimization"
 Shows how to express PPO-specific failure modes using the framework
 and add project-specific rules for issues the standard library
 doesn't cover.
+
+Source: Huang et al. 2022, "The 37 Implementation Details of Proximal
+  Policy Optimization" (ICLR Blog Track); Andy Jones, "Debugging RL"
 """
 
 from goodhart.models import *

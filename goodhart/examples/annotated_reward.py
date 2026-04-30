@@ -12,6 +12,8 @@ Usage:
 
     # CLI
     goodhart --check goodhart.examples.annotated_reward:compute_reward
+
+Source: Tutorial example — demonstrates the @reward_function decorator. No external paper.
 """
 
 from goodhart import reward_function, RewardSource, RewardType, RespawnBehavior

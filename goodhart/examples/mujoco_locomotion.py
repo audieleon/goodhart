@@ -12,6 +12,9 @@ Covers:
 - Hopper early termination incentive
 - Humanoid energy minimization
 - The general pattern: alive_bonus vs velocity tradeoff
+
+Source: Todorov et al. 2012 (MuJoCo, IROS); Brockman et al. 2016
+  (OpenAI Gym); Towers et al. 2023 (Gymnasium, arXiv:2407.17032)
 """
 
 from goodhart.models import *

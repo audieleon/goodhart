@@ -5,6 +5,9 @@ to replay it and re-collect rewards, instead of advancing to
 harder levels with the same or lower reward density.
 
 Shows the death_reset_exploit rule.
+
+Source: Saunders et al. 2017, "Trial without Error: Towards Safe RL
+  via Human Intervention" (arXiv:1707.05173)
 """
 
 from goodhart.models import *

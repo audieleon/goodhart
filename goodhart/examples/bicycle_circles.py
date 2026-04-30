@@ -7,6 +7,9 @@ harvest the distance-decrease shaping reward.
 Shows the shaping_loop_exploit rule and illustrates why
 potential-based shaping (Ng et al. 1999) is the only safe
 form of reward shaping.
+
+Source: Randlov & Alstrom 1998, "Learning to Drive a Bicycle using
+  Reinforcement Learning and Shaping" (ICML)
 """
 
 from goodhart.models import *

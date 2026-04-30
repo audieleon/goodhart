@@ -8,6 +8,9 @@ Demonstrates three new analysis capabilities:
 1. exponential_saturation: exp(-error/sigma) tracking plateaus
 2. reward_dominance_imbalance: 800,000x magnitude spread
 3. idle_exploit: feet_air_time pays for standing still
+
+Source: Rudin et al. 2022, "Learning to Walk in Minutes Using Massively
+  Parallel Deep RL" (RSS); reward table from Section III-B
 """
 
 from goodhart.presets import PRESETS

@@ -8,6 +8,9 @@ incentivizing hyper-aggressive strategies that sacrifice units.
 
 The passive damage_received penalty creates a death-beats-survival
 incentive: a dead ally stops accumulating damage penalty.
+
+Source: Samvelyan et al. 2019, "The StarCraft Multi-Agent Challenge"
+  (AAMAS); reward from Section 3.2
 """
 
 from goodhart.presets import PRESETS

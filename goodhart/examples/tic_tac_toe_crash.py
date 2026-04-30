@@ -10,6 +10,9 @@ runtime, not just the game state.
 
 The framework cannot catch this (it's not a reward issue)
 but including it documents the boundary clearly.
+
+Source: Lehman et al. 2020, "The Surprising Creativity of Digital
+  Evolution" (Section 3.2, tic-tac-toe memory bomb)
 """
 
 from goodhart.models import *

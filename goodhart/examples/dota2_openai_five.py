@@ -15,6 +15,9 @@ produced degenerate strategies.
 This example pushes the framework's expressiveness by modeling
 a multi-component, multi-timescale reward function and showing
 which interactions it catches.
+
+Source: Berner et al. 2019, "Dota 2 with Large Scale Deep Reinforcement
+  Learning" (OpenAI); reward structure from technical report Section 4.3
 """
 
 from goodhart.models import *

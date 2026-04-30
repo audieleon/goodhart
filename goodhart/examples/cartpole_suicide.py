@@ -6,6 +6,9 @@ agent learns to fall over immediately.
 
 Uses the mountain-car preset which demonstrates the same
 death-beats-survival pattern.
+
+Source: Barto, Sutton & Anderson 1983 (CartPole); Sutton & Barto 2018
+  (Ch. 3.4, reward hypothesis)
 """
 
 from goodhart.presets import PRESETS

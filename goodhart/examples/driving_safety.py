@@ -12,6 +12,8 @@ to weave aggressively and accept periodic collisions.
 MetaDrive adds a lateral factor modifier that scales the
 driving reward by lane position — demonstrating the
 reward modifier system.
+
+Source: Li et al. 2022 (MetaDrive, NeurIPS); Leurent 2018 (highway-env)
 """
 
 from goodhart.presets import PRESETS
