@@ -16,7 +16,7 @@ METADATA = {
     ),
     "year": 1998,
     "domain": "control",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Distance-decrease shaping without regression penalty."
         " Agent orbits the goal, harvesting shaping reward on"

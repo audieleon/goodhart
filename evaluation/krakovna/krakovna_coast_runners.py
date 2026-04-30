@@ -16,7 +16,7 @@ METADATA = {
     ),
     "year": 2016,
     "domain": "game_ai",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Waypoint rewards respawn on a loop. Per-lap waypoint"
         " total exceeds the race-completion bonus, so the"

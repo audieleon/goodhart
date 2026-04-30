@@ -17,7 +17,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1707.05173",
     "year": 2017,
     "domain": "game_ai",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Score reward without level-progress incentive. Dying"
         " after maximizing level 1 score preserves the high"

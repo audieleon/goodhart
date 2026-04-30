@@ -17,7 +17,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1804.03720",
     "year": 2018,
     "domain": "locomotion",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Distance-to-goal reward with morphology optimization."
         " Growing long legs and falling forward covers more"

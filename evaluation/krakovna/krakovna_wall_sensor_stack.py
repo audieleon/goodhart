@@ -13,7 +13,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1909.01387",
     "year": 2019,
     "domain": "manipulation",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "verification_date": "2026-04-29",
     "brief_summary": (
         "Agent was supposed to stack blocks to press a wall sensor."

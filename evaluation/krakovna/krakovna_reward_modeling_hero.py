@@ -18,7 +18,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1811.06521",
     "year": 2018,
     "domain": "game_ai",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Learned reward model trained from human demos"
         " overvalues the shooting motion relative to the"

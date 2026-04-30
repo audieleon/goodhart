@@ -17,7 +17,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1703.04070",
     "year": 2017,
     "domain": "control",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Reward structure is straightforward. Agent exploits"
         " systematic biases in a learned dynamics model to"

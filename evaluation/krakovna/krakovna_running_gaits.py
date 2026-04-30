@@ -16,7 +16,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1804.00361",
     "year": 2018,
     "domain": "locomotion",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Forward velocity reward without naturalness constraint."
         " Agent exploits simulator physics to find gaits that"

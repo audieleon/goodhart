@@ -17,7 +17,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1804.03720",
     "year": 2018,
     "domain": "game_ai",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Forward progress reward plus level completion bonus."
         " Reward is appropriate for a platformer; the exploit"

@@ -17,7 +17,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1812.03381",
     "year": 2018,
     "domain": "game_ai",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Standard Atari score reward. The exploit is an"
         " emulator bug causing the key to respawn, not a"

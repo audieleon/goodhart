@@ -17,7 +17,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1704.03073",
     "year": 2017,
     "domain": "manipulation",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Stacking proxy measures bottom-face height. Flipping"
         " the block achieves the target height without stacking."

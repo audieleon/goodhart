@@ -17,7 +17,7 @@ METADATA = {
     "paper_url": "https://arxiv.org/abs/1907.11180",
     "year": 2020,
     "domain": "game_ai",
-    "encoding_basis": "catalog_derived",
+    "encoding_basis": "primary_source",
     "brief_summary": (
         "Sparse goal reward lets the agent discover that"
         " throw-in positioning via out-of-bounds kicks is"
