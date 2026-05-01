@@ -20,7 +20,7 @@ METADATA = {
     "reward_location": "Well-known failure pattern: Sharpe = mean/std, inaction minimizes std",
     "year": 2001,
     "domain": "finance",
-    "encoding_basis": "primary_source",
+    "encoding_basis": "illustrative",
     "verification_date": "2026-04-30",
     "brief_summary": "Agent was supposed to trade profitably. Instead it learned to make tiny trades or not trade at all, maximizing the Sharpe ratio by minimizing volatility.",
     "documented_failure": "Sharpe ratio idle exploit: not trading gives 0/0 (often defaulted to 0 or small positive). Any trade introduces volatility in the denominator. Agent learns to never trade or make tiny trades to maximize ratio rather than return.",
@@ -44,7 +44,7 @@ def run_example():
     print("Financial Trading — Sharpe ratio idle exploit")
     print("=" * 70)
     print()
-    print("Source: Dang-Nhu 2025, various quant finance RL papers")
+    print("Source: Moody & Saffell 2001; general quant finance RL literature")
     print("Reward: portfolio return per step (proxy for Sharpe)")
     print("Exploit: not trading = 0 volatility = infinite Sharpe")
     print()
