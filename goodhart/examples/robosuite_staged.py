@@ -4,7 +4,7 @@ Pick-and-place with 4 prerequisite-gated stages creating learning plateaus.
 Source: Zhu et al. 2020, "robosuite: A Modular Simulation Framework and Benchmark for Robot Learning" (CoRL)
 """
 
-from goodhart.presets import PRESETS
+from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
 
 METADATA = {
@@ -32,7 +32,14 @@ METADATA = {
 
 
 def run_example():
-    model, config = PRESETS["robosuite-pick-place"]
+    model = EnvironmentModel(
+        name="Robosuite Pick-and-Place (staged rewards)", max_steps=200, gamma=0.99,
+        n_states=100000, n_actions=8, action_type="continuous", death_probability=0.0,
+    )
+    model.add_reward_source(RewardSource(name="grasp", reward_type=RewardType.ON_EVENT, value=0.35, requires_action=True, intentional=True, state_dependent=True))
+    model.add_reward_source(RewardSource(name="lift", reward_type=RewardType.ON_EVENT, value=0.15, requires_action=True, intentional=True, state_dependent=True, prerequisite="grasp"))
+    model.add_reward_source(RewardSource(name="hover", reward_type=RewardType.ON_EVENT, value=0.2, requires_action=True, intentional=True, state_dependent=True, prerequisite="lift"))
+    model.add_reward_source(RewardSource(name="place", reward_type=RewardType.TERMINAL, value=1.0, requires_action=True, intentional=True, state_dependent=True, prerequisite="hover"))
     engine = TrainingAnalysisEngine().add_all_rules()
 
     print("Robosuite Pick-and-Place — Staged Rewards")
@@ -45,7 +52,7 @@ def run_example():
         print(f"  {s.name:10s} {s.value:+.2f}  p(discover)={s.discovery_probability:.2f}{prereq}")
     print()
 
-    engine.print_report(model, config)
+    engine.print_report(model)
 
     print()
     print("The staged structure means:")

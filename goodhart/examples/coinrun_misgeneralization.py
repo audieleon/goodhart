@@ -6,7 +6,7 @@ from training distribution bias. Beyond structural reward analysis.
 Source: Langosco et al. 2022 (ICML), Cobbe et al. 2019 (CoinRun)
 """
 
-from goodhart.presets import PRESETS
+from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
 
 METADATA = {
@@ -34,8 +34,19 @@ METADATA = {
 
 
 def run_example():
-    model, config = PRESETS["coinrun"]
     engine = TrainingAnalysisEngine().add_all_rules()
+
+    model = EnvironmentModel(
+        name="CoinRun (goal misgeneralization)",
+        max_steps=1000, gamma=0.999,
+        n_states=100000, n_actions=15,
+        action_type="discrete", death_probability=0.02,
+    )
+    model.add_reward_source(RewardSource(
+        name="coin", reward_type=RewardType.TERMINAL, value=10.0,
+        requires_action=True, requires_exploration=True,
+        discovery_probability=0.5, intentional=True,
+    ))
 
     print("=" * 70)
     print("CoinRun — goal misgeneralization (TOOL LIMITATION)")
@@ -50,7 +61,7 @@ def run_example():
     print("What goodhart says:")
     print()
 
-    result = engine.print_report(model, config)
+    result = engine.print_report(model)
 
     print()
     print("=" * 70)

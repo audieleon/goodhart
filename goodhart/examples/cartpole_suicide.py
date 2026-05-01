@@ -6,7 +6,7 @@ optimal, so the agent learns to fall over immediately.
 Source: Barto, Sutton & Anderson 1983; Sutton & Barto 2018 (Ch. 3.4)
 """
 
-from goodhart.presets import PRESETS
+from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
 
 METADATA = {
@@ -34,7 +34,12 @@ METADATA = {
 
 
 def run_example():
-    model, config = PRESETS["mountain-car"]
+    model = EnvironmentModel(
+        name="Mountain Car (step penalty trap)", max_steps=200, gamma=1.0,
+        n_states=600, n_actions=3, action_type="discrete", death_probability=0.0,
+    )
+    model.add_reward_source(RewardSource(name="reach flag", reward_type=RewardType.TERMINAL, value=1.0, requires_action=True, intentional=True, requires_exploration=True, discovery_probability=0.01))
+    model.add_reward_source(RewardSource(name="step penalty", reward_type=RewardType.PER_STEP, value=-1.0, state_dependent=False, requires_action=False, intentional=True))
     engine = TrainingAnalysisEngine().add_all_rules()
 
     print("Mountain Car / CartPole Suicide Analysis")
@@ -45,7 +50,7 @@ def run_example():
     print(f"Max steps: {model.max_steps}")
     print()
 
-    engine.print_report(model, config)
+    engine.print_report(model)
 
     print("This is a 'reward desert' — all non-goal strategies")
     print("score equally. The agent has no gradient signal to")

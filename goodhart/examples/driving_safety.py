@@ -6,7 +6,7 @@ weave aggressively and accept periodic collisions as optimal.
 Source: Li et al. 2022 (MetaDrive, NeurIPS); Leurent 2018 (highway-env)
 """
 
-from goodhart.presets import PRESETS
+from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
 
 METADATA = {
@@ -37,12 +37,31 @@ def run_example():
     print("Driving Reward Safety Analysis")
     print("=" * 50)
 
-    for name in ["highway-env", "metadrive"]:
-        model, config = PRESETS[name]
+    # --- highway-env ---
+    highway_model = EnvironmentModel(
+        name="highway-env (driving)", max_steps=40, gamma=0.8,
+        n_states=10000, n_actions=5, action_type="discrete", death_probability=0.05,
+    )
+    highway_model.add_reward_source(RewardSource(name="collision", reward_type=RewardType.ON_EVENT, value=-1.0, state_dependent=True, requires_action=False, intentional=True))
+    highway_model.add_reward_source(RewardSource(name="high_speed", reward_type=RewardType.PER_STEP, value=0.4, state_dependent=True, requires_action=True, intentional=True))
+    highway_model.add_reward_source(RewardSource(name="right_lane", reward_type=RewardType.PER_STEP, value=0.1, state_dependent=True, requires_action=True, intentional=False))
+
+    # --- metadrive ---
+    metadrive_model = EnvironmentModel(
+        name="MetaDrive (multi-agent driving)", max_steps=1000, gamma=0.99,
+        n_states=100000, n_actions=2, action_type="continuous", death_probability=0.02,
+    )
+    metadrive_model.add_reward_source(RewardSource(name="driving_reward", reward_type=RewardType.PER_STEP, value=1.0, state_dependent=True, requires_action=True, intentional=True))
+    metadrive_model.add_reward_source(RewardSource(name="speed_reward", reward_type=RewardType.PER_STEP, value=0.1, state_dependent=True, requires_action=True, intentional=False))
+    metadrive_model.add_reward_source(RewardSource(name="crash_penalty", reward_type=RewardType.ON_EVENT, value=-5.0, state_dependent=True, requires_action=False, intentional=True))
+    metadrive_model.add_reward_source(RewardSource(name="out_of_road_penalty", reward_type=RewardType.ON_EVENT, value=-5.0, state_dependent=True, requires_action=True, intentional=True))
+    metadrive_model.add_reward_source(RewardSource(name="arrive_dest", reward_type=RewardType.TERMINAL, value=10.0, requires_action=True, intentional=True))
+
+    for model, source_label in [(highway_model, "Leurent 2018"), (metadrive_model, "Li et al. 2021")]:
         engine = TrainingAnalysisEngine().add_all_rules()
 
         print(f"\n--- {model.name} ---")
-        print(f"Source: {'Leurent 2018' if 'highway' in name else 'Li et al. 2021'}")
+        print(f"Source: {source_label}")
         for s in model.reward_sources:
             extra = ""
             if s.modifies:
@@ -51,7 +70,7 @@ def run_example():
                 extra += " [state-dep]"
             print(f"  {s.name:20s} {s.value:+.1f} ({s.reward_type.value}){extra}")
         print()
-        result = engine.analyze(model, config)
+        result = engine.analyze(model)
         for v in result.verdicts:
             icon = {"critical": "X", "warning": "!", "info": "i"}[v.severity.value]
             print(f"  [{icon}] {v.rule_name}: {v.message[:70]}")

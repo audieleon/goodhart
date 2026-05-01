@@ -45,4 +45,4 @@ proofs/.lake/
 
 # Paper workspace (private — not part of the tool release)
 .paper/
-papers/
+/papers/

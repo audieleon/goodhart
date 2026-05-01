@@ -32,7 +32,6 @@ Usage (analyze and get Result):
 
 from goodhart.cli import preflight_check as check
 from goodhart.engine import AnalysisEngine, TrainingAnalysisEngine
-from goodhart.presets import PRESETS
 from goodhart.models import (
     EnvironmentModel,
     RewardSource,
@@ -75,6 +74,5 @@ __all__ = [
     "Result",
     "AnalysisEngine",
     "TrainingAnalysisEngine",
-    "PRESETS",
     "__version__",
 ]

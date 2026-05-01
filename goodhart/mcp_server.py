@@ -194,36 +194,6 @@ def handle_explain(params: dict) -> dict:
     return result
 
 
-def handle_list_presets(params: dict) -> dict:
-    """List available presets with environment names."""
-    from goodhart.presets import PRESETS
-    presets = []
-    for name in sorted(PRESETS):
-        model, config = PRESETS[name]
-        presets.append({
-            "name": name,
-            "environment": model.name,
-            "n_sources": len(model.reward_sources),
-            "max_steps": model.max_steps,
-        })
-    return {"presets": presets, "total": len(presets)}
-
-
-def handle_check_preset(params: dict) -> dict:
-    """Run analysis on a named preset."""
-    from goodhart.presets import PRESETS
-    preset_name = params.get("preset", "")
-    if preset_name not in PRESETS:
-        return {"error": f"Unknown preset: {preset_name}",
-                "available": sorted(PRESETS.keys())}
-
-    model, config = PRESETS[preset_name]
-    engine = TrainingAnalysisEngine().add_all_rules()
-    result = engine.analyze(model, config)
-    verbose = params.get("verbose", True)
-    return result.to_dict(verbose=verbose)
-
-
 def handle_list_examples(params: dict) -> dict:
     """List cookbook examples with descriptions."""
     import pkgutil
@@ -468,23 +438,6 @@ TOOLS = [
         },
     },
     {
-        "name": "goodhart_list_presets",
-        "description": "List available preset configurations from published papers.",
-        "inputSchema": {"type": "object", "properties": {}},
-    },
-    {
-        "name": "goodhart_check_preset",
-        "description": "Run analysis on a named preset environment (e.g., humanoid, coast-runners).",
-        "inputSchema": {
-            "type": "object",
-            "required": ["preset"],
-            "properties": {
-                "preset": {"type": "string", "description": "Preset name"},
-                "verbose": {"type": "boolean", "description": "Include learn_more (default: true)"},
-            },
-        },
-    },
-    {
         "name": "goodhart_list_examples",
         "description": "List 57 cookbook examples from published papers, each demonstrating a reward design pattern or failure mode.",
         "inputSchema": {"type": "object", "properties": {}},
@@ -542,8 +495,6 @@ HANDLERS = {
     "goodhart_check": handle_check,
     "goodhart_list_rules": handle_list_rules,
     "goodhart_explain": handle_explain,
-    "goodhart_list_presets": handle_list_presets,
-    "goodhart_check_preset": handle_check_preset,
     "goodhart_list_examples": handle_list_examples,
     "goodhart_get_example": handle_get_example,
     "goodhart_doctor": handle_doctor,
