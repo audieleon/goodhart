@@ -46,6 +46,12 @@ def run_example():
     highway_model.add_reward_source(RewardSource(name="high_speed", reward_type=RewardType.PER_STEP, value=0.4, state_dependent=True, requires_action=True, intentional=True))
     highway_model.add_reward_source(RewardSource(name="right_lane", reward_type=RewardType.PER_STEP, value=0.1, state_dependent=True, requires_action=True, intentional=False))
 
+    highway_config = TrainingConfig(
+        algorithm="DQN", lr=5e-4, entropy_coeff=0.01, num_envs=4,
+        n_actors=4, total_steps=100_000, replay_buffer_size=15000,
+        target_update_freq=50,
+    )
+
     # --- metadrive ---
     metadrive_model = EnvironmentModel(
         name="MetaDrive (multi-agent driving)", max_steps=1000, gamma=0.99,
@@ -57,7 +63,7 @@ def run_example():
     metadrive_model.add_reward_source(RewardSource(name="out_of_road_penalty", reward_type=RewardType.ON_EVENT, value=-5.0, state_dependent=True, requires_action=True, intentional=True))
     metadrive_model.add_reward_source(RewardSource(name="arrive_dest", reward_type=RewardType.TERMINAL, value=10.0, requires_action=True, intentional=True))
 
-    for model, source_label in [(highway_model, "Leurent 2018"), (metadrive_model, "Li et al. 2021")]:
+    for model, config, source_label in [(highway_model, highway_config, "Leurent 2018"), (metadrive_model, None, "Li et al. 2021")]:
         engine = TrainingAnalysisEngine().add_all_rules()
 
         print(f"\n--- {model.name} ---")
@@ -70,7 +76,7 @@ def run_example():
                 extra += " [state-dep]"
             print(f"  {s.name:20s} {s.value:+.1f} ({s.reward_type.value}){extra}")
         print()
-        result = engine.analyze(model)
+        result = engine.analyze(model, config)
         for v in result.verdicts:
             icon = {"critical": "X", "warning": "!", "info": "i"}[v.severity.value]
             print(f"  [{icon}] {v.rule_name}: {v.message[:70]}")
