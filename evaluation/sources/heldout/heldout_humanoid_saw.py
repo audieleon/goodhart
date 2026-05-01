@@ -11,13 +11,13 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "heldout_humanoid_saw",
     "source_paper": (
-        'van Marum et al. 2024, "Revisiting Reward Design and'
-        ' Evaluation for Robust Humanoid Standing and Walking,"'
-        " IROS 2024"
+        'van Marum, Shrestha, Duan, Dugar, Dao & Fern, "Revisiting '
+        'Reward Design and Evaluation for Robust Humanoid Standing '
+        'and Walking," IROS 2024, pp. 11256-11263'
     ),
-    "paper_url": None,
-    "source_code_url": None,
-    "reward_location": "N/A",
+    "paper_url": "https://arxiv.org/abs/2404.19173",
+    "source_code_url": "https://b-vm.github.io/Robust-SaW/",
+    "reward_location": "Reward structure from paper description",
     "year": 2024,
     "domain": "locomotion",
     "encoding_basis": "primary_source",

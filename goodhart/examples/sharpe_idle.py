@@ -1,7 +1,8 @@
-"""Example: Financial Trading -- Sharpe ratio as reward.
+"""Example: Financial Trading -- Sharpe ratio idle exploit.
 
-Not trading gives 0/0 Sharpe (often defaulting to 0), and any trade introduces volatility.
-Source: Various; Dang-Nhu 2025, "Risk-Aware RL for Financial Trading"
+Not trading gives 0/0 Sharpe (often defaulting to 0), and
+any trade introduces volatility. Well-known failure pattern.
+Source: Moody & Saffell 2001; general quant finance RL literature
 """
 
 from goodhart.models import *
@@ -9,12 +10,16 @@ from goodhart.engine import TrainingAnalysisEngine
 
 METADATA = {
     "id": "sharpe_idle",
-    "source_paper": "Dang-Nhu 2025, 'Risk-Aware RL for Financial Trading'; various quant finance RL papers",
-    "paper_url": None,
+    "source_paper": (
+        "Moody & Saffell 2001, 'Learning to Trade via Direct "
+        "Reinforcement' (IEEE TNN); general quant finance RL "
+        "literature documenting Sharpe ratio idle exploit"
+    ),
+    "paper_url": "https://ieeexplore.ieee.org/document/935097",
     "source_code_url": None,
-    "reward_location": "Reward structure from paper description",
-    "year": 2025,
-    "domain": "industrial",
+    "reward_location": "Well-known failure pattern: Sharpe = mean/std, inaction minimizes std",
+    "year": 2001,
+    "domain": "finance",
     "encoding_basis": "primary_source",
     "verification_date": "2026-04-30",
     "brief_summary": "Agent was supposed to trade profitably. Instead it learned to make tiny trades or not trade at all, maximizing the Sharpe ratio by minimizing volatility.",

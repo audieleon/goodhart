@@ -11,12 +11,13 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "heldout_curriculum_rl",
     "source_paper": (
-        'Freitag et al. 2025, "CurriculumRL: Curriculum Learning'
-        ' for Reinforcement Learning," EWRL 2025'
+        'Freitag, Ceder, Laezza, Akesson & Haghir Chehreghani, '
+        '"Curriculum Reinforcement Learning for Complex Reward '
+        'Functions," EWRL 2025'
     ),
-    "paper_url": None,
+    "paper_url": "https://openreview.net/forum?id=DHOxjoy1sP",
     "source_code_url": None,
-    "reward_location": "N/A",
+    "reward_location": "Reward structure from paper description",
     "year": 2025,
     "domain": "navigation",
     "encoding_basis": "primary_source",

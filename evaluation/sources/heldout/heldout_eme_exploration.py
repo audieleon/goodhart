@@ -11,13 +11,13 @@ from goodhart.engine import TrainingAnalysisEngine
 METADATA = {
     "id": "heldout_eme_exploration",
     "source_paper": (
-        'Wang et al. 2024, "EME: Exploration with Mutual'
-        ' Information Maximizing State and Action Embeddings,"'
-        " NeurIPS 2024"
+        'Wang, Zhao, Liu & Hou U, "Rethinking Exploration in '
+        'Reinforcement Learning with Effective Metric-Based '
+        'Exploration Bonus," NeurIPS 2024 (Spotlight)'
     ),
-    "paper_url": None,
+    "paper_url": "https://openreview.net/forum?id=QpKWFLtZKi",
     "source_code_url": None,
-    "reward_location": "N/A",
+    "reward_location": "Reward structure from paper description",
     "year": 2024,
     "domain": "navigation",
     "encoding_basis": "primary_source",
