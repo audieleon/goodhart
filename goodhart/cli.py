@@ -121,8 +121,8 @@ _build_from_config_dict = build_from_config_dict  # backward compat alias
 def _output_analysis(model, config, args):
     """Run analysis and output results based on --json/--quiet/default flags.
 
-    This is the shared output dispatch used by --config, --preset, and
-    --goal/--penalty/--steps paths. Eliminates triplication of the
+    This is the shared output dispatch used by --config and
+    --goal/--penalty/--steps paths. Eliminates duplication of the
     json/quiet/print logic.
     """
     engine = TrainingAnalysisEngine().add_all_rules()
@@ -415,8 +415,6 @@ What it can't catch:
                         help="Learn about Goodhart's Law and this tool")
     parser.add_argument("--rules", action="store_true",
                         help="List all analysis rules")
-    parser.add_argument("--presets", action="store_true",
-                        help="List all environment presets from published papers")
     parser.add_argument("--examples", action="store_true",
                         help="Browse cookbook examples from published papers")
     parser.add_argument("--example", type=str, metavar="NAME",
@@ -428,8 +426,6 @@ What it can't catch:
                              "(e.g. --check my_env:compute_reward)")
     parser.add_argument("--config", type=str, metavar="FILE",
                         help="Load config from file (YAML, JSON, or TOML)")
-    parser.add_argument("--preset", type=str, metavar="NAME", nargs="?", const="__list__",
-                        help="Use a preset environment. Run --preset without a name to list all.")
     parser.add_argument("--doctor", action="store_true",
                         help="Diagnose issues and suggest a fixed configuration")
     parser.add_argument("--quiet", "-q", action="store_true",
@@ -726,65 +722,6 @@ What it can't catch:
     if args.config:
         cfg = _load_config_file(args.config)
         model, config = _build_from_config_dict(cfg, fallback_name=args.config)
-        _output_analysis(model, config, args)
-        return
-
-    if getattr(args, 'presets', False):
-        from goodhart.presets import PRESETS
-        import goodhart.presets as _pm
-        from goodhart.fmt import header, rule_list_item, DIM_COLOR, RESET
-        header(f"Presets ({len(PRESETS)})")
-        for name in sorted(PRESETS):
-            m, c = PRESETS[name]
-            # Extract source from the preset function's docstring
-            func_name = f"_{name.replace('-', '_')}"
-            fn = getattr(_pm, func_name, None)
-            doc = (fn.__doc__ or "").strip().split("\n")[0] if fn else ""
-            desc = f"{m.name} ({c.algorithm})"
-            rule_list_item(name, desc, width=24)
-        print()
-        print(f"  {DIM_COLOR}Usage: goodhart --preset <name>{RESET}")
-        print()
-        return
-
-    if args.preset:
-        from goodhart.presets import PRESETS
-        if args.preset == "__list__" or args.preset not in PRESETS:
-            from goodhart.fmt import (header, rule_list_item, DIM_COLOR,
-                                      RULE_COLOR, RESET, CRITICAL_COLOR)
-            if args.preset != "__list__":
-                print(f"\n  {CRITICAL_COLOR}Unknown preset: {args.preset}{RESET}")
-            header(f"Presets ({len(PRESETS)})")
-            for name in sorted(PRESETS):
-                m, _ = PRESETS[name]
-                rule_list_item(name, m.name, width=24)
-            print()
-            print(f"  {DIM_COLOR}Usage: goodhart --preset <name>{RESET}")
-            print()
-            sys.exit(0 if args.preset == "__list__" else 1)
-
-        model, config = PRESETS[args.preset]
-
-        # Allow CLI overrides on top of the preset (replace, not append)
-        if args.goal is not None:
-            model.reward_sources = [s for s in model.reward_sources
-                                    if s.reward_type != RewardType.TERMINAL]
-            model.add_reward_source(RewardSource(
-                name="goal", reward_type=RewardType.TERMINAL,
-                value=args.goal,
-                discovery_probability=args.discovery,
-            ))
-        if args.penalty is not None:
-            model.reward_sources = [s for s in model.reward_sources
-                                    if not (s.reward_type == RewardType.PER_STEP
-                                            and s.value < 0)]
-            model.add_reward_source(RewardSource(
-                name="step penalty", reward_type=RewardType.PER_STEP,
-                value=args.penalty,
-            ))
-        if args.steps is not None:
-            model.max_steps = args.steps
-
         _output_analysis(model, config, args)
         return
 

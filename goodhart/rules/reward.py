@@ -171,7 +171,7 @@ class DeathBeatsSurvival(Rule):
         # ratio > 1 means surviving accumulates more penalty than dying.
         # Threshold 2.0 for CRITICAL: dying saves >50% of accumulated cost.
         # Threshold 1.0 for WARNING: any suicidal incentive at all.
-        # These thresholds are calibrated against presets, not formally derived.
+        # These thresholds are calibrated against built-in examples, not formally derived.
         ratio = ev_survive / ev_die
 
         if ratio > 2.0:

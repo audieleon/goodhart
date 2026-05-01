@@ -327,56 +327,6 @@ def test_discounted_penalty_dominates_goal():
     assert not any(v.severity == Severity.CRITICAL for v in verdicts)
 
 
-# --- Preset tests ---
-
-def test_presets_all_load():
-    """Every preset creates a valid EnvironmentModel and TrainingConfig."""
-    from goodhart.presets import PRESETS
-    assert len(PRESETS) >= 7
-    for name, (model, config) in PRESETS.items():
-        assert isinstance(model, EnvironmentModel), f"Preset {name} model is not EnvironmentModel"
-        assert isinstance(config, TrainingConfig), f"Preset {name} config is not TrainingConfig"
-        assert model.name, f"Preset {name} has no name"
-        assert model.max_steps > 0, f"Preset {name} has invalid max_steps"
-        assert 0.0 < model.gamma <= 1.0, f"Preset {name} has invalid gamma"
-
-
-def test_preset_atari():
-    from goodhart.presets import PRESETS
-    model, config = PRESETS["atari"]
-    assert model.max_steps == 18000
-    assert model.gamma == 0.99
-    assert model.n_states == 100000
-    assert len(model.reward_sources) > 0
-    assert config.lr > 0
-
-
-def test_preset_mujoco_locomotion():
-    from goodhart.presets import PRESETS
-    model, config = PRESETS["mujoco-locomotion"]
-    assert model.max_steps == 1000
-    assert model.gamma == 0.99
-    # Should have forward velocity, alive bonus, control penalty
-    assert len(model.reward_sources) >= 3
-
-
-def test_preset_sparse_goal():
-    from goodhart.presets import PRESETS
-    model, config = PRESETS["sparse-goal"]
-    assert model.max_steps == 500
-    assert len(model.goal_sources) > 0
-
-
-def test_preset_analyzable():
-    """Each preset can be analyzed without errors, including training rules."""
-    from goodhart.presets import PRESETS
-    from goodhart.engine import TrainingAnalysisEngine
-    engine = TrainingAnalysisEngine().add_all_rules()
-    for name, (model, config) in PRESETS.items():
-        result = engine.analyze(model, config)
-        assert result is not None, f"Analysis of preset {name} returned None"
-
-
 # --- CompoundTrap tests ---
 
 def test_compound_trap_penalty_plus_respawning():

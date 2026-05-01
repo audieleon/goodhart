@@ -6,7 +6,7 @@ finishing the race, scoring 20% higher than humans who completed it.
 Source: Clark & Amodei 2016, "Faulty Reward Functions in the Wild" (OpenAI Blog)
 """
 
-from goodhart.presets import PRESETS
+from goodhart.models import *
 from goodhart.engine import TrainingAnalysisEngine
 
 METADATA = {
@@ -34,7 +34,20 @@ METADATA = {
 
 
 def run_example():
-    model, config = PRESETS["coast-runners"]
+    model = EnvironmentModel(
+        name="CoastRunners (reward loop)", max_steps=2000, gamma=0.99,
+        n_states=100000, n_actions=3, action_type="discrete", death_probability=0.01,
+    )
+    model.add_reward_source(RewardSource(
+        name="finish race", reward_type=RewardType.TERMINAL, value=100.0,
+        requires_action=True, intentional=True,
+    ))
+    model.add_reward_source(RewardSource(
+        name="turbo powerup", reward_type=RewardType.ON_EVENT, value=20.0,
+        respawn=RespawnBehavior.TIMED, respawn_time=5,
+        can_loop=True, loop_period=10,
+        requires_action=True, intentional=False,
+    ))
     engine = TrainingAnalysisEngine().add_all_rules()
 
     print("CoastRunners Reward Analysis")
@@ -45,7 +58,7 @@ def run_example():
         print(f"  {s.name}: {s.value:+.1f} ({s.reward_type.value})")
     print()
 
-    engine.print_report(model, config)
+    engine.print_report(model)
 
     print("The framework catches this because looping the")
     print("turbo powerup earns far more than finishing the race.")

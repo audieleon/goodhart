@@ -163,33 +163,8 @@ def main():
 
     pause()
 
-    # ---- Demo 7: Presets ----
-    section("DEMO 7: Environment presets")
-    print("  Don't know your exact parameters? Start with a preset.")
-    pause()
-
-    from goodhart.presets import PRESETS
-
-    print(f"  Available presets: {list(PRESETS.keys())}")
-    print()
-    print("  >>> from goodhart.presets import PRESETS")
-    print("  >>> model, config = PRESETS['mujoco-locomotion']")
-    print()
-
-    from goodhart.engine import TrainingAnalysisEngine
-    engine = TrainingAnalysisEngine().add_all_rules()
-    model, config = PRESETS['mujoco-locomotion']
-    result = engine.analyze(model, config)
-
-    for v in result.criticals + result.warnings:
-        print(f"  {v}")
-    if not result.criticals and not result.warnings:
-        print("  No issues with MuJoCo locomotion preset!")
-
-    pause()
-
-    # ---- Demo 8: Formal proofs ----
-    section("DEMO 8: Backed by formal proofs")
+    # ---- Demo 7: Formal proofs ----
+    section("DEMO 7: Backed by formal proofs")
     print("  Every core rule is linked to a LEAN 4 theorem.")
     print("  The math is machine-verified, not just tested.")
     pause()
@@ -217,8 +192,7 @@ def main():
     print("    3. Typed Result API for training scripts")
     print("    4. ASCII visualization of reward landscape")
     print("    5. Real failure case (CoastRunners)")
-    print("    6. Environment presets for common domains")
-    print("    7. Formal LEAN proofs backing each rule")
+    print("    6. Formal LEAN proofs backing each rule")
     print()
     from goodhart.rules import RULE_COUNT
     print(f"  {RULE_COUNT} rules | 57 examples from 40+ papers")
