@@ -113,12 +113,10 @@ def classify_source(path):
         return "builtin"
     elif "sources/eureka" in path:
         return "eureka"
-    elif "sources/heldout" in path:
-        return "heldout"
     elif "sources/krakovna" in path:
         return "krakovna"
-    elif "sources/published_papers" in path:
-        return "published_papers"
+    elif "sources/papers" in path:
+        return "papers"
     return "unknown"
 
 
@@ -196,9 +194,8 @@ def discover_files():
     dirs = [
         os.path.join(ROOT, "goodhart", "examples"),
         os.path.join(ROOT, "evaluation", "sources", "eureka"),
-        os.path.join(ROOT, "evaluation", "sources", "heldout"),
         os.path.join(ROOT, "evaluation", "sources", "krakovna"),
-        os.path.join(ROOT, "evaluation", "sources", "published_papers"),
+        os.path.join(ROOT, "evaluation", "sources", "papers"),
     ]
     files = []
     for d in dirs:
