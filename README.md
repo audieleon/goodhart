@@ -65,8 +65,23 @@ goodhart --explain idle_exploit
 # Diagnose and suggest fixes
 goodhart --doctor --goal 1.0 --penalty -0.01 --steps 500
 
-# CI integration (exit code 1 on critical issues)
-goodhart --quiet --exit-on-critical --config experiment.yaml
+# Machine-readable doctor output
+goodhart --doctor --goal 1.0 --penalty -0.01 --steps 500 -j
+
+# Field reference
+goodhart --fields                    # list all fields
+goodhart --field intentional         # explain one field
+
+# CI integration
+goodhart -q --config experiment.yaml            # exit 1 on criticals
+goodhart -sq --config experiment.yaml           # exit 1 on warnings too
+goodhart -sq --ignore idle_exploit --config e.yaml  # suppress known-OK warnings
+
+# Grep-friendly output
+goodhart --format compact --config experiment.yaml | grep CRITICAL
+
+# Read config from stdin
+cat reward.yaml | goodhart --config - -j | jq '.criticals'
 ```
 
 ### Python API

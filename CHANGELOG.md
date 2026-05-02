@@ -7,25 +7,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Added
-- `intrinsic_dominance` rule: flags when accumulated intrinsic reward
-  exceeds the terminal goal (Verified, LEAN proof).
-- `discount_horizon_mismatch` rule: episode exceeds discount horizon
-  with sparse rewards (Verified, LEAN proof).
-- `negative_only_reward` rule: all components non-positive, no learning
-  signal (Verified, LEAN proof).
-- `reward_delay_horizon` rule: terminal goal discounted below noise
-  floor (Verified, LEAN proof).
-- 9 new examples (6 intrinsic dominance + 3 new rules).
-- LEAN CI uses leanprover/lean-action (precompiled Mathlib).
-- LEAN CI runs on PRs, not just push to main.
-- Branch protection on main (PR + CI required).
-- Total theorems increased from 92 to 103.
-- Proved rules increased from 17 to 24 (13 verified, 7 grounded, 4 motivated).
-- Examples increased from 57 to 66.
-- Upgraded `shaping_loop_exploit` and `shaping_not_potential_based` from
-  Motivated to Grounded.
-- Added FormalBasis to `critic_lr_ratio`, `batch_size_interaction`,
-  `parallelism_effect`.
+- **Reward Failure Dataset**: 212 structured encodings from 133 published
+  papers across 18 domains (manipulation, game AI, locomotion, driving,
+  control, multi-agent, navigation, energy, finance, healthcare, safety,
+  RLHF, chip design, fusion, industrial, and more).
+- `--fields` and `--field NAME`: plain-language field reference in CLI.
+- `--strict` (`-s`): treat warnings as errors (exit code 1).
+- `--ignore RULES`: suppress specific rules by name (comma-separated).
+- `--format compact`: one-line-per-finding output for grep and log scanning.
+- `--doctor --json`: machine-readable fix suggestions.
+- `--config -`: read YAML/JSON config from stdin.
+- `-j` short flag for `--json`, `-s` for `--strict`.
+- Plain-language docstrings on all RewardSource and EnvironmentModel fields.
+- 4 new rules: `intrinsic_dominance`, `discount_horizon_mismatch`,
+  `negative_only_reward`, `reward_delay_horizon` (all Verified, LEAN).
+- 146 evaluation entries encoded independently of rule development.
+- Total theorems increased from 92 to 105.
+- Proved rules increased from 17 to 24.
+- LLM baseline comparison: 4 frontier LLMs tested (May 2026).
+- Datasheet for the Reward Failure Dataset (Gebru et al. format).
+
+### Removed
+- Presets system (`goodhart/presets.py`, `--preset` CLI flag).
+  Examples are now self-contained with inline model definitions.
+
+### Changed
+- Examples no longer depend on presets; each builds its own
+  EnvironmentModel with full METADATA and paper provenance.
+- Quick-check (`--goal/--penalty/--steps`) now routes through
+  `_output_analysis` for consistent `--strict`/`--ignore` support.
+
+### Fixed
+- `.gitignore` no longer ignores `evaluation/sources/papers/`.
+- 4 tool bugs found during evaluation encoding (multiplicative
+  modifiers, tracking-controller severity, advisory scope,
+  state-dependent penalty handling).
 
 ## [0.1.0] - 2026-04-26
 
