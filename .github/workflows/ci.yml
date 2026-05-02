@@ -25,14 +25,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]" || pip install -e .
-          pip install pytest
+          pip install pytest ruff
 
-      - name: Lint with python -m py_compile
-        run: |
-          find goodhart -name "*.py" -exec python -m py_compile {} +
+      - name: Lint
+        run: ruff check goodhart/ --ignore F403,F405
+
+      - name: Format check
+        run: ruff format --check goodhart/
 
       - name: Run tests
         run: pytest -v
+
+      - name: Extract dataset
+        if: matrix.python-version == '3.12'
+        run: |
+          python evaluation/scripts/extract_dataset.py 2>&1 | tee /tmp/extract.log
+          grep "0 errors" /tmp/extract.log || exit 1
 
   lean:
     runs-on: ubuntu-latest
