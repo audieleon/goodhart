@@ -192,6 +192,18 @@ def reward_landscape_ascii(model: EnvironmentModel,
         lines.append(f"  {GREEN}{BOLD}Good:{RESET} {GREEN}Solving the task has "
                      f"the highest expected value.{RESET}")
 
+    # Note if model has per-step rewards beyond simple penalty
+    passive_sources = [s for s in model.reward_sources
+                       if s.reward_type.name == "PER_STEP" and not s.requires_action
+                       and s.value > 0]
+    active_perstep = [s for s in model.reward_sources
+                      if s.reward_type.name == "PER_STEP" and s.intentional]
+    if passive_sources or active_perstep:
+        names = [s.name for s in passive_sources + active_perstep]
+        lines.append(f"  {DIM}Note: this chart shows goal vs penalty tradeoffs.")
+        lines.append(f"  Per-step rewards ({', '.join(names)}) are analyzed")
+        lines.append(f"  by the rule engine above, not this chart.{RESET}")
+
     lines.append("")
     return "\n".join(lines)
 
