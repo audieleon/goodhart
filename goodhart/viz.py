@@ -21,95 +21,116 @@ def _discounted_steps(gamma: float, n: int) -> float:
     return (1.0 - gamma ** n) / (1.0 - gamma)
 
 
-def _compute_strategy_evs(model: EnvironmentModel) -> Dict[str, float]:
+def _compute_strategy_evs(model: EnvironmentModel,
+                          result=None) -> Dict[str, float]:
     """Compute expected value for canonical agent strategies.
 
-    Returns a dict mapping strategy name to expected total episode return.
-    Accounts for all reward sources: passive per-step, active per-step,
-    terminal, on-event, and shaping rewards.
+    If a rule engine result is provided, pulls EVs directly from
+    rule verdicts to ensure the viz agrees with the analysis.
+    Falls back to independent calculation otherwise.
     """
-    gamma = model.gamma
-    T = model.max_steps
-
-    # Classify reward sources
-    passive_perstep = 0.0  # earned by doing nothing (alive bonus)
-    active_perstep = 0.0   # earned by acting (velocity, tracking)
-    penalties = 0.0         # per-step costs (ctrl_cost, etc.)
-    goal_reward = 0.0       # terminal/on-event goal rewards
-    loop_reward = 0.0       # respawning/loopable rewards per step
-    disc_prob = 0.0         # best goal discovery probability
-
-    for s in model.reward_sources:
-        if s.reward_type.name in ("TERMINAL", "ON_EVENT"):
-            if s.value > 0:
-                goal_reward += s.value
-                disc_prob = max(disc_prob, s.discovery_probability)
-        elif s.reward_type.name in ("PER_STEP", "SHAPING"):
-            if not s.requires_action and s.value > 0:
-                passive_perstep += s.value
-            elif s.requires_action and s.intentional and s.value > 0:
-                active_perstep += s.value
-            elif s.value < 0:
-                penalties += s.value  # negative
-
-        # Loopable rewards (any type)
-        if s.can_loop and s.value > 0:
-            if s.reward_type.name in ("ON_EVENT", "SHAPING"):
-                # Estimate per-step equivalent from loop period
-                period = max(1, s.loop_period) if s.loop_period > 0 else 5
-                loop_reward += s.value / period
-            elif s.reward_type.name == "PER_STEP":
-                loop_reward += s.value
-
-    # Death risk: active strategies have shorter expected episodes
-    death_p = model.death_probability
-    if death_p > 0:
-        active_ep_len = min(T, int(1.0 / death_p))  # expected steps before death
-    else:
-        active_ep_len = T
-
-    disc_full = _discounted_steps(gamma, T)
-    disc_active = _discounted_steps(gamma, active_ep_len)
-    avg_discovery = max(1, active_ep_len // 2)
-    gamma_disc_goal = gamma ** avg_discovery if gamma < 1.0 else 1.0
-
     strategies = {}
 
-    # 1. Die immediately -- 1 step of everything, then done
+    # Extract EVs from rule engine verdicts if available
+    ev_idle = None
+    ev_explore = None
+    ev_die = None
+    ev_survive = None
+    ev_loop = None
+    goal_reward = None
+
+    if result:
+        for v in result.verdicts:
+            d = v.details or {}
+            if v.rule_name == "idle_exploit":
+                ev_idle = d.get("ev_idle")
+                ev_explore = d.get("ev_explore")
+            elif v.rule_name == "death_beats_survival":
+                ev_die = d.get("ev_die")
+                ev_survive = d.get("ev_survive_10")
+            elif v.rule_name == "respawning_exploit":
+                if ev_loop is None or d.get("ev_loop", 0) > ev_loop:
+                    ev_loop = d.get("ev_loop")
+                if goal_reward is None:
+                    goal_reward = d.get("goal_reward")
+            elif v.rule_name == "compound_trap":
+                if ev_loop is None or d.get("loop_ev", 0) > ev_loop:
+                    ev_loop = d.get("loop_ev")
+                if goal_reward is None:
+                    goal_reward = d.get("goal_ev")
+
+    # Build strategies from rule engine data + independent calculation
+    gamma = model.gamma
+    T = model.max_steps
+    disc_full = _discounted_steps(gamma, T)
+
+    # Passive per-step and penalties (always needed for fallback)
+    passive_perstep = sum(s.value for s in model.reward_sources
+                          if s.reward_type.name in ("PER_STEP", "SHAPING")
+                          and not s.requires_action and s.value > 0)
+    active_perstep = sum(s.value for s in model.reward_sources
+                         if s.reward_type.name in ("PER_STEP", "SHAPING")
+                         and s.requires_action and s.intentional and s.value > 0)
+    penalties = sum(s.value for s in model.reward_sources
+                    if s.reward_type.name in ("PER_STEP", "SHAPING")
+                    and s.value < 0)
+    goal_rv = model.max_goal_reward if goal_reward is None else goal_reward
+    disc_prob = max((s.discovery_probability for s in model.goal_sources), default=0.0)
+
+    death_p = model.death_probability
+    active_ep_len = min(T, int(1.0 / death_p)) if death_p > 0 else T
+    disc_active = _discounted_steps(gamma, active_ep_len)
+
+    # Die immediately
     disc_1 = _discounted_steps(gamma, 1)
-    strategies["die_fast"] = (passive_perstep + penalties) * disc_1
+    if ev_die is not None:
+        strategies["die_fast"] = ev_die
+    else:
+        strategies["die_fast"] = (passive_perstep + penalties) * disc_1
 
-    # 2. Stand still -- collect passive rewards for full episode.
-    #    No death risk (not moving), no action costs, no goal.
-    strategies["stand_still"] = (passive_perstep + penalties) * disc_full
+    # Stand still (idle)
+    if ev_idle is not None:
+        strategies["stand_still"] = ev_idle
+    else:
+        strategies["stand_still"] = (passive_perstep + penalties) * disc_full
 
-    # 3. Random exploration -- random walk, faces death risk
-    strategies["explore_random"] = (
-        (passive_perstep + penalties) * disc_active
-        + disc_prob * goal_reward * gamma_disc_goal
-    )
+    # Explore (uses rule engine's ev_explore if available)
+    if ev_explore is not None:
+        strategies["explore"] = ev_explore
+    else:
+        avg_discovery = max(1, active_ep_len // 2)
+        gamma_disc_goal = gamma ** avg_discovery if gamma < 1.0 else 1.0
+        strategies["explore"] = (
+            (passive_perstep + active_perstep * 0.3 + penalties) * disc_active
+            + disc_prob * goal_rv * gamma_disc_goal
+        )
 
-    # 4. Full exploration -- explore exhaustively, faces death risk
-    disc_half = _discounted_steps(gamma, avg_discovery)
-    strategies["explore_full"] = (
-        (passive_perstep + active_perstep * 0.3 + penalties) * disc_half
-        + goal_reward * gamma_disc_goal
-    )
-
-    # 5. Solve the task -- reach goal efficiently, faces death risk
+    # Solve the task (optimal)
     optimal_steps = max(1, int(active_ep_len * 0.3))
     disc_opt = _discounted_steps(gamma, optimal_steps)
     gamma_disc_opt = gamma ** optimal_steps if gamma < 1.0 else 1.0
     strategies["optimal"] = (
         (passive_perstep + active_perstep + penalties) * disc_opt
-        + goal_reward * gamma_disc_opt
+        + goal_rv * gamma_disc_opt
     )
 
-    # 6. Loop exploit -- if loopable rewards exist, farm them
-    if loop_reward > 0:
-        strategies["loop"] = (
-            (passive_perstep + loop_reward + penalties) * disc_active
-        )
+    # Loop exploit
+    if ev_loop is not None and ev_loop > 0:
+        strategies["loop"] = ev_loop
+    else:
+        # Check for loopable sources
+        loop_reward = 0.0
+        for s in model.reward_sources:
+            if s.can_loop and s.value > 0:
+                if s.reward_type.name in ("ON_EVENT", "SHAPING"):
+                    period = max(1, s.loop_period) if s.loop_period > 0 else 5
+                    loop_reward += s.value / period
+                elif s.reward_type.name == "PER_STEP":
+                    loop_reward += s.value
+        if loop_reward > 0:
+            strategies["loop"] = (
+                (passive_perstep + loop_reward + penalties) * disc_active
+            )
 
     return strategies
 
@@ -118,7 +139,7 @@ def _classify_strategy(name: str) -> str:
     """Return color class for a strategy: 'red', 'yellow', or 'green'."""
     if name in ("die_fast", "stand_still", "loop"):
         return "red"
-    elif name in ("explore_random", "explore_full"):
+    elif name in ("explore", "explore_random", "explore_full"):
         return "yellow"
     else:
         return "green"
@@ -129,19 +150,23 @@ def _classify_strategy(name: str) -> str:
 # =====================================================================
 
 def reward_landscape_ascii(model: EnvironmentModel,
-                           config: TrainingConfig = None) -> str:
+                           config: TrainingConfig = None,
+                           result=None) -> str:
     """Generate an ASCII reward landscape chart.
 
     Args:
         model: The environment model to visualize.
         config: Optional training config (unused currently).
+        result: Optional analysis Result from the rule engine.
+            If provided, EVs are pulled from rule verdicts for
+            consistency. If not, EVs are computed independently.
 
     Returns:
         A multi-line string with the ASCII chart.
     """
     import os, sys
 
-    strategies = _compute_strategy_evs(model)
+    strategies = _compute_strategy_evs(model, result=result)
     sorted_strats = sorted(strategies.items(), key=lambda x: x[1], reverse=True)
 
     # Color support
@@ -161,6 +186,7 @@ def reward_landscape_ascii(model: EnvironmentModel,
     labels = {
         "die_fast": ("Die immediately", "terminate at step 1 to avoid penalties"),
         "stand_still": ("Stand still", "do nothing, collect passive rewards only"),
+        "explore": ("Explore", "search for the goal, pay action costs"),
         "explore_random": ("Random exploration", "random walk, might find the goal"),
         "explore_full": ("Full exploration", "explore exhaustively, find the goal"),
         "optimal": ("Solve the task", "reach the goal efficiently"),

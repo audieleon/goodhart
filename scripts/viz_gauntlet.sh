@@ -61,8 +61,12 @@ for f in sorted(os.listdir(examples_dir)):
     model = captured['model']
 
     # Test 1: does it run without crashing?
+    # Run rule engine and pass result to viz for consistency
+    engine_for_viz = TrainingAnalysisEngine().add_all_rules()
+    analysis = engine_for_viz.analyze(model)
+
     try:
-        output = reward_landscape_ascii(model)
+        output = reward_landscape_ascii(model, result=analysis)
     except Exception as e:
         results.append({"id": pid, "status": "FAIL", "reason": f"crashed: {e}"})
         continue
@@ -88,8 +92,6 @@ for f in sorted(os.listdir(examples_dir)):
         continue
 
     # Test 5: does the winner make sense relative to the rule engine?
-    engine = TrainingAnalysisEngine().add_all_rules()
-    analysis = engine.analyze(model)
     rule_names = [v.rule_name for v in analysis.criticals]
 
     winner = None
@@ -101,14 +103,20 @@ for f in sorted(os.listdir(examples_dir)):
                 winner = parts[-1].split('◀')[0].strip()
             break
 
-    # Cross-check: if rule engine says idle_exploit, viz should NOT say "Solve the task"
+    # Cross-check: if rule engine flags idle/loop exploits, the viz
+    # winner should be a degenerate strategy (stand still, die, loop)
+    # — NOT "Solve the task". If the viz says a degenerate strategy
+    # wins, it agrees with the rules.
     idle_flagged = "idle_exploit" in rule_names
-    viz_says_solve = winner == "Solve the task"
+    loop_flagged = any(r in rule_names for r in
+        ["respawning_exploit", "shaping_loop_exploit"])
+    degenerate_flagged = idle_flagged or loop_flagged
+    viz_degenerate_wins = winner in ("Stand still", "Die immediately", "Farm loop")
 
-    if idle_flagged and viz_says_solve:
+    if degenerate_flagged and not viz_degenerate_wins:
         results.append({
             "id": pid, "status": "WARN",
-            "reason": f"rule engine flags idle_exploit but viz says '{winner}'",
+            "reason": f"rules flag degenerate exploit but viz says '{winner}'",
             "winner": winner
         })
         continue

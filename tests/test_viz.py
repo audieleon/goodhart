@@ -41,7 +41,7 @@ def test_ascii_contains_strategies():
     assert "Die immediately" in output
     assert "Stand still" in output
     assert "Solve the task" in output
-    assert "exploration" in output.lower()
+    assert "explore" in output.lower()
 
 
 def test_ascii_contains_ev_values():
@@ -80,8 +80,7 @@ def test_compute_strategy_evs_returns_dict():
     assert "die_fast" in evs
     assert "stand_still" in evs
     assert "optimal" in evs
-    assert "explore_random" in evs
-    assert "explore_full" in evs
+    assert "explore" in evs
 
 
 def test_compute_strategy_evs_optimal_highest_with_good_config():

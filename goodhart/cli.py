@@ -922,23 +922,13 @@ Tab completion (bash):
             routing_floor=args.floor, n_states=args.states,
             gamma=args.gamma, name=args.name,
         )
-        _output_analysis(model, config, args)
+        result = _output_analysis(model, config, args)
 
         if args.viz or args.ascii:
-            model, config = _build_model_and_config(
-                goal=args.goal or 0.0, penalty=args.penalty or 0.0,
-                max_steps=args.steps or 500,
-                discovery_prob=args.discovery, n_actors=args.actors,
-                total_steps=args.budget, lr=args.lr,
-                critic_lr=args.critic_lr, entropy=args.entropy,
-                n_specialists=args.specialists,
-                routing_floor=args.floor, n_states=args.states,
-                name=args.name,
-            )
             if args.ascii:
                 from goodhart.viz import reward_landscape_ascii
                 print()
-                print(reward_landscape_ascii(model, config))
+                print(reward_landscape_ascii(model, config, result=result))
             else:
                 try:
                     from goodhart.viz import reward_landscape
