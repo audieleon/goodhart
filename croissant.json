@@ -1,0 +1,173 @@
+{
+  "@context": {
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "ml": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/"
+  },
+  "@type": "sc:Dataset",
+  "name": "Reward Failure Dataset",
+  "description": "212 structured encodings of RL reward configurations from 133 published papers (1983-2025) across 18 domains. Each entry encodes the reward structure as typed RewardSource objects with provenance, ground truth, and static analysis results from the goodhart tool.",
+  "url": "https://huggingface.co/datasets/audieleon/reward-failure-dataset",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "creator": {
+    "@type": "sc:Person",
+    "name": "Audie Leon Sheridan",
+    "email": "audie@w3.io"
+  },
+  "datePublished": "2026-05-02",
+  "version": "1.0.0",
+  "keywords": [
+    "reinforcement-learning",
+    "reward-design",
+    "reward-hacking",
+    "specification-gaming",
+    "static-analysis",
+    "safety"
+  ],
+  "inLanguage": "en",
+  "distribution": [
+    {
+      "@type": "sc:FileObject",
+      "name": "reward_failure_dataset.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/audieleon/reward-failure-dataset/resolve/main/reward_failure_dataset.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "bbb19f7be7dda9d3de1c9e6c69f6567ae03b3056d07eb7b24082c677a142fd99"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "ml:RecordSet",
+      "name": "reward_configurations",
+      "description": "Each record is a structured encoding of an RL reward configuration from a published paper.",
+      "field": [
+        {
+          "@type": "ml:Field",
+          "name": "id",
+          "description": "Unique identifier for this entry",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": "reward_failure_dataset.jsonl",
+            "extract": {
+              "jsonPath": "$.id"
+            }
+          }
+        },
+        {
+          "@type": "ml:Field",
+          "name": "source_paper",
+          "description": "Paper or source this configuration comes from",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": "reward_failure_dataset.jsonl",
+            "extract": {
+              "jsonPath": "$.source_paper"
+            }
+          }
+        },
+        {
+          "@type": "ml:Field",
+          "name": "paper_url",
+          "description": "URL to the source paper",
+          "dataType": "sc:URL",
+          "source": {
+            "fileObject": "reward_failure_dataset.jsonl",
+            "extract": {
+              "jsonPath": "$.paper_url"
+            }
+          }
+        },
+        {
+          "@type": "ml:Field",
+          "name": "year",
+          "description": "Publication year of the source paper",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": "reward_failure_dataset.jsonl",
+            "extract": {
+              "jsonPath": "$.year"
+            }
+          }
+        },
+        {
+          "@type": "ml:Field",
+          "name": "domain",
+          "description": "Application domain (e.g., locomotion, game_ai, driving)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": "reward_failure_dataset.jsonl",
+            "extract": {
+              "jsonPath": "$.domain"
+            }
+          }
+        },
+        {
+          "@type": "ml:Field",
+          "name": "is_negative_example",
+          "description": "True if this is a well-designed reward; False if it has a documented failure",
+          "dataType": "sc:Boolean",
+          "source": {
+            "fileObject": "reward_failure_dataset.jsonl",
+            "extract": {
+              "jsonPath": "$.is_negative_example"
+            }
+          }
+        },
+        {
+          "@type": "ml:Field",
+          "name": "failure_mechanism",
+          "description": "Type of failure (e.g., idle_exploit, shaping_loop, ontological_proxy). Null for well-designed rewards.",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": "reward_failure_dataset.jsonl",
+            "extract": {
+              "jsonPath": "$.failure_mechanism"
+            }
+          }
+        },
+        {
+          "@type": "ml:Field",
+          "name": "brief_summary",
+          "description": "One-line description of the reward configuration and its outcome",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": "reward_failure_dataset.jsonl",
+            "extract": {
+              "jsonPath": "$.brief_summary"
+            }
+          }
+        },
+        {
+          "@type": "ml:Field",
+          "name": "documented_failure",
+          "description": "Description of the failure as reported in the original paper. Null for well-designed rewards.",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": "reward_failure_dataset.jsonl",
+            "extract": {
+              "jsonPath": "$.documented_failure"
+            }
+          }
+        },
+        {
+          "@type": "ml:Field",
+          "name": "num_reward_sources",
+          "description": "Number of reward components in this configuration",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": "reward_failure_dataset.jsonl",
+            "extract": {
+              "jsonPath": "$.num_reward_sources"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "rai:dataBiases": "Single annotator (the author) encoded all configurations. Encoding involves judgment calls about design intent (intentional flag) and exploitability (can_loop flag). All decisions documented in encoding_rationale field per entry.",
+  "rai:dataCollection": "Reward configurations were manually encoded from published papers by reading reward equations, tables, or source code. No automated scraping. No personal data collected. All source papers are public.",
+  "rai:personalSensitiveInformation": "None. The dataset contains only reward function specifications from published papers.",
+  "rai:dataUseCases": "Benchmarking reward analysis tools. Studying reward design patterns across domains. Teaching reward design. NOT intended for training RL agents.",
+  "rai:dataSocialImpact": "Positive: helps practitioners avoid wasting compute on structurally flawed rewards. The YouTube case study illustrates how structural analysis applies to systems affecting billions of users. No negative impacts identified.",
+  "rai:dataLimitations": "Single annotator. 8 entries lack paper URLs. Encoding basis is primary_source (166), code_derived (38), or unverified_folklore (7). The structural/semantic classification involves judgment."
+}
