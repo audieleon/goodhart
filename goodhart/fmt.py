@@ -43,18 +43,22 @@ DIM_COLOR = _DIM
 HEADER_COLOR = _BOLD
 RESET = _RESET
 
-# Fixed terminal width for wrapping
-try:
-    TERM_WIDTH = min(os.get_terminal_size().columns, 80) if sys.stdout.isatty() else 80
-except (OSError, ValueError, AttributeError):
-    TERM_WIDTH = 80
+# Terminal width — recalculated on each call to adapt to resizes
 INDENT = "     "
-WRAP_WIDTH = max(TERM_WIDTH - len(INDENT), 20)
+
+def _term_width():
+    try:
+        return min(os.get_terminal_size().columns, 80) if sys.stdout.isatty() else 80
+    except (OSError, ValueError, AttributeError):
+        return 80
+
+def _wrap_width():
+    return max(_term_width() - len(INDENT), 20)
 
 
 def header(title, subtitle=None):
     """Print a bold header bar."""
-    line = "=" * TERM_WIDTH
+    line = "=" * _term_width()
     print(f"\n{HEADER_COLOR}{line}{RESET}")
     print(f"{HEADER_COLOR}  {title}{RESET}")
     if subtitle:
@@ -84,14 +88,14 @@ def verdict(v, verbose=False):
     rule = f"{RULE_COLOR}{v.rule_name}{RESET}"
 
     # Main message — wrap long lines
-    msg_lines = textwrap.wrap(v.message, width=WRAP_WIDTH)
+    msg_lines = textwrap.wrap(v.message, width=_wrap_width())
     print(f"  [{icon}] [{rule}]")
     for line in msg_lines:
         print(f"{INDENT}{line}")
 
     # Recommendation
     if v.recommendation:
-        rec_lines = textwrap.wrap(v.recommendation, width=WRAP_WIDTH - 3)
+        rec_lines = textwrap.wrap(v.recommendation, width=_wrap_width() - 3)
         print(f"\n{INDENT}{REC_COLOR}-> {rec_lines[0]}{RESET}")
         for line in rec_lines[1:]:
             print(f"{INDENT}   {REC_COLOR}{line}{RESET}")
@@ -100,7 +104,7 @@ def verdict(v, verbose=False):
     if verbose and v.learn_more:
         print()
         for paragraph in v.learn_more.split("\n"):
-            wrapped = textwrap.wrap(paragraph.strip(), width=WRAP_WIDTH - 3)
+            wrapped = textwrap.wrap(paragraph.strip(), width=_wrap_width() - 3)
             for line in wrapped:
                 print(f"{INDENT}   {DIM_COLOR}{line}{RESET}")
             if wrapped:
@@ -121,7 +125,7 @@ def summary(n_critical, n_warning, n_info):
         parts.append(f"{GREEN_LABEL}0 critical{RESET}")
     parts.append(f"{n_warning} warnings")
     parts.append(f"{n_info} info")
-    print(f"{DIM_COLOR}{'─' * TERM_WIDTH}{RESET}")
+    print(f"{DIM_COLOR}{'─' * _term_width()}{RESET}")
     print(f"  {', '.join(parts)}")
     print()
 
@@ -139,7 +143,7 @@ def failed_banner(n):
 def rule_list_item(name, description, width=32):
     """Print a rule in the --rules listing."""
     # Wrap description to fit after the name column
-    desc_width = TERM_WIDTH - width - 6
+    desc_width = _term_width() - width - 6
     desc_lines = textwrap.wrap(description, width=desc_width)
     print(f"    {RULE_COLOR}{name:<{width}}{RESET} {desc_lines[0] if desc_lines else ''}")
     for line in desc_lines[1:]:
@@ -148,7 +152,7 @@ def rule_list_item(name, description, width=32):
 
 def explain_header(rule_name, description):
     """Print the --explain header."""
-    line = "=" * TERM_WIDTH
+    line = "=" * _term_width()
     print(f"\n{HEADER_COLOR}{line}{RESET}")
     print(f"  {HEADER_COLOR}Rule:{RESET} {RULE_COLOR}{rule_name}{RESET}")
     print(f"  {description}")
@@ -160,7 +164,7 @@ def explain_section(title, content):
     print(f"  {HEADER_COLOR}{title}:{RESET}")
     if isinstance(content, str):
         for paragraph in content.split("\n"):
-            wrapped = textwrap.wrap(paragraph.strip(), width=WRAP_WIDTH - 3)
+            wrapped = textwrap.wrap(paragraph.strip(), width=_wrap_width() - 3)
             for line in wrapped:
                 print(f"     {line}")
             if wrapped:
@@ -174,4 +178,4 @@ def explain_section(title, content):
 def category_header(name):
     """Print a category header in --rules."""
     print(f"\n  {HEADER_COLOR}{name}{RESET}")
-    print(f"  {DIM_COLOR}{'─' * (TERM_WIDTH - 2)}{RESET}")
+    print(f"  {DIM_COLOR}{'─' * (_term_width() - 2)}{RESET}")
