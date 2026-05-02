@@ -264,6 +264,38 @@ def reward_landscape_ascii(model: EnvironmentModel,
         lines.append(f"  {GREEN}{BOLD}Good:{RESET} {GREEN}Solving the task has "
                      f"the highest expected value.{RESET}")
 
+    # Show rule engine findings if available
+    if result and result.verdicts:
+        from goodhart.models import Severity
+        # Group by severity, skip rules already reflected in the chart
+        chart_rules = {"idle_exploit", "death_beats_survival",
+                       "respawning_exploit", "compound_trap"}
+        other_verdicts = [v for v in result.verdicts
+                          if v.rule_name not in chart_rules]
+
+        if other_verdicts:
+            lines.append(f"  {DIM}{'─' * 55}{RESET}")
+            for v in other_verdicts:
+                if v.severity == Severity.CRITICAL:
+                    icon, color_v = "✗", RED
+                elif v.severity == Severity.WARNING:
+                    icon, color_v = "!", YELLOW
+                else:
+                    icon, color_v = "·", DIM
+
+                # Truncate message to one readable line
+                msg = v.message.replace('\n', ' ')
+                if len(msg) > 70:
+                    # Cut at last space before 70 chars
+                    cut = msg[:70].rfind(' ')
+                    if cut > 30:
+                        msg = msg[:cut] + "..."
+                    else:
+                        msg = msg[:67] + "..."
+                lines.append(
+                    f"  {color_v}{icon} {v.rule_name}: {msg}{RESET}")
+            lines.append("")
+
     lines.append("")
     return "\n".join(lines)
 
