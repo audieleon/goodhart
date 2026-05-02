@@ -148,12 +148,8 @@ def run_example():
     print("COMPARISON")
     print("=" * 70)
     print()
-    pbrs_rules = {
-        v.rule_name for v in result_pbrs.verdicts if v.severity == Severity.CRITICAL
-    }
-    naive_rules = {
-        v.rule_name for v in result_naive.verdicts if v.severity == Severity.CRITICAL
-    }
+    pbrs_rules = {v.rule_name for v in result_pbrs.verdicts if v.severity == Severity.CRITICAL}
+    naive_rules = {v.rule_name for v in result_naive.verdicts if v.severity == Severity.CRITICAL}
     extra = naive_rules - pbrs_rules
 
     print(f"PBRS criticals:  {sorted(pbrs_rules)}")

@@ -33,10 +33,7 @@ def detect_env(env_id: str, n_episodes: int = 20) -> Tuple[EnvironmentModel, dic
     try:
         import gymnasium as gym
     except ImportError:
-        raise ImportError(
-            "gymnasium is required for --detect. "
-            "Install with: pip install goodhart[detect]"
-        )
+        raise ImportError("gymnasium is required for --detect. Install with: pip install goodhart[detect]")
 
     try:
         env = gym.make(env_id)
@@ -44,9 +41,7 @@ def detect_env(env_id: str, n_episodes: int = 20) -> Tuple[EnvironmentModel, dic
         raise RuntimeError(f"Could not create environment '{env_id}': {e}")
 
     spec = env.spec
-    max_episode_steps = (
-        spec.max_episode_steps if spec and spec.max_episode_steps else 1000
-    )
+    max_episode_steps = spec.max_episode_steps if spec and spec.max_episode_steps else 1000
     n_actions = (
         env.action_space.n
         if hasattr(env.action_space, "n")
@@ -107,21 +102,13 @@ def detect_env(env_id: str, n_episodes: int = 20) -> Tuple[EnvironmentModel, dic
     step_std = statistics.stdev(all_step_rewards) if len(all_step_rewards) > 1 else 0.0
 
     # Detect state-dependence: high variance relative to mean
-    is_state_dependent = (
-        step_std > abs(step_mean) * 0.5 if step_mean != 0 else step_std > 0.01
-    )
+    is_state_dependent = step_std > abs(step_mean) * 0.5 if step_mean != 0 else step_std > 0.01
 
     # Detect terminal reward: last-step reward differs from mid-episode
-    mid_rewards = (
-        all_step_rewards[:-1] if len(all_step_rewards) > 1 else all_step_rewards
-    )
+    mid_rewards = all_step_rewards[:-1] if len(all_step_rewards) > 1 else all_step_rewards
     mid_mean = statistics.mean(mid_rewards) if mid_rewards else 0.0
     terminal_mean = statistics.mean(terminal_rewards) if terminal_rewards else 0.0
-    has_terminal = (
-        abs(terminal_mean - mid_mean) > abs(mid_mean) * 2
-        if mid_mean != 0
-        else abs(terminal_mean) > 0.1
-    )
+    has_terminal = abs(terminal_mean - mid_mean) > abs(mid_mean) * 2 if mid_mean != 0 else abs(terminal_mean) > 0.1
 
     stats = {
         "env_id": env_id,
@@ -180,9 +167,7 @@ def detect_env(env_id: str, n_episodes: int = 20) -> Tuple[EnvironmentModel, dic
         pass
     elif step_min < -0.1 and has_terminal:
         # There's a penalty alongside the terminal reward
-        penalty_estimate = (
-            step_mean if step_mean < 0 else step_min / max(mean_length, 1)
-        )
+        penalty_estimate = step_mean if step_mean < 0 else step_min / max(mean_length, 1)
         model.add_reward_source(
             RewardSource(
                 name="step_penalty",

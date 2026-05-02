@@ -53,10 +53,7 @@ class PenaltyDominatesGoal(Rule):
 
     @property
     def description(self):
-        return (
-            "Total step penalty over max episode exceeds goal reward, "
-            "making even optimal play potentially negative"
-        )
+        return "Total step penalty over max episode exceeds goal reward, making even optimal play potentially negative"
 
     @property
     def proof(self):
@@ -73,19 +70,13 @@ class PenaltyDominatesGoal(Rule):
     def check(self, model, config=None):
         verdicts = []
         # Use worst-case values when ranges are available
-        penalty_sources = [
-            s
-            for s in model.reward_sources
-            if s.reward_type == RewardType.PER_STEP and s.value < 0
-        ]
+        penalty_sources = [s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP and s.value < 0]
         penalty_per_step = (
             sum(abs(_worst_case_value(s)) for s in penalty_sources)
             if penalty_sources
             else abs(model.total_step_penalty)
         )
-        total_penalty = penalty_per_step * _discounted_steps(
-            model.gamma, model.max_steps
-        )
+        total_penalty = penalty_per_step * _discounted_steps(model.gamma, model.max_steps)
         goal = model.max_goal_reward
 
         if total_penalty > goal:
@@ -294,10 +285,7 @@ class IdleExploit(Rule):
         )
 
     def applies_to(self, model):
-        return (
-            any(not s.requires_action for s in model.reward_sources)
-            or model.total_step_penalty < 0
-        )
+        return any(not s.requires_action for s in model.reward_sources) or model.total_step_penalty < 0
 
     def check(self, model, config=None):
         verdicts = []
@@ -306,9 +294,7 @@ class IdleExploit(Rule):
         idle_sources = [
             s
             for s in model.reward_sources
-            if not s.requires_action
-            and s.reward_type == RewardType.PER_STEP
-            and s.modifier_type == "none"
+            if not s.requires_action and s.reward_type == RewardType.PER_STEP and s.modifier_type == "none"
         ]
 
         # State-dependent penalties with requires_action=True are
@@ -408,10 +394,7 @@ class ExplorationThreshold(Rule):
 
     @property
     def description(self):
-        return (
-            "Minimum goal discovery rate needed for exploration "
-            "to beat degenerate strategies"
-        )
+        return "Minimum goal discovery rate needed for exploration to beat degenerate strategies"
 
     @property
     def proof(self):
@@ -471,11 +454,7 @@ class ExplorationThreshold(Rule):
         p_actual = unique_states / model.n_states
 
         # Determine if this is a "desert" (no gradient) or "trap" (perverse incentive)
-        is_desert = (
-            model.death_probability == 0
-            and best_degenerate <= 0
-            and penalty_per_step < 0
-        )
+        is_desert = model.death_probability == 0 and best_degenerate <= 0 and penalty_per_step < 0
 
         if p_min > 1.0:
             if is_desert:
@@ -501,8 +480,7 @@ class ExplorationThreshold(Rule):
                     Verdict(
                         rule_name=self.name,
                         severity=Severity.CRITICAL,
-                        message="Exploration can NEVER beat degenerate strategies "
-                        "under current reward structure.",
+                        message="Exploration can NEVER beat degenerate strategies under current reward structure.",
                         details={"p_min": p_min, "p_actual": p_actual, "type": "trap"},
                         recommendation="Restructure reward: add shaping or remove penalty",
                     )
@@ -530,10 +508,7 @@ class ExplorationThreshold(Rule):
                 Verdict(
                     rule_name=self.name,
                     severity=Severity.INFO,
-                    message=(
-                        f"Exploration viable: p(goal)>{p_min:.4f} needed, "
-                        f"random walk achieves ~{p_actual:.4f}."
-                    ),
+                    message=(f"Exploration viable: p(goal)>{p_min:.4f} needed, random walk achieves ~{p_actual:.4f}."),
                     details={"p_min": p_min, "p_actual": p_actual},
                 )
             )
@@ -549,10 +524,7 @@ class RespawningExploit(Rule):
 
     @property
     def description(self):
-        return (
-            "Respawning reward sources can be harvested in loops, "
-            "giving higher EV than reaching the goal"
-        )
+        return "Respawning reward sources can be harvested in loops, giving higher EV than reaching the goal"
 
     @property
     def proof(self):
@@ -587,11 +559,7 @@ class RespawningExploit(Rule):
             # Only apply when the source uses timed respawn (not explicit
             # can_loop or infinite), since can_loop=True and infinite
             # sources are designed for repeated collection.
-            if (
-                source.max_occurrences > 0
-                and not source.can_loop
-                and source.respawn != RespawnBehavior.INFINITE
-            ):
+            if source.max_occurrences > 0 and not source.can_loop and source.respawn != RespawnBehavior.INFINITE:
                 cycles = min(cycles, source.max_occurrences)
                 ev_loop = source.value * cycles
 
@@ -600,9 +568,7 @@ class RespawningExploit(Rule):
                 # 0.01/step) are often designed to dominate sparse goals early
                 # in training. Downgrade to INFO when the per-step value is
                 # tiny and other positive reward sources exist alongside it.
-                other_positive = any(
-                    s.value > 0 and s is not source for s in model.reward_sources
-                )
+                other_positive = any(s.value > 0 and s is not source for s in model.reward_sources)
                 is_small_value = source.value < 0.1 and other_positive
                 severity = Severity.INFO if is_small_value else Severity.CRITICAL
                 verdicts.append(
@@ -649,10 +615,7 @@ class DeathResetExploit(Rule):
 
     @property
     def description(self):
-        return (
-            "Dying resets collectible rewards, making deliberate death "
-            "more valuable than continuing"
-        )
+        return "Dying resets collectible rewards, making deliberate death more valuable than continuing"
 
     @property
     def proof(self):
@@ -674,11 +637,7 @@ class DeathResetExploit(Rule):
     def check(self, model, config=None):
         verdicts = []
 
-        resettable_value = sum(
-            s.value * s.discovery_probability
-            for s in model.resettable_sources
-            if s.value > 0
-        )
+        resettable_value = sum(s.value * s.discovery_probability for s in model.resettable_sources if s.value > 0)
 
         if resettable_value <= 0:
             return verdicts
@@ -805,18 +764,11 @@ class IntrinsicSufficiency(Rule):
         )
 
     def applies_to(self, model):
-        return any(
-            s.reward_type == RewardType.PER_STEP and s.value > 0
-            for s in model.reward_sources
-        )
+        return any(s.reward_type == RewardType.PER_STEP and s.value > 0 for s in model.reward_sources)
 
     def check(self, model, config=None):
         verdicts = []
-        intrinsic_sources = [
-            s
-            for s in model.reward_sources
-            if s.reward_type == RewardType.PER_STEP and s.value > 0
-        ]
+        intrinsic_sources = [s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP and s.value > 0]
         intrinsic_per_step = sum(s.value for s in intrinsic_sources)
         penalty_per_step = abs(model.total_step_penalty)
 
@@ -936,10 +888,7 @@ class CompoundTrap(Rule):
 
     @property
     def description(self):
-        return (
-            "Detect traps arising from combinations of reward sources "
-            "that individual rules miss"
-        )
+        return "Detect traps arising from combinations of reward sources that individual rules miss"
 
     @property
     def proof(self):
@@ -947,8 +896,7 @@ class CompoundTrap(Rule):
             proof_name="compound_trap",
             strength=ProofStrength.VERIFIED,
             statement=(
-                "∀ goal > 0, penalty < 0, D > 0, loop_ev > 0, "
-                "goal < -penalty * D → loop_ev > goal + penalty * D"
+                "∀ goal > 0, penalty < 0, D > 0, loop_ev > 0, goal < -penalty * D → loop_ev > goal + penalty * D"
             ),
             parameters={
                 "goal": "goal",
@@ -971,9 +919,7 @@ class CompoundTrap(Rule):
             for source in model.loopable_sources:
                 if source.can_loop and source.loop_period > 0:
                     loop_reward_per_step = source.value / source.loop_period
-                elif (
-                    source.respawn == RespawnBehavior.TIMED and source.respawn_time > 0
-                ):
+                elif source.respawn == RespawnBehavior.TIMED and source.respawn_time > 0:
                     loop_reward_per_step = source.value / source.respawn_time
                 elif source.respawn == RespawnBehavior.INFINITE:
                     loop_reward_per_step = source.value
@@ -981,14 +927,8 @@ class CompoundTrap(Rule):
                     continue
                 # Respect max_occurrences for timed sources (same logic as RespawningExploit)
                 effective_steps = model.max_steps
-                if (
-                    source.max_occurrences > 0
-                    and not source.can_loop
-                    and source.respawn != RespawnBehavior.INFINITE
-                ):
-                    max_loop_steps = source.max_occurrences * max(
-                        source.respawn_time, 1
-                    )
+                if source.max_occurrences > 0 and not source.can_loop and source.respawn != RespawnBehavior.INFINITE:
+                    max_loop_steps = source.max_occurrences * max(source.respawn_time, 1)
                     effective_steps = min(model.max_steps, max_loop_steps)
                 loop_ev = (loop_reward_per_step - penalty_per_step) * effective_steps
                 if loop_ev > goal_ev and loop_ev > 0:
@@ -1008,10 +948,7 @@ class CompoundTrap(Rule):
                                 "loop_reward_per_step": loop_reward_per_step,
                                 "penalty_per_step": penalty_per_step,
                             },
-                            recommendation=(
-                                f"Remove step penalty or cap '{source.name}' "
-                                f"occurrences"
-                            ),
+                            recommendation=(f"Remove step penalty or cap '{source.name}' occurrences"),
                         )
                     )
 
@@ -1037,11 +974,7 @@ class CompoundTrap(Rule):
         # to the penalty — a 0.001 resettable with -0.00001 penalty
         # is not a meaningful compound trap.
         if model.resettable_sources and model.total_step_penalty < 0:
-            resettable_value = sum(
-                s.value * s.discovery_probability
-                for s in model.resettable_sources
-                if s.value > 0
-            )
+            resettable_value = sum(s.value * s.discovery_probability for s in model.resettable_sources if s.value > 0)
             penalty_magnitude = abs(model.total_step_penalty)
             # Only fire if resettable reward is at least 10% of penalty per step
             if resettable_value <= penalty_magnitude * 0.1:
@@ -1165,8 +1098,7 @@ class ProxyRewardHackability(Rule):
     @property
     def description(self):
         return (
-            "Proxy reward may be hackable: optimizing the proxy could "
-            "degrade the true objective (Skalse et al. 2022)"
+            "Proxy reward may be hackable: optimizing the proxy could degrade the true objective (Skalse et al. 2022)"
         )
 
     @property
@@ -1209,8 +1141,7 @@ class ProxyRewardHackability(Rule):
                     ),
                     details={"shaping_sources": names, "goal_sources": goal_names},
                     recommendation=(
-                        "Use potential-based shaping (Ng 1999) to "
-                        "guarantee the proxy preserves optimal policy"
+                        "Use potential-based shaping (Ng 1999) to guarantee the proxy preserves optimal policy"
                     ),
                 )
             )
@@ -1234,10 +1165,7 @@ class ProxyRewardHackability(Rule):
                         "goal_ev": goal_ev,
                         "ratio": shaping_ev / goal_ev,
                     },
-                    recommendation=(
-                        "Reduce shaping magnitude or increase goal "
-                        "reward so the true objective dominates"
-                    ),
+                    recommendation=("Reduce shaping magnitude or increase goal reward so the true objective dominates"),
                 )
             )
 
@@ -1269,10 +1197,7 @@ class StagedRewardPlateau(Rule):
         return FormalBasis(
             proof_name="staged_sparsity",
             strength=ProofStrength.VERIFIED,
-            statement=(
-                "∀ p : Fin n → [0,1], ∀ j, ∏ p_i ≤ p_j "
-                "(product of stage probabilities ≤ any single stage)"
-            ),
+            statement=("∀ p : Fin n → [0,1], ∀ j, ∏ p_i ≤ p_j (product of stage probabilities ≤ any single stage)"),
             parameters={"stage_probs": "p", "n_stages": "n"},
         )
 
@@ -1306,9 +1231,7 @@ class StagedRewardPlateau(Rule):
             while current and current in source_names and current not in visited:
                 chain.append(current)
                 visited.add(current)
-                prereq_src = next(
-                    (s for s in model.reward_sources if s.name == current), None
-                )
+                prereq_src = next((s for s in model.reward_sources if s.name == current), None)
                 if prereq_src and prereq_src.prerequisite:
                     current = prereq_src.prerequisite
                 else:
@@ -1328,8 +1251,7 @@ class StagedRewardPlateau(Rule):
                         ),
                         details={"chain": list(reversed(chain)), "depth": len(chain)},
                         recommendation=(
-                            "Add distance-based shaping for each stage, "
-                            "or use curriculum learning to unlock stages"
+                            "Add distance-based shaping for each stage, or use curriculum learning to unlock stages"
                         ),
                     )
                 )
@@ -1373,22 +1295,15 @@ class RewardDominanceImbalance(Rule):
 
     @property
     def description(self):
-        return (
-            "One reward component dominates all others by >100x, "
-            "making other components invisible to the optimizer"
-        )
+        return "One reward component dominates all others by >100x, making other components invisible to the optimizer"
 
     def applies_to(self, model):
-        per_step = [
-            s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP
-        ]
+        per_step = [s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP]
         return len(per_step) >= 3
 
     def check(self, model, config=None):
         verdicts = []
-        per_step = [
-            s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP
-        ]
+        per_step = [s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP]
         if len(per_step) < 3:
             return verdicts
 
@@ -1405,17 +1320,11 @@ class RewardDominanceImbalance(Rule):
             return verdicts
 
         max_mag = max(magnitudes.values())
-        min_mag = (
-            min(v for v in magnitudes.values() if v > 0)
-            if any(v > 0 for v in magnitudes.values())
-            else 1.0
-        )
+        min_mag = min(v for v in magnitudes.values() if v > 0) if any(v > 0 for v in magnitudes.values()) else 1.0
 
         if max_mag > 0 and min_mag > 0 and max_mag / min_mag > 100:
             dominant = [n for n, m in magnitudes.items() if m == max_mag]
-            invisible = [
-                n for n, m in magnitudes.items() if m > 0 and max_mag / m > 100
-            ]
+            invisible = [n for n, m in magnitudes.items() if m > 0 and max_mag / m > 100]
             verdicts.append(
                 Verdict(
                     rule_name=self.name,
@@ -1494,10 +1403,7 @@ class ExponentialSaturation(Rule):
                             "sigma": sigma,
                             "saturation_95": sigma * 3,
                         },
-                        recommendation=(
-                            "If precision matters, consider linear or "
-                            "quadratic penalty near the target"
-                        ),
+                        recommendation=("If precision matters, consider linear or quadratic penalty near the target"),
                     )
                 )
         return verdicts
@@ -1519,10 +1425,7 @@ class IntrinsicDominance(Rule):
 
     @property
     def description(self):
-        return (
-            "Accumulated per-step intrinsic reward exceeds "
-            "the discounted goal reward over the episode"
-        )
+        return "Accumulated per-step intrinsic reward exceeds the discounted goal reward over the episode"
 
     @property
     def proof(self):
@@ -1554,8 +1457,7 @@ class IntrinsicDominance(Rule):
             for s in model.reward_sources
         )
         has_goal = any(
-            s.reward_type in (RewardType.TERMINAL, RewardType.ON_EVENT) and s.value > 0
-            for s in model.reward_sources
+            s.reward_type in (RewardType.TERMINAL, RewardType.ON_EVENT) and s.value > 0 for s in model.reward_sources
         )
         return has_intrinsic and has_goal
 
@@ -1676,20 +1578,14 @@ class DiscountHorizonMismatch(Rule):
 
     @property
     def description(self):
-        return (
-            "Discount factor creates an effective horizon shorter "
-            "than the episode, making distant rewards invisible"
-        )
+        return "Discount factor creates an effective horizon shorter than the episode, making distant rewards invisible"
 
     @property
     def proof(self):
         return FormalBasis(
             proof_name="horizon_coverage",
             strength=ProofStrength.VERIFIED,
-            statement=(
-                "T > 3 × 1/(1-γ) → T(1-γ) > 3. The episode is "
-                "more than 3x the effective horizon."
-            ),
+            statement=("T > 3 × 1/(1-γ) → T(1-γ) > 3. The episode is more than 3x the effective horizon."),
             parameters={"gamma": "γ", "episode_length": "T", "horizon": "1/(1-γ)"},
         )
 
@@ -1703,10 +1599,7 @@ class DiscountHorizonMismatch(Rule):
             and s.discovery_probability < 0.1
             for s in model.reward_sources
         )
-        has_dense = any(
-            s.reward_type == RewardType.PER_STEP and s.value > 0
-            for s in model.reward_sources
-        )
+        has_dense = any(s.reward_type == RewardType.PER_STEP and s.value > 0 for s in model.reward_sources)
         return model.gamma < 1.0 and has_sparse and not has_dense
 
     def check(self, model, config=None):
@@ -1737,8 +1630,7 @@ class DiscountHorizonMismatch(Rule):
                         "end_discount": end_discount,
                     },
                     recommendation=(
-                        f"Increase gamma to {1 - 1 / model.max_steps:.4f} "
-                        f"or higher, or shorten the episode"
+                        f"Increase gamma to {1 - 1 / model.max_steps:.4f} or higher, or shorten the episode"
                     ),
                 )
             )
@@ -1784,10 +1676,7 @@ class NegativeOnlyReward(Rule):
 
     @property
     def description(self):
-        return (
-            "All reward components are zero or negative. "
-            "No positive signal to guide learning."
-        )
+        return "All reward components are zero or negative. No positive signal to guide learning."
 
     @property
     def proof(self):
@@ -1811,16 +1700,12 @@ class NegativeOnlyReward(Rule):
             return verdicts
 
         has_positive = any(s.value > 0 for s in model.reward_sources)
-        has_positive_range = any(
-            s.value_range and max(s.value_range) > 0 for s in model.reward_sources
-        )
+        has_positive_range = any(s.value_range and max(s.value_range) > 0 for s in model.reward_sources)
 
         if not has_positive and not has_positive_range:
             # Distinguish reward desert (constant negative, no gradient)
             # from tracking control (state-dependent negative, informative)
-            has_tracking_signal = any(
-                s.value < 0 and s.state_dependent for s in model.reward_sources
-            )
+            has_tracking_signal = any(s.value < 0 and s.state_dependent for s in model.reward_sources)
 
             if has_tracking_signal:
                 # State-dependent negative reward: the gradient IS
@@ -1891,19 +1776,14 @@ class RewardDelayHorizon(Rule):
 
     @property
     def description(self):
-        return (
-            "Terminal goal reward is discounted to near-zero "
-            "by the time the agent could reach it"
-        )
+        return "Terminal goal reward is discounted to near-zero by the time the agent could reach it"
 
     @property
     def proof(self):
         return FormalBasis(
             proof_name="discounted_reward_invisible",
             strength=ProofStrength.VERIFIED,
-            statement=(
-                "γ^t × R < ε → the discounted reward is below the visibility threshold."
-            ),
+            statement=("γ^t × R < ε → the discounted reward is below the visibility threshold."),
             parameters={"reward": "R", "discount": "γ^t", "threshold": "ε"},
         )
 
@@ -1937,10 +1817,7 @@ class RewardDelayHorizon(Rule):
                             "discounted_value": discounted_value,
                             "avg_step": avg_discovery_step,
                         },
-                        recommendation=(
-                            "Increase gamma, add intermediate "
-                            "shaping rewards, or shorten the episode"
-                        ),
+                        recommendation=("Increase gamma, add intermediate shaping rewards, or shorten the episode"),
                     )
                 )
             elif ratio < 0.1:

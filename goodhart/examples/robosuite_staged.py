@@ -93,9 +93,7 @@ def run_example():
     print("Reward chain:")
     for s in model.reward_sources:
         prereq = f" (requires: {s.prerequisite})" if s.prerequisite else ""
-        print(
-            f"  {s.name:10s} {s.value:+.2f}  p(discover)={s.discovery_probability:.2f}{prereq}"
-        )
+        print(f"  {s.name:10s} {s.value:+.2f}  p(discover)={s.discovery_probability:.2f}{prereq}")
     print()
 
     engine.print_report(model)

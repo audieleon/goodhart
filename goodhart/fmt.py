@@ -144,9 +144,7 @@ def rule_list_item(name, description, width=32):
     # Wrap description to fit after the name column
     desc_width = _term_width() - width - 6
     desc_lines = textwrap.wrap(description, width=desc_width)
-    print(
-        f"    {RULE_COLOR}{name:<{width}}{RESET} {desc_lines[0] if desc_lines else ''}"
-    )
+    print(f"    {RULE_COLOR}{name:<{width}}{RESET} {desc_lines[0] if desc_lines else ''}")
     for line in desc_lines[1:]:
         print(f"    {' ' * width} {line}")
 

@@ -67,22 +67,15 @@ def _compute_strategy_evs(model: EnvironmentModel, result=None) -> Dict[str, flo
     passive_perstep = sum(
         s.value
         for s in model.reward_sources
-        if s.reward_type.name in ("PER_STEP", "SHAPING")
-        and not s.requires_action
-        and s.value > 0
+        if s.reward_type.name in ("PER_STEP", "SHAPING") and not s.requires_action and s.value > 0
     )
     active_perstep = sum(
         s.value
         for s in model.reward_sources
-        if s.reward_type.name in ("PER_STEP", "SHAPING")
-        and s.requires_action
-        and s.intentional
-        and s.value > 0
+        if s.reward_type.name in ("PER_STEP", "SHAPING") and s.requires_action and s.intentional and s.value > 0
     )
     penalties = sum(
-        s.value
-        for s in model.reward_sources
-        if s.reward_type.name in ("PER_STEP", "SHAPING") and s.value < 0
+        s.value for s in model.reward_sources if s.reward_type.name in ("PER_STEP", "SHAPING") and s.value < 0
     )
     goal_rv = model.max_goal_reward if goal_reward is None else goal_reward
     disc_prob = max((s.discovery_probability for s in model.goal_sources), default=0.0)
@@ -118,9 +111,7 @@ def _compute_strategy_evs(model: EnvironmentModel, result=None) -> Dict[str, flo
     optimal_steps = max(1, int(active_ep_len * 0.3))
     disc_opt = _discounted_steps(gamma, optimal_steps)
     gamma_disc_opt = gamma**optimal_steps if gamma < 1.0 else 1.0
-    strategies["optimal"] = (
-        passive_perstep + active_perstep + penalties
-    ) * disc_opt + goal_rv * gamma_disc_opt
+    strategies["optimal"] = (passive_perstep + active_perstep + penalties) * disc_opt + goal_rv * gamma_disc_opt
 
     # Loop exploit
     if ev_loop is not None and ev_loop > 0:
@@ -136,9 +127,7 @@ def _compute_strategy_evs(model: EnvironmentModel, result=None) -> Dict[str, flo
                 elif s.reward_type.name == "PER_STEP":
                     loop_reward += s.value
         if loop_reward > 0:
-            strategies["loop"] = (
-                passive_perstep + loop_reward + penalties
-            ) * disc_active
+            strategies["loop"] = (passive_perstep + loop_reward + penalties) * disc_active
 
     return strategies
 
@@ -158,9 +147,7 @@ def _classify_strategy(name: str) -> str:
 # =====================================================================
 
 
-def reward_landscape_ascii(
-    model: EnvironmentModel, config: TrainingConfig = None, result=None
-) -> str:
+def reward_landscape_ascii(model: EnvironmentModel, config: TrainingConfig = None, result=None) -> str:
     """Generate an ASCII reward landscape chart.
 
     Args:
@@ -180,11 +167,7 @@ def reward_landscape_ascii(
     sorted_strats = sorted(strategies.items(), key=lambda x: x[1], reverse=True)
 
     # Color support
-    use_color = (
-        hasattr(sys.stdout, "isatty")
-        and sys.stdout.isatty()
-        and not os.environ.get("NO_COLOR")
-    )
+    use_color = hasattr(sys.stdout, "isatty") and sys.stdout.isatty() and not os.environ.get("NO_COLOR")
 
     RED = "\033[31m" if use_color else ""
     GREEN = "\033[32m" if use_color else ""
@@ -243,12 +226,7 @@ def reward_landscape_ascii(
         tag = " ◀ agent learns this" if is_winner else ""
         bold = BOLD if is_winner else ""
 
-        lines.append(
-            f"  {bold}{color}{ev:+9.2f}{RESET}  "
-            f"{color}{bar}{RESET}  "
-            f"{bold}{label}{RESET}"
-            f"{color}{tag}{RESET}"
-        )
+        lines.append(f"  {bold}{color}{ev:+9.2f}{RESET}  {color}{bar}{RESET}  {bold}{label}{RESET}{color}{tag}{RESET}")
         lines.append(f"  {DIM}{'':9s}  {'':>{bar_width}s}  {explanation}{RESET}")
 
     lines.append("")
@@ -264,40 +242,21 @@ def reward_landscape_ascii(
         winner_label = labels.get(winner_name, (winner_name, ""))[0].lower()
         optimal_ev = strategies.get("optimal", 0)
         winner_ev = strategies[winner_name]
-        lines.append(
-            f"  {RED}{BOLD}Problem:{RESET} {RED}The agent will learn to "
-            f"{winner_label}{RESET}"
-        )
-        lines.append(
-            f"  {RED}because it scores {winner_ev:+.2f} vs "
-            f"{optimal_ev:+.2f} for solving the task.{RESET}"
-        )
+        lines.append(f"  {RED}{BOLD}Problem:{RESET} {RED}The agent will learn to {winner_label}{RESET}")
+        lines.append(f"  {RED}because it scores {winner_ev:+.2f} vs {optimal_ev:+.2f} for solving the task.{RESET}")
         if winner_name == "die_fast":
-            lines.append(
-                f"  {DIM}Fix: reduce step penalty or add a survival bonus{RESET}"
-            )
+            lines.append(f"  {DIM}Fix: reduce step penalty or add a survival bonus{RESET}")
         elif winner_name == "stand_still":
-            lines.append(
-                f"  {DIM}Fix: reduce passive rewards or increase active reward{RESET}"
-            )
+            lines.append(f"  {DIM}Fix: reduce passive rewards or increase active reward{RESET}")
         elif winner_name == "loop":
-            lines.append(
-                f"  {DIM}Fix: make loopable rewards non-cyclable or add a terminal goal that dominates{RESET}"
-            )
+            lines.append(f"  {DIM}Fix: make loopable rewards non-cyclable or add a terminal goal that dominates{RESET}")
     elif winner_class == "yellow":
         lines.append(
-            f"  {YELLOW}{BOLD}Caution:{RESET} {YELLOW}Exploration may "
-            f"outperform the intended strategy.{RESET}"
+            f"  {YELLOW}{BOLD}Caution:{RESET} {YELLOW}Exploration may outperform the intended strategy.{RESET}"
         )
-        lines.append(
-            f"  {DIM}The agent may settle for partial progress "
-            f"instead of solving the task.{RESET}"
-        )
+        lines.append(f"  {DIM}The agent may settle for partial progress instead of solving the task.{RESET}")
     else:
-        lines.append(
-            f"  {GREEN}{BOLD}Good:{RESET} {GREEN}Solving the task has "
-            f"the highest expected value.{RESET}"
-        )
+        lines.append(f"  {GREEN}{BOLD}Good:{RESET} {GREEN}Solving the task has the highest expected value.{RESET}")
 
     # Show rule engine findings if available
     if result and result.verdicts:
@@ -383,8 +342,7 @@ def reward_landscape(
         import matplotlib.patches as mpatches
     except ImportError:
         raise ImportError(
-            "matplotlib is required for graphical visualization.\n"
-            "Install it with: pip install goodhart[viz]"
+            "matplotlib is required for graphical visualization.\nInstall it with: pip install goodhart[viz]"
         )
 
     strategies = _compute_strategy_evs(model)
@@ -429,11 +387,7 @@ def reward_landscape(
 
     # Annotate values
     for i, (bar, val) in enumerate(zip(bars, values)):
-        x_pos = (
-            val + (max(values) - min(values)) * 0.02
-            if val >= 0
-            else val - (max(values) - min(values)) * 0.02
-        )
+        x_pos = val + (max(values) - min(values)) * 0.02 if val >= 0 else val - (max(values) - min(values)) * 0.02
         ha = "left" if val >= 0 else "right"
         weight = "bold" if i == winner_idx else "normal"
         ax.annotate(
@@ -460,11 +414,7 @@ def reward_landscape(
     ax.legend(handles=legend_patches, loc="lower right", fontsize=10)
 
     # Subtitle with config info
-    subtitle = (
-        f"goal={model.max_goal_reward}, "
-        f"penalty={model.total_step_penalty}/step, "
-        f"max_steps={model.max_steps}"
-    )
+    subtitle = f"goal={model.max_goal_reward}, penalty={model.total_step_penalty}/step, max_steps={model.max_steps}"
     ax.text(
         0.5,
         -0.12,

@@ -24,7 +24,7 @@ jobs:
 
       - name: Lint and format
         run: |
-          ruff check goodhart/ --ignore F403,F405
+          ruff check goodhart/
           ruff format --check goodhart/
 
       - name: Test

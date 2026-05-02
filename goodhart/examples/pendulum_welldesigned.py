@@ -92,11 +92,7 @@ def compute_reward(obs, action, _info):
     """Gymnasium Pendulum-v1 reward (exact implementation)."""
     theta, theta_dot = obs["theta"], obs["theta_dot"]
     torque = action[0]
-    return (
-        ANGLE_WEIGHT * theta**2
-        + VELOCITY_WEIGHT * theta_dot**2
-        + TORQUE_WEIGHT * torque**2
-    )
+    return ANGLE_WEIGHT * theta**2 + VELOCITY_WEIGHT * theta_dot**2 + TORQUE_WEIGHT * torque**2
 
 
 def run_example():
@@ -105,10 +101,7 @@ def run_example():
     print("=" * 70)
     print()
     print("Source: Gymnasium, Brockman et al. 2016")
-    print(
-        f"r = {ANGLE_WEIGHT}*theta^2 + {VELOCITY_WEIGHT}*theta_dot^2"
-        f" + {TORQUE_WEIGHT}*action^2"
-    )
+    print(f"r = {ANGLE_WEIGHT}*theta^2 + {VELOCITY_WEIGHT}*theta_dot^2 + {TORQUE_WEIGHT}*action^2")
     print("Best reward: 0 (upright, still, no torque)")
     print()
     print("Constants defined once, shared by decorator and function:")
@@ -133,10 +126,7 @@ def run_example():
     print("  1. All-penalty, zero is best — no idle exploit possible")
     print("     (standing still is NOT zero, the pendulum hangs down)")
     print("  2. Coefficient ratios encode priorities correctly:")
-    print(
-        f"     angle ({abs(ANGLE_WEIGHT)}) >> velocity ({abs(VELOCITY_WEIGHT)})"
-        f" >> torque ({abs(TORQUE_WEIGHT)})"
-    )
+    print(f"     angle ({abs(ANGLE_WEIGHT)}) >> velocity ({abs(VELOCITY_WEIGHT)}) >> torque ({abs(TORQUE_WEIGHT)})")
     print("  3. No respawning, no looping, no terminal goals to miss")
     print()
     print("DESIGN PATTERN: When the task is 'maintain state X',")

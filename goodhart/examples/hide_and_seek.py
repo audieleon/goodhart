@@ -62,8 +62,7 @@ class ZeroSumArmsRace(PrecedentRule):
         return [
             Precedent(
                 source="Baker et al. 2019 — Emergent Tool Use (ICLR 2020)",
-                setting="Hiders: +1 if hidden, -1 if seen. "
-                "Seekers: opposite. Zero-sum.",
+                setting="Hiders: +1 if hidden, -1 if seen. Seekers: opposite. Zero-sum.",
                 outcome="6 emergent strategies including box surfing "
                 "(riding boxes through walls via physics bug). "
                 "Each strategy forced a counter-strategy. Arms "
@@ -119,8 +118,7 @@ class MultiAgentRewardAsymmetry(PrecedentRule):
         return [
             Precedent(
                 source="OpenAI Five — Dota 2 (2019)",
-                setting="Reward includes gold advantage, XP advantage, "
-                "kills, tower damage. Each component weighted.",
+                setting="Reward includes gold advantage, XP advantage, kills, tower damage. Each component weighted.",
                 outcome="Reward shaping required 'surgery' — continuing "
                 "training across reward function changes. Getting "
                 "the weights wrong caused degenerate strategies "
@@ -168,8 +166,7 @@ class PhysicsExploitRisk(PrecedentRule):
             Precedent(
                 source="Lilian Weng 2024 — Reward Hacking survey",
                 setting="Robot jumping task in physics simulator",
-                outcome="Agent exploited physics simulator bug to achieve "
-                "unrealistic jump height for maximum reward.",
+                outcome="Agent exploited physics simulator bug to achieve unrealistic jump height for maximum reward.",
                 year=2024,
             ),
             Precedent(

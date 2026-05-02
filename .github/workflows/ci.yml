@@ -28,7 +28,7 @@ jobs:
           pip install pytest ruff
 
       - name: Lint
-        run: ruff check goodhart/ --ignore F403,F405
+        run: ruff check goodhart/
 
       - name: Format check
         run: ruff format --check goodhart/

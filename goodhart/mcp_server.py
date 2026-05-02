@@ -240,9 +240,7 @@ def handle_list_examples(params: dict) -> dict:
     import goodhart.examples
 
     examples = []
-    for m in sorted(
-        pkgutil.iter_modules(goodhart.examples.__path__), key=lambda m: m.name
-    ):
+    for m in sorted(pkgutil.iter_modules(goodhart.examples.__path__), key=lambda m: m.name):
         if m.name == "__init__" or m.name.startswith("sample"):
             continue
         try:

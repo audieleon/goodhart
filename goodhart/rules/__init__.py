@@ -66,12 +66,7 @@ from goodhart.rules.advisories import (
     ADVISORY_RULES,
 )
 
-ALL_RULES = (
-    list(REWARD_RULES)
-    + list(TRAINING_RULES)
-    + list(ARCHITECTURE_RULES)
-    + list(ADVISORY_RULES)
-)
+ALL_RULES = list(REWARD_RULES) + list(TRAINING_RULES) + list(ARCHITECTURE_RULES) + list(ADVISORY_RULES)
 RULE_COUNT = len(ALL_RULES)
 
 __all__ = [

@@ -119,9 +119,7 @@ def run_example():
 
     # The fix
     print("--- The Fix: Scale alive bonus below velocity ---")
-    model3 = EnvironmentModel(
-        name="Walker2d (fixed)", max_steps=1000, death_probability=0.02
-    )
+    model3 = EnvironmentModel(name="Walker2d (fixed)", max_steps=1000, death_probability=0.02)
     model3.add_reward_source(
         RewardSource(
             name="alive bonus",

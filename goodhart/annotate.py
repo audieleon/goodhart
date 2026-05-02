@@ -200,8 +200,7 @@ def load_annotated_function(module_path: str):
     """
     if ":" not in module_path:
         raise ValueError(
-            f"Expected 'module:function' format, got '{module_path}'. "
-            f"Example: goodhart --check my_env:compute_reward"
+            f"Expected 'module:function' format, got '{module_path}'. Example: goodhart --check my_env:compute_reward"
         )
     module_str, func_name = module_path.rsplit(":", 1)
 
@@ -223,8 +222,5 @@ def load_annotated_function(module_path: str):
     if fn is None:
         raise AttributeError(f"Module '{module_str}' has no attribute '{func_name}'")
     if not hasattr(fn, "goodhart_model"):
-        raise AttributeError(
-            f"Function '{func_name}' in '{module_str}' is not decorated "
-            f"with @reward_function."
-        )
+        raise AttributeError(f"Function '{func_name}' in '{module_str}' is not decorated with @reward_function.")
     return fn

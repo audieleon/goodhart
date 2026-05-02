@@ -131,27 +131,19 @@ class AnalysisEngine:
             # Penalty contradictions
             (
                 lambda r: "add" in r and "penalty" in r,
-                lambda r: (
-                    ("remove" in r and "penalty" in r)
-                    or (r.startswith("set") and "penalty" in r and "0" in r)
-                ),
+                lambda r: ("remove" in r and "penalty" in r) or (r.startswith("set") and "penalty" in r and "0" in r),
                 "One rule says add step penalty, another says remove it",
             ),
             # Entropy contradictions
             (
                 lambda r: "increase" in r and "entropy" in r,
-                lambda r: (
-                    ("decrease" in r and "entropy" in r)
-                    or ("entropy" in r and "too high" in r)
-                ),
+                lambda r: ("decrease" in r and "entropy" in r) or ("entropy" in r and "too high" in r),
                 "One rule says increase entropy, another says decrease it",
             ),
             # Intrinsic motivation contradictions
             (
                 lambda r: "add" in r and "intrinsic" in r,
-                lambda r: (
-                    "intrinsic" in r and ("too" in r or "exceed" in r or "reduce" in r)
-                ),
+                lambda r: "intrinsic" in r and ("too" in r or "exceed" in r or "reduce" in r),
                 "One rule says add intrinsic motivation, another says it is already too strong",
             ),
         ]
@@ -229,12 +221,7 @@ class TrainingAnalysisEngine(AnalysisEngine):
         from goodhart.rules.advisories import ADVISORY_RULES
 
         existing_names = {r.name for r in self.rules}
-        for rule in (
-            list(REWARD_RULES)
-            + list(TRAINING_RULES)
-            + list(ARCHITECTURE_RULES)
-            + list(ADVISORY_RULES)
-        ):
+        for rule in list(REWARD_RULES) + list(TRAINING_RULES) + list(ARCHITECTURE_RULES) + list(ADVISORY_RULES):
             if rule.name not in existing_names:
                 self.rules.append(rule)
                 existing_names.add(rule.name)
@@ -275,9 +262,7 @@ class TrainingAnalysisEngine(AnalysisEngine):
             print(f"  {HEADER_COLOR}Reward sources:{RESET}")
             for s in model.reward_sources:
                 intent = f" {REC_COLOR}(intentional){RESET}" if s.intentional else ""
-                passive = (
-                    f" {DIM_COLOR}(passive){RESET}" if not s.requires_action else ""
-                )
+                passive = f" {DIM_COLOR}(passive){RESET}" if not s.requires_action else ""
                 print(
                     f"    {RULE_COLOR}{s.name:28s}{RESET} "
                     f"{s.value:+8.4f}  {DIM_COLOR}{s.reward_type.value}{RESET}"

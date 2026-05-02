@@ -46,5 +46,13 @@ Repository = "https://github.com/audieleon/goodhart"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+# F403: import * — used intentionally in examples for readability
+# F405: undefined from import * — consequence of F403
+ignore = ["F403", "F405"]
+
 [tool.setuptools.packages.find]
 include = ["goodhart*"]

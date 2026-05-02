@@ -40,18 +40,11 @@ class PhysicsExploitAdvisory(Rule):
 
     @property
     def description(self):
-        return (
-            "Rich environment dynamics may enable physics exploits "
-            "that reward analysis cannot detect"
-        )
+        return "Rich environment dynamics may enable physics exploits that reward analysis cannot detect"
 
     def applies_to(self, model):
         # Only fires for complex environments
-        return (
-            model.n_states >= 50000
-            and model.n_actions >= 6
-            and model.death_probability < 0.05
-        )
+        return model.n_states >= 50000 and model.n_actions >= 6 and model.death_probability < 0.05
 
     def check(self, model, config=None):
         # Additional signal: multiple reward sources (complex reward =
@@ -108,8 +101,7 @@ class GoalMisgeneralizationAdvisory(Rule):
     @property
     def description(self):
         return (
-            "Easy terminal goal may enable misgeneralization — "
-            "agent learns a shortcut instead of the intended behavior"
+            "Easy terminal goal may enable misgeneralization — agent learns a shortcut instead of the intended behavior"
         )
 
     def applies_to(self, model):
@@ -121,11 +113,7 @@ class GoalMisgeneralizationAdvisory(Rule):
         if dominant.discovery_probability < 0.5:
             return False
         # Exclude competitive environments (symmetric win/lose)
-        neg_terminals = [
-            s
-            for s in model.reward_sources
-            if s.reward_type == RewardType.TERMINAL and s.value < 0
-        ]
+        neg_terminals = [s for s in model.reward_sources if s.reward_type == RewardType.TERMINAL and s.value < 0]
         if neg_terminals:
             # Symmetric win/lose = competitive, not misgeneralization
             return False
@@ -139,11 +127,7 @@ class GoalMisgeneralizationAdvisory(Rule):
         dominant = max(goals, key=lambda s: s.value)
 
         # Only flag if there are few other reward signals
-        non_goal_signals = [
-            s
-            for s in model.reward_sources
-            if s.reward_type != RewardType.TERMINAL and s.value > 0
-        ]
+        non_goal_signals = [s for s in model.reward_sources if s.reward_type != RewardType.TERMINAL and s.value > 0]
 
         if len(non_goal_signals) >= 3:
             # Dense reward signal — less likely to misgeneralize
@@ -192,17 +176,10 @@ class CreditAssignmentAdvisory(Rule):
 
     @property
     def description(self):
-        return (
-            "Extremely sparse reward in long episodes suggests "
-            "deep credit assignment problem beyond simple sparsity"
-        )
+        return "Extremely sparse reward in long episodes suggests deep credit assignment problem beyond simple sparsity"
 
     def applies_to(self, model):
-        goals = [
-            s
-            for s in model.reward_sources
-            if s.requires_exploration and s.discovery_probability < 0.01
-        ]
+        goals = [s for s in model.reward_sources if s.requires_exploration and s.discovery_probability < 0.01]
         return len(goals) > 0 and model.max_steps >= 500
 
     def check(self, model, config=None):
@@ -220,15 +197,9 @@ class CreditAssignmentAdvisory(Rule):
             # credit assignment problem
             return []
 
-        sparse_goals = [
-            s
-            for s in model.reward_sources
-            if s.requires_exploration and s.discovery_probability < 0.01
-        ]
+        sparse_goals = [s for s in model.reward_sources if s.requires_exploration and s.discovery_probability < 0.01]
 
-        steps_per_discovery = int(
-            model.max_steps / max(sparse_goals[0].discovery_probability, 1e-6)
-        )
+        steps_per_discovery = int(model.max_steps / max(sparse_goals[0].discovery_probability, 1e-6))
 
         return [
             Verdict(
@@ -286,9 +257,7 @@ class ConstrainedRLAdvisory(Rule):
         neg_events = [
             s
             for s in model.reward_sources
-            if s.reward_type == RewardType.ON_EVENT
-            and s.value < 0
-            and not s.requires_action
+            if s.reward_type == RewardType.ON_EVENT and s.value < 0 and not s.requires_action
         ]
         return len(neg_events) > 0
 
@@ -296,9 +265,7 @@ class ConstrainedRLAdvisory(Rule):
         neg_events = [
             s
             for s in model.reward_sources
-            if s.reward_type == RewardType.ON_EVENT
-            and s.value < 0
-            and not s.requires_action
+            if s.reward_type == RewardType.ON_EVENT and s.value < 0 and not s.requires_action
         ]
 
         pos_value = sum(s.value for s in model.reward_sources if s.value > 0)
@@ -310,8 +277,7 @@ class ConstrainedRLAdvisory(Rule):
         small_penalties = [
             s
             for s in neg_events
-            if abs(s.value) < pos_value * 0.2
-            and not any(p in s.name.lower() for p in punishment_names)
+            if abs(s.value) < pos_value * 0.2 and not any(p in s.name.lower() for p in punishment_names)
         ]
 
         if not small_penalties:
@@ -361,14 +327,11 @@ class NonStationarityAdvisory(Rule):
     @property
     def description(self):
         return (
-            "Symmetric win/lose rewards suggest competitive dynamics "
-            "where opponent adaptation creates non-stationarity"
+            "Symmetric win/lose rewards suggest competitive dynamics where opponent adaptation creates non-stationarity"
         )
 
     def applies_to(self, model):
-        terminals = [
-            s for s in model.reward_sources if s.reward_type == RewardType.TERMINAL
-        ]
+        terminals = [s for s in model.reward_sources if s.reward_type == RewardType.TERMINAL]
         if len(terminals) < 2:
             return False
         pos = [s for s in terminals if s.value > 0]
@@ -391,9 +354,7 @@ class NonStationarityAdvisory(Rule):
         return True
 
     def check(self, model, config=None):
-        terminals = [
-            s for s in model.reward_sources if s.reward_type == RewardType.TERMINAL
-        ]
+        terminals = [s for s in model.reward_sources if s.reward_type == RewardType.TERMINAL]
         pos = [s for s in terminals if s.value > 0]
         neg = [s for s in terminals if s.value < 0]
 
@@ -448,11 +409,7 @@ class LearnedRewardAdvisory(Rule):
         )
 
     def applies_to(self, model):
-        return (
-            len(model.reward_sources) <= 2
-            and model.n_states >= 100000
-            and model.n_actions >= 10
-        )
+        return len(model.reward_sources) <= 2 and model.n_states >= 100000 and model.n_actions >= 10
 
     def check(self, model, config=None):
         # Very high action space with very simple reward = likely learned
@@ -517,19 +474,12 @@ class MissingConstraintAdvisory(Rule):
         # (tokamak: tracking + no coil constraint) or all-negative
         # (nuclear: -||error||² + no temperature constraint).
         no_safety_penalties = not any(
-            s.reward_type == RewardType.ON_EVENT and s.value < 0
-            for s in model.reward_sources
+            s.reward_type == RewardType.ON_EVENT and s.value < 0 for s in model.reward_sources
         )
         rich_state = model.n_states >= 50000
         permissive = model.death_probability < 0.05
         few_sources = len(model.reward_sources) <= 4
-        return (
-            no_safety_penalties
-            and model.is_continuous_control
-            and rich_state
-            and permissive
-            and few_sources
-        )
+        return no_safety_penalties and model.is_continuous_control and rich_state and permissive and few_sources
 
     def check(self, model, config=None):
         return [
@@ -585,15 +535,11 @@ class AggregationTrapAdvisory(Rule):
         )
 
     def applies_to(self, model):
-        has_terminal = any(
-            s.reward_type == RewardType.TERMINAL for s in model.reward_sources
-        )
+        has_terminal = any(s.reward_type == RewardType.TERMINAL for s in model.reward_sources)
         if has_terminal:
             return False
         # All per-step rewards are small and positive
-        per_step = [
-            s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP
-        ]
+        per_step = [s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP]
         if not per_step:
             return False
         all_small = all(abs(s.value) < 0.1 for s in per_step)
@@ -601,9 +547,7 @@ class AggregationTrapAdvisory(Rule):
         return all_small and all_positive
 
     def check(self, model, config=None):
-        per_step = [
-            s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP
-        ]
+        per_step = [s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP]
         max_val = max(s.value for s in per_step)
 
         return [

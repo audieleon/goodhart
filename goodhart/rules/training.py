@@ -55,10 +55,7 @@ class LearningRateRegime(Rule):
                     Verdict(
                         rule_name=self.name,
                         severity=Severity.WARNING,
-                        message=(
-                            f"lr={config.lr:.0e} is high for {algo}. "
-                            f"Standard range: {lo:.0e} to {hi:.0e}."
-                        ),
+                        message=(f"lr={config.lr:.0e} is high for {algo}. Standard range: {lo:.0e} to {hi:.0e}."),
                         recommendation=f"Try lr={default} as starting point",
                     )
                 )
@@ -67,10 +64,7 @@ class LearningRateRegime(Rule):
                     Verdict(
                         rule_name=self.name,
                         severity=Severity.WARNING,
-                        message=(
-                            f"lr={config.lr:.0e} is very low for {algo}. "
-                            f"Training will be slow."
-                        ),
+                        message=(f"lr={config.lr:.0e} is very low for {algo}. Training will be slow."),
                         recommendation=f"Try lr={default} unless deliberately fine-tuning",
                     )
                 )
@@ -228,9 +222,7 @@ class ClipFractionPrediction(Rule):
         if config.clip_epsilon <= 0:
             return verdicts
         risk_score = (
-            (config.lr / self.PPO_REFERENCE_LR)
-            * config.num_epochs
-            * (self.PPO_REFERENCE_CLIP / config.clip_epsilon)
+            (config.lr / self.PPO_REFERENCE_LR) * config.num_epochs * (self.PPO_REFERENCE_CLIP / config.clip_epsilon)
         )
 
         if risk_score > 5:
@@ -254,8 +246,7 @@ class ClipFractionPrediction(Rule):
                     rule_name=self.name,
                     severity=Severity.WARNING,
                     message=(
-                        f"target_kl={config.target_kl} is very tight. "
-                        f"Most updates will be cut short, wasting compute."
+                        f"target_kl={config.target_kl} is very tight. Most updates will be cut short, wasting compute."
                     ),
                     recommendation="Standard target_kl: 0.01 to 0.05",
                 )
@@ -303,10 +294,7 @@ class ExpertCollapse(Rule):
                         f"receive zero gradient. Confirmed in multi-specialist experiments and "
                         f"MiniHack multi-specialist experiments."
                     ),
-                    recommendation=(
-                        f"Set routing_floor to at least "
-                        f"{1.0 / config.num_specialists / 3:.2f}"
-                    ),
+                    recommendation=(f"Set routing_floor to at least {1.0 / config.num_specialists / 3:.2f}"),
                 )
             )
 
@@ -662,8 +650,7 @@ class EpsilonSchedule(Rule):
                 Verdict(
                     rule_name=self.name,
                     severity=Severity.WARNING,
-                    message="epsilon_end=0 means zero exploration after decay. "
-                    "Agent can never discover new states.",
+                    message="epsilon_end=0 means zero exploration after decay. Agent can never discover new states.",
                     recommendation="Set epsilon_end >= 0.01 for residual exploration",
                 )
             )
@@ -708,8 +695,7 @@ class SoftUpdateRate(Rule):
                     rule_name=self.name,
                     severity=Severity.INFO,
                     message=(
-                        f"tau={config.tau} is very small. Target network "
-                        f"updates slowly — stable but may lag behind."
+                        f"tau={config.tau} is very small. Target network updates slowly — stable but may lag behind."
                     ),
                 )
             )

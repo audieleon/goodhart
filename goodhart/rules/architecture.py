@@ -69,8 +69,7 @@ class EmbedDimCapacity(PrecedentRule):
             Precedent(
                 source="Empirical -- model scaling experiments",
                 setting="5x transformer: 21.5M params, 16 layers, embed=256",
-                outcome="WORSE than 1x baseline (4.6M). +37.1 vs +40.4. "
-                "Overfitting with excessive capacity.",
+                outcome="WORSE than 1x baseline (4.6M). +37.1 vs +40.4. Overfitting with excessive capacity.",
                 year=2026,
             ),
         ]
@@ -108,12 +107,10 @@ class EmbedDimCapacity(PrecedentRule):
                     rule_name=self.name,
                     severity=Severity.WARNING,
                     message=(
-                        f"embed_dim={config.embed_dim} with {model.n_states} "
-                        f"states. Limited representational capacity."
+                        f"embed_dim={config.embed_dim} with {model.n_states} states. Limited representational capacity."
                     ),
                     recommendation=(
-                        "Precedent: MiniHack small (embed=16) failed on "
-                        "Room-Ultimate. Medium (embed=64) succeeded."
+                        "Precedent: MiniHack small (embed=16) failed on Room-Ultimate. Medium (embed=64) succeeded."
                     ),
                 )
             )
@@ -124,8 +121,7 @@ class EmbedDimCapacity(PrecedentRule):
                     rule_name=self.name,
                     severity=Severity.INFO,
                     message=(
-                        f"Large model ({config.model_params / 1e6:.1f}M params). "
-                        f"Risk of overfitting on simple tasks."
+                        f"Large model ({config.model_params / 1e6:.1f}M params). Risk of overfitting on simple tasks."
                     ),
                     recommendation=(
                         "Precedent: larger models do not always outperform "
@@ -154,22 +150,19 @@ class RoutingFloorNecessity(PrecedentRule):
             Precedent(
                 source="Empirical -- load balancing loss",
                 setting="3 specialists, no floor, softmax routing",
-                outcome="Third specialist consistently marginalized to "
-                "<5% weight. Expert collapse.",
+                outcome="Third specialist consistently marginalized to <5% weight. Expert collapse.",
                 year=2026,
             ),
             Precedent(
                 source="Empirical -- MiniHack expert collapse",
                 setting="3 specialists, gate MLP, no floor",
-                outcome="95% MLP, 5% CNN, 0% Transformer. Complete "
-                "collapse detected by inspecting trained weights.",
+                outcome="95% MLP, 5% CNN, 0% Transformer. Complete collapse detected by inspecting trained weights.",
                 year=2026,
             ),
             Precedent(
                 source="Shazeer et al. 2017 -- MoE",
                 setting="Sparse gating without load balancing",
-                outcome="Most experts receive zero traffic. Load balancing "
-                "loss introduced as standard fix.",
+                outcome="Most experts receive zero traffic. Load balancing loss introduced as standard fix.",
                 year=2017,
             ),
         ]
@@ -180,20 +173,16 @@ class RoutingFloorNecessity(PrecedentRule):
         verdicts = []
 
         if config.num_specialists > 1 and config.routing_floor == 0:
-            precedent_text = "; ".join(
-                f"{p.source}: {p.outcome[:60]}..." for p in self.precedents[:2]
-            )
+            precedent_text = "; ".join(f"{p.source}: {p.outcome[:60]}..." for p in self.precedents[:2])
             verdicts.append(
                 Verdict(
                     rule_name=self.name,
                     severity=Severity.CRITICAL,
                     message=(
-                        f"{config.num_specialists} specialists with "
-                        f"routing_floor=0. Expert collapse is near-certain."
+                        f"{config.num_specialists} specialists with routing_floor=0. Expert collapse is near-certain."
                     ),
                     recommendation=(
-                        f"Set routing_floor >= {1.0 / config.num_specialists / 3:.2f}. "
-                        f"Precedents: {precedent_text}"
+                        f"Set routing_floor >= {1.0 / config.num_specialists / 3:.2f}. Precedents: {precedent_text}"
                     ),
                 )
             )
@@ -218,15 +207,13 @@ class RecurrenceType(PrecedentRule):
             Precedent(
                 source="Empirical -- MiniHack GRU vs LSTM",
                 setting="Used GRU (SF default) instead of paper's LSTM",
-                outcome="Different training dynamics. Results not comparable "
-                "to published baselines using LSTM.",
+                outcome="Different training dynamics. Results not comparable to published baselines using LSTM.",
                 year=2026,
             ),
             Precedent(
                 source="Samvelyan et al. 2021 (MiniHack, Appendix D.2)",
                 setting="LSTM with hidden=256 for all experiments",
-                outcome="Standard choice for NetHack/MiniHack. GRU may "
-                "work but isn't validated in this domain.",
+                outcome="Standard choice for NetHack/MiniHack. GRU may work but isn't validated in this domain.",
                 year=2021,
             ),
         ]
@@ -278,8 +265,7 @@ class ActorCountEffect(PrecedentRule):
             Precedent(
                 source="Samvelyan et al. 2021 (MiniHack, Appendix D.2)",
                 setting="256 actors, 7667 steps/sec on 2 GPUs + 20 CPUs",
-                outcome="High throughput enables sparse reward tasks. "
-                "Fewer actors may fail on same tasks.",
+                outcome="High throughput enables sparse reward tasks. Fewer actors may fail on same tasks.",
                 year=2021,
             ),
         ]
@@ -296,8 +282,7 @@ class ActorCountEffect(PrecedentRule):
                     rule_name=self.name,
                     severity=Severity.WARNING,
                     message=(
-                        f"Only {total_actors} actors for {model.n_states} "
-                        f"states. May be insufficient for exploration."
+                        f"Only {total_actors} actors for {model.n_states} states. May be insufficient for exploration."
                     ),
                     recommendation=(
                         "Precedent: MiniHack paper used 256 actors. 64 "

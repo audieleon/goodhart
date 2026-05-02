@@ -111,9 +111,7 @@ def run_example():
     print("the robot learns to do nothing or knock object off table.")
     print()
 
-    model3 = EnvironmentModel(
-        name="Sparse Pick-and-Place", max_steps=200, n_states=50000
-    )
+    model3 = EnvironmentModel(name="Sparse Pick-and-Place", max_steps=200, n_states=50000)
     model3.add_reward_source(
         RewardSource(
             name="successful placement",

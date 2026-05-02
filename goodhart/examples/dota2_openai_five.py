@@ -54,8 +54,7 @@ class RewardComponentInteraction(PrecedentRule):
         return [
             Precedent(
                 source="OpenAI Five — Dota 2 (2019)",
-                setting="Dense reward: gold/XP advantage + kill reward + "
-                "tower damage + win/loss. Each weighted.",
+                setting="Dense reward: gold/XP advantage + kill reward + tower damage + win/loss. Each weighted.",
                 outcome="Required multiple rounds of 'surgery' to get weights "
                 "right. Wrong weights caused: ignoring creeps (gold "
                 "reward too low), suicidal tower diving (kill reward "
@@ -67,15 +66,9 @@ class RewardComponentInteraction(PrecedentRule):
     def check(self, model, config=None):
         verdicts = []
         # Check if multiple reward sources could conflict
-        event_sources = [
-            s for s in model.reward_sources if s.reward_type == RewardType.ON_EVENT
-        ]
-        shaping_sources = [
-            s for s in model.reward_sources if s.reward_type == RewardType.SHAPING
-        ]
-        terminal_sources = [
-            s for s in model.reward_sources if s.reward_type == RewardType.TERMINAL
-        ]
+        event_sources = [s for s in model.reward_sources if s.reward_type == RewardType.ON_EVENT]
+        shaping_sources = [s for s in model.reward_sources if s.reward_type == RewardType.SHAPING]
+        terminal_sources = [s for s in model.reward_sources if s.reward_type == RewardType.TERMINAL]
 
         n_components = len(event_sources) + len(shaping_sources) + len(terminal_sources)
 
@@ -117,10 +110,7 @@ class RewardComponentInteraction(PrecedentRule):
                 Verdict(
                     rule_name=self.name,
                     severity=Severity.INFO,
-                    message=(
-                        f"{n_components} reward components. Multi-component "
-                        f"rewards risk conflicting incentives."
-                    ),
+                    message=(f"{n_components} reward components. Multi-component rewards risk conflicting incentives."),
                     recommendation=(
                         "Precedent: OpenAI Five — wrong reward weights caused "
                         "degenerate strategies (ignoring creeps, suicidal tower "
@@ -149,8 +139,7 @@ class SparseDelayedGoal(PrecedentRule):
         return [
             Precedent(
                 source="OpenAI Five — Dota 2",
-                setting="Win/loss after ~45 min (~80,000 steps). "
-                "Dense shaping rewards added to bridge the gap.",
+                setting="Win/loss after ~45 min (~80,000 steps). Dense shaping rewards added to bridge the gap.",
                 outcome="Sparse win/loss alone was insufficient. Dense "
                 "shaping (gold/XP advantage) was essential for "
                 "learning but introduced its own exploit risks.",
@@ -168,14 +157,11 @@ class SparseDelayedGoal(PrecedentRule):
 
     def check(self, model, config=None):
         verdicts = []
-        terminal = [
-            s for s in model.reward_sources if s.reward_type == RewardType.TERMINAL
-        ]
+        terminal = [s for s in model.reward_sources if s.reward_type == RewardType.TERMINAL]
         per_step = [
             s
             for s in model.reward_sources
-            if s.reward_type
-            in (RewardType.PER_STEP, RewardType.SHAPING, RewardType.ON_EVENT)
+            if s.reward_type in (RewardType.PER_STEP, RewardType.SHAPING, RewardType.ON_EVENT)
         ]
 
         if terminal and not per_step and model.max_steps > 1000:

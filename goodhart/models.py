@@ -172,20 +172,13 @@ class RewardSource:
         if math.isnan(self.value) or math.isinf(self.value):
             raise ValueError(f"value must be finite, got {self.value}")
         if not (0.0 <= self.discovery_probability <= 1.0):
-            raise ValueError(
-                f"discovery_probability must be in [0, 1], "
-                f"got {self.discovery_probability}"
-            )
+            raise ValueError(f"discovery_probability must be in [0, 1], got {self.discovery_probability}")
         if self.max_occurrences < 0:
-            raise ValueError(
-                f"max_occurrences must be >= 0, got {self.max_occurrences}"
-            )
+            raise ValueError(f"max_occurrences must be >= 0, got {self.max_occurrences}")
         if self.loop_period < 0:
             raise ValueError(f"loop_period must be >= 0, got {self.loop_period}")
         if not (0.0 <= self.explore_fraction <= 1.0):
-            raise ValueError(
-                f"explore_fraction must be in [0, 1], got {self.explore_fraction}"
-            )
+            raise ValueError(f"explore_fraction must be in [0, 1], got {self.explore_fraction}")
 
 
 # =====================================================================
@@ -257,13 +250,9 @@ class EnvironmentModel:
         if self.n_actions <= 0:
             raise ValueError(f"n_actions must be > 0, got {self.n_actions}")
         if not (0.0 <= self.death_probability <= 1.0):
-            raise ValueError(
-                f"death_probability must be in [0, 1], got {self.death_probability}"
-            )
+            raise ValueError(f"death_probability must be in [0, 1], got {self.death_probability}")
         if not (0.0 <= self.wall_probability <= 1.0):
-            raise ValueError(
-                f"wall_probability must be in [0, 1], got {self.wall_probability}"
-            )
+            raise ValueError(f"wall_probability must be in [0, 1], got {self.wall_probability}")
 
     def add_reward_source(self, source: RewardSource):
         self.reward_sources.append(source)
@@ -287,11 +276,7 @@ class EnvironmentModel:
 
     @property
     def goal_sources(self) -> List[RewardSource]:
-        return [
-            s
-            for s in self.reward_sources
-            if s.reward_type == RewardType.TERMINAL and s.value > 0
-        ]
+        return [s for s in self.reward_sources if s.reward_type == RewardType.TERMINAL and s.value > 0]
 
     @property
     def penalty_sources(self) -> List[RewardSource]:
@@ -307,10 +292,7 @@ class EnvironmentModel:
             s
             for s in self.reward_sources
             if not s.intentional  # intentional rewards are not exploits
-            and (
-                s.can_loop
-                or s.respawn in (RespawnBehavior.TIMED, RespawnBehavior.INFINITE)
-            )
+            and (s.can_loop or s.respawn in (RespawnBehavior.TIMED, RespawnBehavior.INFINITE))
         ]
 
     @property
@@ -325,11 +307,7 @@ class EnvironmentModel:
     @property
     def modifier_sources(self) -> List[RewardSource]:
         """Sources that modify other sources."""
-        return [
-            s
-            for s in self.reward_sources
-            if s.modifies is not None and s.modifier_type != "none"
-        ]
+        return [s for s in self.reward_sources if s.modifies is not None and s.modifier_type != "none"]
 
     @property
     def state_dependent_sources(self) -> List[RewardSource]:
@@ -349,9 +327,7 @@ class EnvironmentModel:
         return sum(
             s.value
             for s in self.reward_sources
-            if s.reward_type == RewardType.PER_STEP
-            and s.value < 0
-            and s.modifier_type == "none"
+            if s.reward_type == RewardType.PER_STEP and s.value < 0 and s.modifier_type == "none"
         )
 
     @property
@@ -369,9 +345,7 @@ class EnvironmentModel:
         if source.modifier_type != "none":
             return 0.0  # Modifiers don't have independent value
         modifiers = [
-            s
-            for s in self.reward_sources
-            if s.modifies == source.name and s.modifier_type == "multiplicative"
+            s for s in self.reward_sources if s.modifies == source.name and s.modifier_type == "multiplicative"
         ]
         if not modifiers:
             return source.value
@@ -617,6 +591,4 @@ class FormalBasis:
     proof_file: str = "GoodhartProofs/Basic.lean"  # relative to proofs/
     paper: Optional[str] = None  # source paper if verifying published work
     statement: str = ""  # human-readable theorem statement
-    parameters: Dict[str, str] = field(
-        default_factory=dict
-    )  # maps Python param → LEAN param
+    parameters: Dict[str, str] = field(default_factory=dict)  # maps Python param → LEAN param

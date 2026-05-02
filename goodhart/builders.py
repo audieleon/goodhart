@@ -37,9 +37,7 @@ def build_model_and_config(
     This is the construction path used by the quick API (check/analyze)
     and the CLI when using --goal/--penalty/--steps flags.
     """
-    model = EnvironmentModel(
-        name=name, max_steps=max_steps, n_states=n_states, gamma=gamma
-    )
+    model = EnvironmentModel(name=name, max_steps=max_steps, n_states=n_states, gamma=gamma)
 
     if goal > 0:
         model.add_reward_source(
@@ -101,8 +99,7 @@ def load_config_file(path):
         raise FileNotFoundError(f"Config file not found: {path}")
     if os.path.getsize(path) > 1_000_000:
         raise ValueError(
-            f"Config file too large (>{os.path.getsize(path) // 1_000_000}MB). "
-            f"Max 1MB to prevent denial-of-service."
+            f"Config file too large (>{os.path.getsize(path) // 1_000_000}MB). Max 1MB to prevent denial-of-service."
         )
     if path.endswith((".yaml", ".yml")):
         import yaml
@@ -124,9 +121,7 @@ def load_config_file(path):
         with open(path, "rb") as f:
             return tomllib.load(f)
     else:
-        raise ValueError(
-            f"Unsupported config format: {path}. Use .yaml, .yml, .json, or .toml"
-        )
+        raise ValueError(f"Unsupported config format: {path}. Use .yaml, .yml, .json, or .toml")
 
 
 def build_from_config_dict(cfg, fallback_name="config"):
@@ -159,9 +154,7 @@ def build_from_config_dict(cfg, fallback_name="config"):
 
     for i, src in enumerate(env_cfg.get("reward_sources", [])):
         if not isinstance(src, dict):
-            raise ValueError(
-                f"reward_sources[{i}] must be a dict, got {type(src).__name__}"
-            )
+            raise ValueError(f"reward_sources[{i}] must be a dict, got {type(src).__name__}")
         rt_str = src.get("reward_type", src.get("type", "terminal"))
         model.add_reward_source(
             RewardSource(

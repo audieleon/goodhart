@@ -107,9 +107,7 @@ def compute_reward(obs, action, info):
     healthy = HEALTHY_REWARD if info.get("is_healthy", True) else 0.0
     velocity = VELOCITY_SCALE * obs.get("x_velocity", 0.0)
     ctrl = -CTRL_COST_WEIGHT * sum(a**2 for a in action)
-    contact = max(
-        CONTACT_COST_RANGE[0], -CONTACT_COST_WEIGHT * obs.get("contact_force", 0.0)
-    )
+    contact = max(CONTACT_COST_RANGE[0], -CONTACT_COST_WEIGHT * obs.get("contact_force", 0.0))
     return healthy + velocity + ctrl + contact
 
 
@@ -120,10 +118,7 @@ def run_example():
     print()
     print("Source: Todorov et al. 2012, Brockman et al. 2016")
     print("Known issue: agent stands still because")
-    print(
-        f"  healthy_reward ({HEALTHY_REWARD}/step)"
-        f" >> velocity_reward (~{VELOCITY_SCALE}/step)"
-    )
+    print(f"  healthy_reward ({HEALTHY_REWARD}/step) >> velocity_reward (~{VELOCITY_SCALE}/step)")
     print()
     print("Constants (from Gymnasium defaults):")
     print(f"  HEALTHY_REWARD     = {HEALTHY_REWARD}")

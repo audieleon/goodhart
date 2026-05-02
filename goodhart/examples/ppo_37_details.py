@@ -121,8 +121,7 @@ class ValueTargetRange(PrecedentRule):
             Precedent(
                 source="Andy Jones — Debugging RL Systems",
                 setting="Rewards not scaled; value targets outside [-10, +10]",
-                outcome="Neural network unable to learn value function. "
-                "Loss explodes or converges to mean.",
+                outcome="Neural network unable to learn value function. Loss explodes or converges to mean.",
                 year=2020,
             ),
             Precedent(
@@ -149,8 +148,7 @@ class ValueTargetRange(PrecedentRule):
                     rule_name=self.name,
                     severity=Severity.WARNING,
                     message=(
-                        f"Estimated max return ~{max_return:.0f}. Value targets "
-                        f"may be too large for stable learning."
+                        f"Estimated max return ~{max_return:.0f}. Value targets may be too large for stable learning."
                     ),
                     recommendation=(
                         f"Precedent: Jones recommends targets in [-10, +10]. "
@@ -178,15 +176,13 @@ class KLDivergenceThreshold(PrecedentRule):
             Precedent(
                 source="37 Implementation Details of PPO",
                 setting="approx_kl > 0.02 with standard PPO",
-                outcome="'Usually means policy is changing too quickly "
-                "and there is a bug.'",
+                outcome="'Usually means policy is changing too quickly and there is a bug.'",
                 year=2022,
             ),
             Precedent(
                 source="Andy Jones — Debugging RL Systems",
                 setting="KL > 0.5 in PPO on-policy",
-                outcome="Experience too stale. Actor and learner running "
-                "at incompatible speeds.",
+                outcome="Experience too stale. Actor and learner running at incompatible speeds.",
                 year=2020,
             ),
             Precedent(

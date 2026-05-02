@@ -108,8 +108,7 @@ def preflight_check(
 
         header(
             f"Pre-flight Check: {name}",
-            f"goal={goal}, penalty={penalty}, steps={max_steps}, "
-            f"p(goal)={discovery_prob}, actors={n_actors}",
+            f"goal={goal}, penalty={penalty}, steps={max_steps}, p(goal)={discovery_prob}, actors={n_actors}",
         )
 
         if result.criticals:
@@ -255,11 +254,7 @@ def _run_doctor(args):
             else:
                 avg_ep_len = float(model.max_steps)
             avg_ep_len = max(1.0, avg_ep_len)
-            best_p = (
-                max(s.discovery_probability for s in model.goal_sources)
-                if model.goal_sources
-                else 0.0
-            )
+            best_p = max(s.discovery_probability for s in model.goal_sources) if model.goal_sources else 0.0
             if best_p > 0 and avg_ep_len > 0:
                 # Need: total_episodes * best_p >= 10
                 # total_episodes = total_steps / avg_ep_len
@@ -511,12 +506,8 @@ Tab completion (bash):
         """,
     )
 
-    parser.add_argument(
-        "--version", action="version", version=f"goodhart {_get_version()}"
-    )
-    parser.add_argument(
-        "--about", action="store_true", help="Learn about Goodhart's Law and this tool"
-    )
+    parser.add_argument("--version", action="version", version=f"goodhart {_get_version()}")
+    parser.add_argument("--about", action="store_true", help="Learn about Goodhart's Law and this tool")
     parser.add_argument(
         "--fields",
         action="store_true",
@@ -550,8 +541,7 @@ Tab completion (bash):
         "--check",
         type=str,
         metavar="MODULE:FUNC",
-        help="Analyze a @reward_function-decorated Python function "
-        "(e.g. --check my_env:compute_reward)",
+        help="Analyze a @reward_function-decorated Python function (e.g. --check my_env:compute_reward)",
     )
     parser.add_argument(
         "--config",
@@ -576,13 +566,9 @@ Tab completion (bash):
         action="store_true",
         help="Show extended explanations for each finding",
     )
-    parser.add_argument(
-        "--json", "-j", action="store_true", help="Output results as JSON"
-    )
+    parser.add_argument("--json", "-j", action="store_true", help="Output results as JSON")
 
-    parser.add_argument(
-        "--goal", type=float, default=None, help="Goal/terminal reward value"
-    )
+    parser.add_argument("--goal", type=float, default=None, help="Goal/terminal reward value")
     parser.add_argument(
         "--penalty",
         type=float,
@@ -596,18 +582,14 @@ Tab completion (bash):
         default=0.05,
         help="P(finding goal per episode) (default: 0.05)",
     )
-    parser.add_argument(
-        "--actors", type=int, default=64, help="Number of parallel actors (default: 64)"
-    )
+    parser.add_argument("--actors", type=int, default=64, help="Number of parallel actors (default: 64)")
     parser.add_argument(
         "--budget",
         type=int,
         default=20_000_000,
         help="Total training steps (default: 20M)",
     )
-    parser.add_argument(
-        "--gamma", type=float, default=0.99, help="Discount factor (default: 0.99)"
-    )
+    parser.add_argument("--gamma", type=float, default=0.99, help="Discount factor (default: 0.99)")
     parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate")
     parser.add_argument(
         "--critic-lr",
@@ -615,21 +597,11 @@ Tab completion (bash):
         default=None,
         help="Critic learning rate (default: same as --lr)",
     )
-    parser.add_argument(
-        "--entropy", type=float, default=0.01, help="Entropy coefficient"
-    )
-    parser.add_argument(
-        "--specialists", type=int, default=1, help="Number of specialist networks"
-    )
-    parser.add_argument(
-        "--floor", type=float, default=0.0, help="Routing floor per specialist"
-    )
-    parser.add_argument(
-        "--states", type=int, default=1000, help="Approximate state space size"
-    )
-    parser.add_argument(
-        "--name", type=str, default="experiment", help="Experiment name"
-    )
+    parser.add_argument("--entropy", type=float, default=0.01, help="Entropy coefficient")
+    parser.add_argument("--specialists", type=int, default=1, help="Number of specialist networks")
+    parser.add_argument("--floor", type=float, default=0.0, help="Routing floor per specialist")
+    parser.add_argument("--states", type=int, default=1000, help="Approximate state space size")
+    parser.add_argument("--name", type=str, default="experiment", help="Experiment name")
     parser.add_argument(
         "--exit-on-critical",
         action="store_true",
@@ -653,9 +625,7 @@ Tab completion (bash):
         default="default",
         help="Output format: 'compact' for one-line-per-finding (grep-friendly)",
     )
-    parser.add_argument(
-        "--viz", action="store_true", help="Generate a reward landscape visualization"
-    )
+    parser.add_argument("--viz", action="store_true", help="Generate a reward landscape visualization")
     parser.add_argument(
         "--ascii",
         action="store_true",
@@ -817,13 +787,9 @@ Tab completion (bash):
             category_header(section_name)
             for fname, (owner, ftype, default, short, _) in _FIELD_REF.items():
                 if owner == section_name:
-                    rule_list_item(
-                        fname, f"{short} {DIM_COLOR}[{ftype}, default={default}]{RESET}"
-                    )
+                    rule_list_item(fname, f"{short} {DIM_COLOR}[{ftype}, default={default}]{RESET}")
             print()
-        print(
-            f"  {DIM_COLOR}Use --field <name> for details (e.g., --field intentional){RESET}"
-        )
+        print(f"  {DIM_COLOR}Use --field <name> for details (e.g., --field intentional){RESET}")
         print(f"  {DIM_COLOR}Use --field all for the complete reference{RESET}")
         print()
         return
@@ -951,9 +917,7 @@ Tab completion (bash):
 
         print()
         print(f"  {DIM_COLOR}Total: {total} rules{RESET}")
-        print(
-            f"  Use {RESET}--explain <rule>{DIM_COLOR} for deep explanation of any rule.{RESET}"
-        )
+        print(f"  Use {RESET}--explain <rule>{DIM_COLOR} for deep explanation of any rule.{RESET}")
         print()
         return
 
@@ -1041,12 +1005,8 @@ Tab completion (bash):
             rule_list_item(name, doc, width=35)
 
         print()
-        print(
-            f"  {DIM_COLOR}{len(examples)} examples from published papers (1983-2025){RESET}"
-        )
-        print(
-            f"  {DIM_COLOR}Includes failures, positive patterns, and limitation cases.{RESET}"
-        )
+        print(f"  {DIM_COLOR}{len(examples)} examples from published papers (1983-2025){RESET}")
+        print(f"  {DIM_COLOR}Includes failures, positive patterns, and limitation cases.{RESET}")
         print()
         return
 
@@ -1130,15 +1090,9 @@ Tab completion (bash):
         print("  Your agent targets it directly. It finds ways to maximize the")
         print("  number without doing the task:")
         print()
-        print(
-            f"    {WARNING_COLOR}-{RESET} Standing still {DIM_COLOR}(avoids step penalties){RESET}"
-        )
-        print(
-            f"    {WARNING_COLOR}-{RESET} Dying immediately {DIM_COLOR}(stops accumulating costs){RESET}"
-        )
-        print(
-            f"    {WARNING_COLOR}-{RESET} Going in circles {DIM_COLOR}(harvests respawning rewards){RESET}"
-        )
+        print(f"    {WARNING_COLOR}-{RESET} Standing still {DIM_COLOR}(avoids step penalties){RESET}")
+        print(f"    {WARNING_COLOR}-{RESET} Dying immediately {DIM_COLOR}(stops accumulating costs){RESET}")
+        print(f"    {WARNING_COLOR}-{RESET} Going in circles {DIM_COLOR}(harvests respawning rewards){RESET}")
         print(
             f"    {WARNING_COLOR}-{RESET} Exploiting physics {DIM_COLOR}(maximizes reward through simulator bugs){RESET}"
         )
@@ -1152,27 +1106,17 @@ Tab completion (bash):
             for r in TrainingAnalysisEngine().add_all_rules().rules
             if hasattr(r, "proof") and r.proof and r.proof.strength
         )
-        print(
-            f"  {HEADER_COLOR}{RULE_COUNT} rules{RESET} tested against 212 encodings from 133 papers (1983-2025)"
-        )
-        print(
-            f"  {HEADER_COLOR}{proved} rules{RESET} linked to LEAN 4 proofs (105 theorems, zero sorry)"
-        )
+        print(f"  {HEADER_COLOR}{RULE_COUNT} rules{RESET} tested against 212 encodings from 133 papers (1983-2025)")
+        print(f"  {HEADER_COLOR}{proved} rules{RESET} linked to LEAN 4 proofs (105 theorems, zero sorry)")
         print()
         print(f"  {DIM_COLOR}Cannot catch: physics exploits, goal misgeneralization,")
         print("  learned-reward gaming, missing reward terms. When config patterns")
         print(f"  match these blind spots, advisory hints are emitted.{RESET}")
         print()
         print(f"  {DIM_COLOR}Sources:{RESET}")
-        print(
-            f'    Goodhart, C.A.E. (1975) {DIM_COLOR}"Problems of Monetary Management"{RESET}'
-        )
-        print(
-            f'    Ng et al. (1999) {DIM_COLOR}"Policy invariance under reward transformations"{RESET}'
-        )
-        print(
-            f'    Skalse et al. (2022) {DIM_COLOR}"Defining and Characterizing Reward Hacking"{RESET}'
-        )
+        print(f'    Goodhart, C.A.E. (1975) {DIM_COLOR}"Problems of Monetary Management"{RESET}')
+        print(f'    Ng et al. (1999) {DIM_COLOR}"Policy invariance under reward transformations"{RESET}')
+        print(f'    Skalse et al. (2022) {DIM_COLOR}"Defining and Characterizing Reward Hacking"{RESET}')
         print(f"    Krakovna et al. {DIM_COLOR}Specification Gaming Master List{RESET}")
         print()
         print(f"  {REC_COLOR}https://github.com/audieleon/goodhart{RESET}")

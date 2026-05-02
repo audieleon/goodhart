@@ -9,10 +9,7 @@ from goodhart.engine import TrainingAnalysisEngine
 
 METADATA = {
     "id": "sharpe_idle",
-    "source_paper": (
-        'Moody & Saffell, "Reinforcement Learning for Trading," '
-        "NeurIPS 1998, pp. 917-923"
-    ),
+    "source_paper": ('Moody & Saffell, "Reinforcement Learning for Trading," NeurIPS 1998, pp. 917-923'),
     "paper_url": "http://papers.neurips.cc/paper/1551-reinforcement-learning-for-trading.pdf",
     "source_code_url": None,
     "reward_location": (
