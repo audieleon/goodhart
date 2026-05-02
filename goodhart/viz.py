@@ -96,72 +96,103 @@ def reward_landscape_ascii(model: EnvironmentModel,
     Returns:
         A multi-line string with the ASCII chart.
     """
-    strategies = _compute_strategy_evs(model)
+    import os, sys
 
-    # Sort by EV for layout
+    strategies = _compute_strategy_evs(model)
     sorted_strats = sorted(strategies.items(), key=lambda x: x[1], reverse=True)
 
-    # Find range for Y-axis
-    all_vals = list(strategies.values())
-    y_max = max(all_vals)
-    y_min = min(all_vals)
+    # Color support
+    use_color = (hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
+                 and not os.environ.get("NO_COLOR"))
 
-    # Add some padding
-    y_range = y_max - y_min if y_max != y_min else 1.0
-    y_max += y_range * 0.1
-    y_min -= y_range * 0.1
+    RED = "\033[31m" if use_color else ""
+    GREEN = "\033[32m" if use_color else ""
+    YELLOW = "\033[33m" if use_color else ""
+    BOLD = "\033[1m" if use_color else ""
+    DIM = "\033[2m" if use_color else ""
+    RESET = "\033[0m" if use_color else ""
 
-    # Build lines
-    lines = []
-    lines.append(f"Reward Landscape: {model.name}")
-    lines.append(f"  goal={model.max_goal_reward}, "
-                 f"penalty={model.total_step_penalty}/step, "
-                 f"max_steps={model.max_steps}")
-    lines.append("")
+    colors = {"red": RED, "yellow": YELLOW, "green": GREEN}
 
-    # Label mapping for display
+    # Labels with explanations
     labels = {
-        "die_fast": "die fast",
-        "stand_still": "stand still",
-        "explore_random": "explore (random)",
-        "explore_full": "explore (full)",
-        "optimal": "optimal",
+        "die_fast": ("Die immediately", "terminate at step 1 to avoid penalties"),
+        "stand_still": ("Stand still", "do nothing, collect passive rewards only"),
+        "explore_random": ("Random exploration", "random walk, might find the goal"),
+        "explore_full": ("Full exploration", "explore exhaustively, find the goal"),
+        "optimal": ("Solve the task", "reach the goal efficiently"),
     }
 
-    # Markers for degenerate vs intended
-    markers = {
-        "red": "XXXX",
-        "yellow": "????",
-        "green": ">>>>",
-    }
+    # Bar rendering
+    all_vals = list(strategies.values())
+    v_max = max(all_vals)
+    v_min = min(all_vals)
+    v_range = v_max - v_min if v_max != v_min else 1.0
+    bar_width = 30  # max bar chars
 
-    # Find the winner
     winner_name = sorted_strats[0][0]
+    winner_class = _classify_strategy(winner_name)
+
+    lines = []
+    lines.append("")
+    lines.append(f"  {BOLD}What will your agent learn to do?{RESET}")
+    lines.append(f"  {DIM}{model.name} — goal={model.max_goal_reward}, "
+                 f"penalty={model.total_step_penalty}/step, "
+                 f"T={model.max_steps}{RESET}")
+    lines.append("")
 
     for name, ev in sorted_strats:
         color_class = _classify_strategy(name)
-        marker = markers[color_class]
-        label = labels.get(name, name)
-        win_tag = " <-- WINS" if name == winner_name else ""
-        lines.append(f"  {ev:+8.2f} | {marker} {label}{win_tag}")
+        color = colors[color_class]
+        label, explanation = labels.get(name, (name, ""))
+        is_winner = (name == winner_name)
+
+        # Normalized bar length (handle negative EVs)
+        if v_range > 0:
+            bar_frac = (ev - v_min) / v_range
+        else:
+            bar_frac = 0.5
+        bar_len = max(1, int(bar_frac * bar_width))
+
+        bar = "█" * bar_len
+        tag = f" ◀ agent learns this" if is_winner else ""
+        bold = BOLD if is_winner else ""
+
+        lines.append(f"  {bold}{color}{ev:+9.2f}{RESET}  "
+                     f"{color}{bar}{RESET}  "
+                     f"{bold}{label}{RESET}"
+                     f"{color}{tag}{RESET}")
+        lines.append(f"  {DIM}{'':9s}  {'':>{bar_width}s}  {explanation}{RESET}")
 
     lines.append("")
 
-    # Legend
-    lines.append("  >>>> = intended    ???? = marginal    XXXX = degenerate")
-
-    # Warning if degenerate wins
-    winner_class = _classify_strategy(winner_name)
-    if winner_class == "red":
-        lines.append("")
-        lines.append("  WARNING: A degenerate strategy has highest EV!")
-        lines.append(f"  The agent will learn to '{labels.get(winner_name, winner_name)}'")
-        lines.append("  instead of solving the task.")
+    # Verdict
+    all_equal = (v_max - v_min) < 1e-10
+    if all_equal:
+        lines.append(f"  {DIM}All strategies score the same. Add a goal reward "
+                     f"to differentiate intended from degenerate behavior.{RESET}")
+    elif winner_class == "red":
+        winner_label = labels.get(winner_name, (winner_name, ""))[0].lower()
+        optimal_ev = strategies.get("optimal", 0)
+        winner_ev = strategies[winner_name]
+        lines.append(f"  {RED}{BOLD}Problem:{RESET} {RED}The agent will learn to "
+                     f"{winner_label}{RESET}")
+        lines.append(f"  {RED}because it scores {winner_ev:+.2f} vs "
+                     f"{optimal_ev:+.2f} for solving the task.{RESET}")
+        if winner_name == "die_fast":
+            lines.append(f"  {DIM}Fix: reduce step penalty or add a survival bonus{RESET}")
+        elif winner_name == "stand_still":
+            lines.append(f"  {DIM}Fix: reduce passive rewards or increase active reward{RESET}")
     elif winner_class == "yellow":
-        lines.append("")
-        lines.append("  CAUTION: A marginal strategy ties or beats optimal.")
-        lines.append("  The agent may settle for partial exploration.")
+        lines.append(f"  {YELLOW}{BOLD}Caution:{RESET} {YELLOW}Exploration may "
+                     f"outperform the intended strategy.{RESET}")
+        lines.append(f"  {DIM}The agent may settle for partial progress "
+                     f"instead of solving the task.{RESET}")
+    else:
+        lines.append(f"  {GREEN}{BOLD}Good:{RESET} {GREEN}Solving the task has "
+                     f"the highest expected value.{RESET}")
 
+    lines.append("")
     return "\n".join(lines)
 
 

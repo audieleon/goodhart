@@ -38,10 +38,10 @@ def test_ascii_contains_strategies():
     """ASCII output should show all strategy names."""
     model = _sample_model()
     output = reward_landscape_ascii(model)
-    assert "die fast" in output
-    assert "stand still" in output
-    assert "optimal" in output
-    assert "explore" in output
+    assert "Die immediately" in output
+    assert "Stand still" in output
+    assert "Solve the task" in output
+    assert "exploration" in output.lower()
 
 
 def test_ascii_contains_ev_values():
@@ -56,7 +56,7 @@ def test_ascii_marks_winner():
     """ASCII output should mark the winning strategy."""
     model = _sample_model()
     output = reward_landscape_ascii(model)
-    assert "WINS" in output
+    assert "agent learns this" in output
 
 
 def test_ascii_warns_on_degenerate_winner():
@@ -69,7 +69,7 @@ def test_ascii_warns_on_degenerate_winner():
     ))
     output = reward_landscape_ascii(model)
     # die_fast or stand_still should win -- both are degenerate
-    assert "WARNING" in output or "CAUTION" in output
+    assert "Problem" in output or "Caution" in output
 
 
 def test_compute_strategy_evs_returns_dict():
@@ -122,7 +122,7 @@ def test_ascii_no_penalty():
     ))
     output = reward_landscape_ascii(model)
     assert isinstance(output, str)
-    assert "optimal" in output
+    assert "Solve the task" in output
 
 
 def test_reward_landscape_matplotlib_import_error():
@@ -141,6 +141,7 @@ def test_legend_in_ascii():
     """ASCII output should include a legend."""
     model = _sample_model()
     output = reward_landscape_ascii(model)
-    assert "intended" in output
-    assert "marginal" in output
-    assert "degenerate" in output
+    # New viz is self-explanatory: labels describe each strategy,
+    # verdict explains what the agent will learn
+    assert "agent learns this" in output
+    assert "Solve the task" in output or "Die immediately" in output
