@@ -44,7 +44,7 @@ from goodhart.models import (
 )
 from goodhart.annotate import reward_function, analyze_function
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 
 def analyze(goal=0.0, penalty=0.0, max_steps=500, **kwargs) -> Result:
