@@ -61,8 +61,16 @@ def _compute_strategy_evs(model: EnvironmentModel) -> Dict[str, float]:
             elif s.reward_type.name == "PER_STEP":
                 loop_reward += s.value
 
+    # Death risk: active strategies have shorter expected episodes
+    death_p = model.death_probability
+    if death_p > 0:
+        active_ep_len = min(T, int(1.0 / death_p))  # expected steps before death
+    else:
+        active_ep_len = T
+
     disc_full = _discounted_steps(gamma, T)
-    avg_discovery = max(1, T // 2)
+    disc_active = _discounted_steps(gamma, active_ep_len)
+    avg_discovery = max(1, active_ep_len // 2)
     gamma_disc_goal = gamma ** avg_discovery if gamma < 1.0 else 1.0
 
     strategies = {}
@@ -71,26 +79,25 @@ def _compute_strategy_evs(model: EnvironmentModel) -> Dict[str, float]:
     disc_1 = _discounted_steps(gamma, 1)
     strategies["die_fast"] = (passive_perstep + penalties) * disc_1
 
-    # 2. Stand still -- collect passive rewards, pay no action costs,
-    #    never reach goal. Full episode.
-    strategies["stand_still"] = passive_perstep * disc_full + penalties * disc_full
+    # 2. Stand still -- collect passive rewards for full episode.
+    #    No death risk (not moving), no action costs, no goal.
+    strategies["stand_still"] = (passive_perstep + penalties) * disc_full
 
-    # 3. Random exploration -- random walk, might find goal
+    # 3. Random exploration -- random walk, faces death risk
     strategies["explore_random"] = (
-        (passive_perstep + penalties) * disc_full
+        (passive_perstep + penalties) * disc_active
         + disc_prob * goal_reward * gamma_disc_goal
     )
 
-    # 4. Full exploration -- explore exhaustively, find goal at T/2
+    # 4. Full exploration -- explore exhaustively, faces death risk
     disc_half = _discounted_steps(gamma, avg_discovery)
     strategies["explore_full"] = (
         (passive_perstep + active_perstep * 0.3 + penalties) * disc_half
         + goal_reward * gamma_disc_goal
     )
 
-    # 5. Solve the task -- reach goal efficiently (~30% of T),
-    #    earn active rewards along the way
-    optimal_steps = max(1, int(T * 0.3))
+    # 5. Solve the task -- reach goal efficiently, faces death risk
+    optimal_steps = max(1, int(active_ep_len * 0.3))
     disc_opt = _discounted_steps(gamma, optimal_steps)
     gamma_disc_opt = gamma ** optimal_steps if gamma < 1.0 else 1.0
     strategies["optimal"] = (
@@ -101,7 +108,7 @@ def _compute_strategy_evs(model: EnvironmentModel) -> Dict[str, float]:
     # 6. Loop exploit -- if loopable rewards exist, farm them
     if loop_reward > 0:
         strategies["loop"] = (
-            (passive_perstep + loop_reward + penalties) * disc_full
+            (passive_perstep + loop_reward + penalties) * disc_active
         )
 
     return strategies
