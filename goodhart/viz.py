@@ -286,14 +286,24 @@ def reward_landscape_ascii(model: EnvironmentModel,
 
                 lines.append(
                     f"  {color_v}{icon} [{label}] {v.rule_name}{RESET}")
-                # Show recommendation if available, otherwise message
+                # Wrap recommendation/message to fit with indent
                 detail = v.recommendation or v.message
                 detail = detail.replace('\n', ' ').strip()
-                if len(detail) > 72:
-                    cut = detail[:72].rfind(' ')
-                    detail = detail[:cut] + "..." if cut > 30 else detail[:69] + "..."
-                lines.append(
-                    f"    {DIM}{detail}{RESET}")
+                indent = "    "
+                max_width = 68
+                words = detail.split()
+                wrapped_lines = []
+                current = ""
+                for word in words:
+                    if current and len(current) + 1 + len(word) > max_width:
+                        wrapped_lines.append(current)
+                        current = word
+                    else:
+                        current = f"{current} {word}" if current else word
+                if current:
+                    wrapped_lines.append(current)
+                for wl in wrapped_lines:
+                    lines.append(f"{indent}{DIM}{wl}{RESET}")
             lines.append("")
 
     lines.append("")
