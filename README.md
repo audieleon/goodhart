@@ -30,12 +30,12 @@ pip install goodhart[all]
 goodhart --goal 1.0 --penalty -0.01 --steps 500
 # -> CRITICAL: death beats survival by 9.6x
 
-# Try a preset from a published paper
-goodhart --preset coast-runners
+# Try an example from a published paper
+goodhart --example coast_runners
 # -> CRITICAL: loop EV (+800) beats goal (+100)
 
-# List all available presets
-goodhart --preset
+# List all available examples
+goodhart --examples
 
 # Interactive mode (asks questions)
 goodhart
@@ -57,7 +57,7 @@ goodhart --config my_experiment.yaml
 goodhart --check my_env.py:compute_reward
 
 # With educational explanations
-goodhart --preset humanoid --verbose
+goodhart --example humanoid_idle --verbose
 
 # Deep-dive on a specific rule
 goodhart --explain idle_exploit
@@ -65,8 +65,23 @@ goodhart --explain idle_exploit
 # Diagnose and suggest fixes
 goodhart --doctor --goal 1.0 --penalty -0.01 --steps 500
 
-# CI integration (exit code 1 on critical issues)
-goodhart --quiet --exit-on-critical --config experiment.yaml
+# Machine-readable doctor output
+goodhart --doctor --goal 1.0 --penalty -0.01 --steps 500 -j
+
+# Field reference
+goodhart --fields                    # list all fields
+goodhart --field intentional         # explain one field
+
+# CI integration
+goodhart -q --config experiment.yaml            # exit 1 on criticals
+goodhart -sq --config experiment.yaml           # exit 1 on warnings too
+goodhart -sq --ignore idle_exploit --config e.yaml  # suppress known-OK warnings
+
+# Grep-friendly output
+goodhart --format compact --config experiment.yaml | grep CRITICAL
+
+# Read config from stdin
+cat reward.yaml | goodhart --config - -j | jq '.criticals'
 ```
 
 ### Python API
@@ -133,7 +148,7 @@ If you use an AI coding assistant, goodhart can run automatically when you discu
 **Claude Code:** add to `~/.claude/settings.json`
 **Cursor:** add to `.cursor/mcp.json`
 
-Then just describe your reward in conversation — the assistant calls `goodhart_check` automatically and explains the findings. 8 tools available: check, doctor, explain rules, browse presets and examples.
+Then just describe your reward in conversation — the assistant calls `goodhart_check` automatically and explains the findings. Tools available: check, doctor, explain rules, and browse examples.
 
 ### YAML Configuration
 
@@ -160,15 +175,15 @@ training:
   total_steps: 10000000
 ```
 
-## Presets
+## Examples
 
-23 presets from published papers, with hyperparameters sourced from the original publications:
+66 built-in examples from published papers, plus 146 evaluation entries from the Reward Failure Dataset:
 
 ```bash
-goodhart --preset              # list all presets
-goodhart --preset coast-runners  # run CoastRunners (loop exploit)
-goodhart --preset humanoid       # run Humanoid (idle exploit)
-goodhart --preset cartpole       # run CartPole (clean pass)
+goodhart --examples              # list all examples
+goodhart --example coast_runners  # run CoastRunners (loop exploit)
+goodhart --example humanoid_idle  # run Humanoid (idle exploit)
+goodhart --fields                 # explain RewardSource fields
 ```
 
 ## Rules

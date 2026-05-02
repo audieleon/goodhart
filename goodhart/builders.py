@@ -58,8 +58,25 @@ def build_model_and_config(goal=0.0, penalty=0.0, max_steps=500,
 
 
 def load_config_file(path):
-    """Load config from YAML, JSON, or TOML file based on extension."""
+    """Load config from YAML, JSON, or TOML file based on extension.
+
+    Use path='-' to read from stdin (YAML or JSON auto-detected).
+    """
     import os
+
+    # Read from stdin
+    if path == '-' or path == '/dev/stdin':
+        import sys
+        content = sys.stdin.read()
+        if not content.strip():
+            raise ValueError("Empty input on stdin")
+        # Try JSON first, fall back to YAML
+        try:
+            return json.loads(content)
+        except (json.JSONDecodeError, ValueError):
+            import yaml
+            return yaml.safe_load(content)
+
     if not os.path.exists(path):
         raise FileNotFoundError(f"Config file not found: {path}")
     if os.path.getsize(path) > 1_000_000:

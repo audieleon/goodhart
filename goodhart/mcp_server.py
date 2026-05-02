@@ -439,7 +439,7 @@ TOOLS = [
     },
     {
         "name": "goodhart_list_examples",
-        "description": "List 57 cookbook examples from published papers, each demonstrating a reward design pattern or failure mode.",
+        "description": "List cookbook examples from published papers, each demonstrating a reward design pattern or failure mode.",
         "inputSchema": {"type": "object", "properties": {}},
     },
     {

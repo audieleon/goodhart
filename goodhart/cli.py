@@ -127,22 +127,39 @@ def _output_analysis(model, config, args):
     """
     engine = TrainingAnalysisEngine().add_all_rules()
 
+    # Apply --ignore: remove suppressed rules before analysis
+    ignored = set()
+    if getattr(args, 'ignore', None):
+        ignored = {r.strip() for r in args.ignore.split(',')}
+        engine.rules = [r for r in engine.rules if r.name not in ignored]
+
+    output_format = getattr(args, 'format', 'default')
+
     if args.json:
         result = engine.analyze(model, config)
         verbose = getattr(args, 'verbose', False)
         print(json.dumps(result.to_dict(verbose=verbose), indent=2))
-        return result
     elif args.quiet:
         result = engine.analyze(model, config)
-        if not result.passed:
-            sys.exit(1)
-        return result
+    elif output_format == 'compact':
+        result = engine.analyze(model, config)
+        for v in result.verdicts:
+            severity = v.severity.value.upper()
+            print(f"{severity}:{v.rule_name}: {v.message}")
     else:
         verbose = getattr(args, 'verbose', False)
         result = engine.print_report(model, config, verbose=verbose)
-        if hasattr(args, 'exit_on_critical') and args.exit_on_critical and not result.passed:
-            sys.exit(1)
-        return result
+
+    # Determine exit code
+    strict = getattr(args, 'strict', False)
+    exit_on_critical = getattr(args, 'exit_on_critical', False)
+
+    if strict and (result.criticals or result.warnings):
+        sys.exit(1)
+    elif (args.quiet or exit_on_critical) and not result.passed:
+        sys.exit(1)
+
+    return result
 
 
 def _run_doctor(args):
@@ -170,23 +187,15 @@ def _run_doctor(args):
     import math
 
     issues = result.criticals + result.warnings
-    print(f"goodhart doctor: {model.name}")
-    print()
 
-    if not issues:
-        print("Diagnosis: no issues found. Configuration looks good.")
-        return
-
-    print(f"Diagnosis: {len(issues)} issue(s) found")
-    print()
-
-    # Collect suggested fixes
+    # Collect suggested fixes (shared by both text and JSON output)
     fixes = {}  # param_name -> (new_value, old_value, comment)
-    for i, v in enumerate(issues, 1):
-        print(f"  {i}. {v.message}")
+    issue_dicts = []  # for JSON output
+
+    for v in issues:
+        issue_entry = {"rule": v.rule_name, "message": v.message}
         if v.recommendation:
-            print(f"     Fix: {v.recommendation}")
-        print()
+            issue_entry["fix"] = v.recommendation
 
         # Derive parameter fixes from known rule patterns
         if v.rule_name == "penalty_dominates_goal":
@@ -248,9 +257,11 @@ def _run_doctor(args):
                 f"10x lower than actor lr",
             )
 
-    # Print suggested config
+        issue_dicts.append(issue_entry)
+
+    # Build suggested config dict
+    suggested_config = {}
     if fixes:
-        print("Suggested config:")
         params = {
             "goal": model.max_goal_reward,
             "penalty": model.total_step_penalty,
@@ -262,6 +273,42 @@ def _run_doctor(args):
             "routing_floor": config.routing_floor,
             "actors": config.n_actors,
         }
+        for key, val in params.items():
+            if key in fixes:
+                new_val, _, _ = fixes[key]
+                suggested_config[key] = new_val
+            else:
+                suggested_config[key] = val
+
+    # JSON output mode
+    if getattr(args, 'json', False):
+        diagnosis = "no issues found" if not issues else f"{len(issues)} issue(s) found"
+        output = {"diagnosis": diagnosis, "issues": issue_dicts}
+        if suggested_config:
+            output["suggested_config"] = suggested_config
+        print(json.dumps(output, indent=2))
+        return
+
+    # Text output mode
+    print(f"goodhart doctor: {model.name}")
+    print()
+
+    if not issues:
+        print("Diagnosis: no issues found. Configuration looks good.")
+        return
+
+    print(f"Diagnosis: {len(issues)} issue(s) found")
+    print()
+
+    for i, v in enumerate(issues, 1):
+        print(f"  {i}. {v.message}")
+        if v.recommendation:
+            print(f"     Fix: {v.recommendation}")
+        print()
+
+    # Print suggested config
+    if fixes:
+        print("Suggested config:")
         def _fmt(v):
             """Format values for human readability."""
             if isinstance(v, float):
@@ -270,6 +317,17 @@ def _run_doctor(args):
                 return f"{v:g}"
             return str(v)
 
+        params = {
+            "goal": model.max_goal_reward,
+            "penalty": model.total_step_penalty,
+            "steps": model.max_steps,
+            "lr": config.lr,
+            "critic_lr": config.critic_lr or config.lr,
+            "entropy": config.entropy_coeff,
+            "specialists": config.num_specialists,
+            "routing_floor": config.routing_floor,
+            "actors": config.n_actors,
+        }
         for key, val in params.items():
             if key in fixes:
                 new_val, old_val, comment = fixes[key]
@@ -350,7 +408,7 @@ def main():
             '\n'
             f'{RULE_COUNT} composable rules covering reward structure, training\n'
             'hyperparameters, architecture, and blind-spot advisories.\n'
-            'Validated against 58 examples from 40+ papers (1983-2025).\n'
+            'Validated against 212 encodings from 133 papers (1983-2025).\n'
             '\n'
             'Takes milliseconds. Catches structural reward traps before you spend compute.'
         ),
@@ -406,6 +464,9 @@ What it can't catch:
   - Adversarial action space attacks (tic-tac-toe crash)
   - Semantic specification errors (sorting by truncation)
   - Emergent multi-agent strategies
+
+Tab completion (bash):
+  eval "$(register-python-argcomplete goodhart)"
         """,
     )
 
@@ -413,6 +474,10 @@ What it can't catch:
                         version=f"goodhart {_get_version()}")
     parser.add_argument("--about", action="store_true",
                         help="Learn about Goodhart's Law and this tool")
+    parser.add_argument("--fields", action="store_true",
+                        help="List all RewardSource and EnvironmentModel fields")
+    parser.add_argument("--field", type=str, metavar="NAME",
+                        help="Explain a specific field (e.g. --field intentional), or --field all")
     parser.add_argument("--rules", action="store_true",
                         help="List all analysis rules")
     parser.add_argument("--examples", action="store_true",
@@ -432,7 +497,7 @@ What it can't catch:
                         help="Suppress output, just set exit code (0=pass, 1=critical)")
     parser.add_argument("--verbose", "-v", action="store_true",
                         help="Show extended explanations for each finding")
-    parser.add_argument("--json", action="store_true",
+    parser.add_argument("--json", "-j", action="store_true",
                         help="Output results as JSON")
 
     parser.add_argument("--goal", type=float, default=None,
@@ -465,6 +530,12 @@ What it can't catch:
                         help="Experiment name")
     parser.add_argument("--exit-on-critical", action="store_true",
                         help="Exit with code 1 if criticals found")
+    parser.add_argument("--strict", "-s", action="store_true",
+                        help="Treat warnings as errors (exit code 1 on warnings too)")
+    parser.add_argument("--ignore", type=str, metavar="RULES",
+                        help="Comma-separated rules to suppress (e.g. --ignore idle_exploit,reward_dominance_imbalance)")
+    parser.add_argument("--format", choices=["default", "compact"], default="default",
+                        help="Output format: 'compact' for one-line-per-finding (grep-friendly)")
     parser.add_argument("--viz", action="store_true",
                         help="Generate a reward landscape visualization")
     parser.add_argument("--ascii", action="store_true",
@@ -473,6 +544,116 @@ What it can't catch:
                         help="Auto-detect reward structure from a Gymnasium env")
 
     args = parser.parse_args()
+
+    # Field reference data (shared by --fields and --field)
+    _FIELD_REF = {
+        # RewardSource fields
+        "name": ("RewardSource", "str", "required",
+                 "A human-readable label for this reward component.",
+                 "Use something descriptive: 'forward_velocity', 'alive_bonus', 'collision_penalty'."),
+        "reward_type": ("RewardSource", "RewardType", "required",
+                        "When this reward is given: TERMINAL (end of episode), PER_STEP (every step), ON_EVENT (when something happens), or SHAPING (guidance toward goal).",
+                        "Terminal for goal completion. Per-step for tracking rewards and penalties. On-event for collectibles and triggers. Shaping for distance-decrease and checkpoint guidance."),
+        "value": ("RewardSource", "float", "required",
+                  "The magnitude of this reward. Positive = good, negative = penalty.",
+                  "Use the actual number from your reward function. The tool compares magnitudes across components to find dominance and imbalance."),
+        "intentional": ("RewardSource", "bool", "False",
+                        "Is this the actual goal, or is it there to help?",
+                        "Set True for the thing you want the agent to accomplish (forward velocity in locomotion, goal reaching in navigation). Set False for shaping, penalties, alive bonuses, and auxiliary signals. This one flag changes which rules fire: a passive +5/step marked intentional is a survival task. Marked non-intentional, it's an idle exploit."),
+        "requires_action": ("RewardSource", "bool", "True",
+                            "Does the agent need to DO something to earn this reward?",
+                            "Set False for alive bonuses, passive tracking, and anything earned by existing. Set True for velocity rewards, goal reaching, and anything requiring deliberate behavior. This determines the idle floor: passive rewards accumulate even when the agent does nothing."),
+        "can_loop": ("RewardSource", "bool", "False",
+                     "Can the agent harvest this reward repeatedly by cycling through states?",
+                     "Set True for shaping rewards where the agent can move toward a target then away then toward again (distance decrease, checkpoint crossing). Set False for terminal rewards, one-time events, and potential-based shaping (which nets to zero over cycles). Triggers shaping_loop_exploit."),
+        "respawn": ("RewardSource", "RespawnBehavior", "NONE",
+                    "What happens to this reward after it's collected?",
+                    "NONE = gone forever. TIMED = reappears after respawn_time steps. ON_DEATH = resets when the agent dies. ON_EPISODE = resets each episode. INFINITE = always available (per-step rewards). Respawning rewards can be farmed; the tool checks whether farming beats completing the task."),
+        "discovery_probability": ("RewardSource", "float", "1.0",
+                                  "How likely is a random agent to encounter this reward?",
+                                  "Set 1.0 for per-step rewards the agent always sees. Set low (0.001-0.05) for sparse goals that require deliberate exploration. Drives exploration threshold analysis."),
+        "state_dependent": ("RewardSource", "bool", "False",
+                            "Does the reward value change based on environment state?",
+                            "Set True for tracking rewards (-||error||^2), velocity rewards, and anything that varies with performance. Set False for fixed bonuses and constant penalties. Affects negative_only_reward severity."),
+        "explore_fraction": ("RewardSource", "float", "0.0",
+                             "What fraction of this reward does a random agent earn?",
+                             "Set 0.0 if random actions produce zero reward (precise tracking). Set 0.5 if random actions earn about half (stumbling forward). Used by idle_exploit to estimate whether exploration is net-positive."),
+        "respawn_time": ("RewardSource", "int", "0",
+                         "Steps until a TIMED reward respawns.",
+                         "Only used when respawn=TIMED. A respawn_time of 10 means the reward reappears 10 steps after collection."),
+        "max_occurrences": ("RewardSource", "int", "1",
+                            "Maximum times this reward can fire per episode (0 = unlimited).",
+                            "Set to the number of collectibles, enemies, or events. Set 0 for unlimited per-step rewards."),
+        "loop_period": ("RewardSource", "int", "0",
+                        "Steps per cycle when can_loop=True.",
+                        "How many steps it takes the agent to complete one loop (e.g., 2 for back-and-forth on an arrow tile)."),
+        # EnvironmentModel fields
+        "max_steps": ("EnvironmentModel", "int", "500",
+                      "Maximum episode length in steps.",
+                      "Affects discount horizon analysis and penalty accumulation. Longer episodes amplify per-step rewards relative to terminal rewards."),
+        "gamma": ("EnvironmentModel", "float", "0.99",
+                  "Discount factor.",
+                  "Lower values make the agent more myopic. At gamma=0.9, rewards 20 steps away are worth 12%. At gamma=0.99, they're worth 82%. At gamma=1.0, no discounting."),
+        "n_states": ("EnvironmentModel", "int", "1000",
+                     "Approximate state space size.",
+                     "Affects exploration analysis and capacity checks. Atari ~100K, MuJoCo ~100K, gridworld ~100-1000."),
+        "n_actions": ("EnvironmentModel", "int", "8",
+                      "Number of actions available.",
+                      "Atari: 18, continuous control: 2-30, gridworld: 4-8. Affects entropy and exploration analysis."),
+        "death_probability": ("EnvironmentModel", "float", "0.01",
+                              "Probability of episode termination per step from agent failure.",
+                              "High values make death-beats-survival traps more likely. Set 0.0 for environments where the agent cannot die."),
+    }
+
+    if getattr(args, 'fields', False):
+        from goodhart.fmt import header, rule_list_item, category_header, DIM_COLOR, RESET
+        header("Fields Reference")
+        print()
+        for section_name in ["RewardSource", "EnvironmentModel"]:
+            category_header(section_name)
+            for fname, (owner, ftype, default, short, _) in _FIELD_REF.items():
+                if owner == section_name:
+                    rule_list_item(fname, f"{short} {DIM_COLOR}[{ftype}, default={default}]{RESET}")
+            print()
+        print(f"  {DIM_COLOR}Use --field <name> for details (e.g., --field intentional){RESET}")
+        print(f"  {DIM_COLOR}Use --field all for the complete reference{RESET}")
+        print()
+        return
+
+    if getattr(args, 'field', None):
+        from goodhart.fmt import (header, explain_header, explain_section,
+                                  DIM_COLOR, RESET, HEADER_COLOR)
+        field_name = args.field
+
+        if field_name == "all":
+            header("Complete Field Reference")
+            for section_name in ["RewardSource", "EnvironmentModel"]:
+                print()
+                print(f"  {HEADER_COLOR}{section_name}{RESET}")
+                print()
+                for fname, (owner, ftype, default, short, detail) in _FIELD_REF.items():
+                    if owner == section_name:
+                        explain_header(fname, short)
+                        explain_section("Type", f"{ftype}, default={default}")
+                        explain_section("Details", detail)
+                        print()
+            return
+
+        if field_name not in _FIELD_REF:
+            print(f"  Unknown field: {field_name}")
+            print()
+            print(f"  Available fields:")
+            for fname, (owner, _, _, short, _) in _FIELD_REF.items():
+                print(f"    {fname:25s} ({owner})")
+            return
+
+        owner, ftype, default, short, detail = _FIELD_REF[field_name]
+        explain_header(field_name, short)
+        explain_section("Type", f"{ftype}, default={default}")
+        explain_section("Owner", owner)
+        explain_section("Details", detail)
+        print()
+        return
 
     if args.rules:
         from goodhart.fmt import header, category_header, rule_list_item, DIM_COLOR, RESET
@@ -611,7 +792,7 @@ What it can't catch:
             rule_list_item(name, doc, width=35)
 
         print()
-        print(f"  {DIM_COLOR}{len(examples)} examples from 40+ published papers (1983-2025){RESET}")
+        print(f"  {DIM_COLOR}{len(examples)} examples from published papers (1983-2025){RESET}")
         print(f"  {DIM_COLOR}Includes failures, positive patterns, and limitation cases.{RESET}")
         print()
         return
@@ -692,8 +873,8 @@ What it can't catch:
         print(f"  This tool catches the mathematical signatures of these failures")
         print(f"  from your configuration alone — before you spend compute.")
         print()
-        print(f"  {HEADER_COLOR}{RULE_COUNT} rules{RESET} tested against 57 examples from 40+ papers (1983-2025)")
-        print(f"  {HEADER_COLOR}17 rules{RESET} linked to LEAN 4 proofs (91 theorems, zero sorry)")
+        print(f"  {HEADER_COLOR}{RULE_COUNT} rules{RESET} tested against 212 encodings from 133 papers (1983-2025)")
+        print(f"  {HEADER_COLOR}24 rules{RESET} linked to LEAN 4 proofs (105 theorems, zero sorry)")
         print()
         print(f"  {DIM_COLOR}Cannot catch: physics exploits, goal misgeneralization,")
         print(f"  learned-reward gaming, missing reward terms. When config patterns")
@@ -731,25 +912,17 @@ What it can't catch:
             interactive()
         # quiet/json with no args: nothing to do
     else:
-        passed = preflight_check(
-            goal=args.goal or 0.0,
-            penalty=args.penalty or 0.0,
+        model, config = _build_model_and_config(
+            goal=args.goal or 0.0, penalty=args.penalty or 0.0,
             max_steps=args.steps or 500,
-            discovery_prob=args.discovery,
-            n_actors=args.actors,
-            total_steps=args.budget,
-            gamma=args.gamma,
-            lr=args.lr,
-            critic_lr=args.critic_lr,
-            entropy=args.entropy,
+            discovery_prob=args.discovery, n_actors=args.actors,
+            total_steps=args.budget, lr=args.lr,
+            critic_lr=args.critic_lr, entropy=args.entropy,
             n_specialists=args.specialists,
-            routing_floor=args.floor,
-            n_states=args.states,
-            name=args.name,
-            quiet=args.quiet,
-            json_output=args.json,
-            exit_on_critical=args.exit_on_critical,
+            routing_floor=args.floor, n_states=args.states,
+            gamma=args.gamma, name=args.name,
         )
+        _output_analysis(model, config, args)
 
         if args.viz or args.ascii:
             model, config = _build_model_and_config(
@@ -775,8 +948,7 @@ What it can't catch:
                     print(f"\n{e}")
                     sys.exit(1)
 
-        if args.quiet and not passed:
-            sys.exit(1)
+        # Exit code handled by _output_analysis
 
 
 if __name__ == "__main__":

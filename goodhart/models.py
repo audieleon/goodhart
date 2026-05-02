@@ -39,18 +39,64 @@ class RespawnBehavior(Enum):
 class RewardSource:
     """A single source of reward in the environment.
 
-    Fields are grouped by concern:
-    - Core: name, reward_type, value, respawn, respawn_time
-    - Availability: max_occurrences, requires_action, requires_exploration,
-      discovery_probability
-    - Looping: can_loop, loop_period, intentional
-    - Value modeling: value_range, value_type, value_params, state_dependent,
-      scales_with
-    - Staged rewards: prerequisite
-    - Cross-reward: modifies, modifier_type
-    - Exploration: explore_fraction
+    Quick reference for the flags that matter most:
 
-    If field count grows past ~25, consider splitting into sub-dataclasses.
+    intentional (bool, default False):
+        Is this reward component the actual goal? Set True for the thing
+        you want the agent to accomplish (forward velocity in locomotion,
+        goal reaching in navigation). Set False for shaping, penalties,
+        alive bonuses, and auxiliary signals. This flag changes which
+        rules fire: a passive +5/step marked intentional is a survival
+        task; marked non-intentional, it's an idle exploit.
+
+    requires_action (bool, default True):
+        Does the agent need to DO something to earn this reward? Set False
+        for alive bonuses, passive tracking, and anything earned by
+        existing. Set True for velocity rewards, goal reaching, and
+        anything requiring deliberate behavior. This flag determines the
+        idle floor: passive rewards accumulate even when the agent does
+        nothing.
+
+    can_loop (bool, default False):
+        Can the agent harvest this reward repeatedly by cycling through
+        states? Set True for shaping rewards where the agent can move
+        toward a target then away then toward again (distance decrease,
+        checkpoint crossing). Set False for terminal rewards, one-time
+        events, and potential-based shaping (which nets to zero over
+        cycles). This flag triggers shaping_loop_exploit.
+
+    respawn (RespawnBehavior, default NONE):
+        What happens to this reward after it's collected? NONE = gone
+        forever. TIMED = reappears after respawn_time steps. ON_DEATH =
+        resets when the agent dies. ON_EPISODE = resets each episode.
+        INFINITE = always available (per-step rewards). Respawning
+        rewards can be farmed; the tool checks whether farming them
+        beats completing the actual task.
+
+    discovery_probability (float, default 1.0):
+        How likely is a random agent to encounter this reward in an
+        episode? Set 1.0 for per-step rewards the agent always sees.
+        Set low (0.001-0.05) for sparse goals that require deliberate
+        exploration to find. Drives exploration threshold analysis.
+
+    state_dependent (bool, default False):
+        Does the reward value change based on the environment state?
+        Set True for tracking rewards (-||error||^2), velocity rewards,
+        and anything that varies with how well the agent is doing.
+        Set False for fixed bonuses (+1/step alive) and constant
+        penalties. Affects negative_only_reward severity: constant
+        negative is worse than state-dependent negative.
+
+    explore_fraction (float, default 0.0):
+        What fraction of this reward does a random agent earn? Set 0.0
+        if random actions produce zero reward (e.g., precise velocity
+        tracking). Set 0.5 if random actions earn about half (e.g.,
+        a walking agent that sometimes stumbles forward). Used by
+        idle_exploit to estimate whether exploration is net-positive.
+
+    Other fields (value_range, value_type, value_params, scales_with,
+    prerequisite, modifies, modifier_type) model advanced reward
+    structures. See inline comments below for details.
     """
     name: str
     reward_type: RewardType
@@ -145,12 +191,35 @@ class RewardSource:
 class EnvironmentModel:
     """Formal description of an MDP's reward dynamics.
 
-    This is the shared space all rules operate on. It captures:
-    - Reward sources and their dynamics (respawning, looping, etc.)
-    - State space structure (terminal states, absorbing states)
-    - Transition properties (death probability, wall probability)
-    - Episode structure (max steps, discount)
-    - Training context (actor count, total budget)
+    You don't need to model the full MDP — just the reward structure
+    and enough environment context for the rules to reason about it.
+
+    name (str): A human-readable label for the environment.
+
+    max_steps (int, default 500): Maximum episode length in steps.
+        Affects discount horizon analysis and penalty accumulation.
+
+    gamma (float, default 0.99): Discount factor. Lower values make
+        the agent more myopic. At gamma=0.9, rewards 20 steps away
+        are worth 12% of immediate rewards. At gamma=0.99, they're
+        worth 82%.
+
+    n_states (int, default 1000): Approximate state space size.
+        Affects exploration analysis and capacity checks.
+
+    n_actions (int, default 8): Number of actions available.
+        Continuous control typically has fewer actions but each is
+        a vector. Affects entropy and exploration analysis.
+
+    action_type (str, default "auto"): "discrete" for Atari/gridworld,
+        "continuous" for robotics/control, "auto" to infer from context.
+
+    death_probability (float, default 0.01): Probability of episode
+        termination per step from agent failure. High values make
+        death-beats-survival traps more likely.
+
+    wall_probability (float, default 0.3): Probability that an action
+        has no effect (hitting a wall). Affects exploration analysis.
     """
     name: str
 

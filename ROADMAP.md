@@ -2,12 +2,12 @@
 
 ## Current (v0.1.0)
 
-44 composable rules, 23 presets, 66 examples, 103 LEAN 4 theorems (zero sorry), `@reward_function` decorator, CLI, Python API, MCP server.
+44 composable rules, 212 reward encodings from 133 papers, 105 LEAN 4 theorems (zero sorry), `@reward_function` decorator, CLI, Python API, MCP server.
 
 ## Next
 
 ### Web interface
-Zero-install trial at goodhart.dev. Paste a YAML config or use a preset, get instant analysis with ProofStrength badges. Shareable URLs for team review.
+Zero-install trial at goodhart.dev. Paste a YAML config or pick an example, get instant analysis with ProofStrength badges. Shareable URLs for team review.
 
 ### LLM reward generation filter
 Pre-screen LLM-generated reward candidates (Eureka, CARD) in milliseconds. Reject structurally doomed candidates before training. Highest-leverage use case for the tool.
