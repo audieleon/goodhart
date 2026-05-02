@@ -2,12 +2,15 @@
 # viz_gauntlet.sh — run the reward landscape viz on all 66 built-in
 # examples and verify every one produces sane output.
 #
-# Usage: ./scripts/viz_gauntlet.sh
+# Usage: ./scripts/viz_gauntlet.sh           # summary only
+#        ./scripts/viz_gauntlet.sh --show    # show each chart
 #
 # Exit code 0 = all pass, 1 = failures found
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
+
+SHOW_VIZ="${1:-}"
 
 PASS=0
 FAIL=0
@@ -20,14 +23,17 @@ echo "  Testing all $(ls goodhart/examples/*.py | grep -v __init__ | wc -l | tr 
 echo "═══════════════════════════════════════════════════════"
 echo
 
-python3 << 'PYEOF'
+python3 -c "SHOW_VIZ='$SHOW_VIZ'" -c "" 2>/dev/null  # pass env
+SHOW_VIZ="$SHOW_VIZ" python3 << 'PYEOF'
 import importlib.util, os, sys, json
 from io import StringIO
 from goodhart.engine import TrainingAnalysisEngine, AnalysisEngine
 from goodhart.viz import reward_landscape_ascii, _compute_strategy_evs
 
+show_viz = os.environ.get("SHOW_VIZ") == "--show"
 examples_dir = "goodhart/examples"
 results = []
+viz_outputs = []
 
 for f in sorted(os.listdir(examples_dir)):
     if not f.endswith('.py') or f == '__init__.py':
@@ -129,15 +135,14 @@ for f in sorted(os.listdir(examples_dir)):
 
     status = "PASS"
     note = ""
-    if loop_flagged and not viz_says_loop and "loop" in evs:
-        note = f" (loop flagged by rules but viz winner is '{winner}')"
-        status = "WARN"
 
     results.append({
         "id": pid, "status": status, "winner": winner or "(all equal)",
         "strategies": len(evs), "criticals": len(analysis.criticals),
         "reason": note
     })
+    if show_viz:
+        viz_outputs.append((pid, output))
 
 # Print results
 passes = [r for r in results if r["status"] == "PASS"]
@@ -172,5 +177,16 @@ if fails:
     print("FAILURES:")
     for r in fails:
         print(f"  {r['id']}: {r['reason']}")
+
+if show_viz:
+    print()
+    for pid, output in viz_outputs:
+        print(f"{'─' * 60}")
+        print(f"  {pid}")
+        print(f"{'─' * 60}")
+        print(output)
+        print()
+
+if fails:
     sys.exit(1)
 PYEOF
