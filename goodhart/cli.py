@@ -873,8 +873,11 @@ Tab completion (bash):
         print(f"  This tool catches the mathematical signatures of these failures")
         print(f"  from your configuration alone — before you spend compute.")
         print()
+        # Dataset counts updated at release (too slow to compute from JSONL)
+        proved = sum(1 for r in TrainingAnalysisEngine().add_all_rules().rules
+                     if hasattr(r, 'proof') and r.proof and r.proof.strength)
         print(f"  {HEADER_COLOR}{RULE_COUNT} rules{RESET} tested against 212 encodings from 133 papers (1983-2025)")
-        print(f"  {HEADER_COLOR}24 rules{RESET} linked to LEAN 4 proofs (105 theorems, zero sorry)")
+        print(f"  {HEADER_COLOR}{proved} rules{RESET} linked to LEAN 4 proofs (105 theorems, zero sorry)")
         print()
         print(f"  {DIM_COLOR}Cannot catch: physics exploits, goal misgeneralization,")
         print(f"  learned-reward gaming, missing reward terms. When config patterns")
@@ -901,7 +904,17 @@ Tab completion (bash):
         return
 
     if args.config:
-        cfg = _load_config_file(args.config)
+        try:
+            cfg = _load_config_file(args.config)
+        except FileNotFoundError:
+            print(f"Error: config file not found: {args.config}", file=sys.stderr)
+            sys.exit(1)
+        except (ValueError, Exception) as e:
+            print(f"Error loading config: {e}", file=sys.stderr)
+            sys.exit(1)
+        if not cfg:
+            print("Error: config file is empty", file=sys.stderr)
+            sys.exit(1)
         model, config = _build_from_config_dict(cfg, fallback_name=args.config)
         _output_analysis(model, config, args)
         return
