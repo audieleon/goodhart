@@ -446,7 +446,7 @@ What it can't catch:
                         help="Suppress output, just set exit code (0=pass, 1=critical)")
     parser.add_argument("--verbose", "-v", action="store_true",
                         help="Show extended explanations for each finding")
-    parser.add_argument("--json", action="store_true",
+    parser.add_argument("--json", "-j", action="store_true",
                         help="Output results as JSON")
 
     parser.add_argument("--goal", type=float, default=None,
@@ -479,7 +479,7 @@ What it can't catch:
                         help="Experiment name")
     parser.add_argument("--exit-on-critical", action="store_true",
                         help="Exit with code 1 if criticals found")
-    parser.add_argument("--strict", action="store_true",
+    parser.add_argument("--strict", "-s", action="store_true",
                         help="Treat warnings as errors (exit code 1 on warnings too)")
     parser.add_argument("--ignore", type=str, metavar="RULES",
                         help="Comma-separated rules to suppress (e.g. --ignore idle_exploit,reward_dominance_imbalance)")
