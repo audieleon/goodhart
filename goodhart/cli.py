@@ -133,12 +133,19 @@ def _output_analysis(model, config, args):
         ignored = {r.strip() for r in args.ignore.split(',')}
         engine.rules = [r for r in engine.rules if r.name not in ignored]
 
+    output_format = getattr(args, 'format', 'default')
+
     if args.json:
         result = engine.analyze(model, config)
         verbose = getattr(args, 'verbose', False)
         print(json.dumps(result.to_dict(verbose=verbose), indent=2))
     elif args.quiet:
         result = engine.analyze(model, config)
+    elif output_format == 'compact':
+        result = engine.analyze(model, config)
+        for v in result.verdicts:
+            severity = v.severity.value.upper()
+            print(f"{severity}:{v.rule_name}: {v.message}")
     else:
         verbose = getattr(args, 'verbose', False)
         result = engine.print_report(model, config, verbose=verbose)
@@ -180,23 +187,15 @@ def _run_doctor(args):
     import math
 
     issues = result.criticals + result.warnings
-    print(f"goodhart doctor: {model.name}")
-    print()
 
-    if not issues:
-        print("Diagnosis: no issues found. Configuration looks good.")
-        return
-
-    print(f"Diagnosis: {len(issues)} issue(s) found")
-    print()
-
-    # Collect suggested fixes
+    # Collect suggested fixes (shared by both text and JSON output)
     fixes = {}  # param_name -> (new_value, old_value, comment)
-    for i, v in enumerate(issues, 1):
-        print(f"  {i}. {v.message}")
+    issue_dicts = []  # for JSON output
+
+    for v in issues:
+        issue_entry = {"rule": v.rule_name, "message": v.message}
         if v.recommendation:
-            print(f"     Fix: {v.recommendation}")
-        print()
+            issue_entry["fix"] = v.recommendation
 
         # Derive parameter fixes from known rule patterns
         if v.rule_name == "penalty_dominates_goal":
@@ -258,9 +257,11 @@ def _run_doctor(args):
                 f"10x lower than actor lr",
             )
 
-    # Print suggested config
+        issue_dicts.append(issue_entry)
+
+    # Build suggested config dict
+    suggested_config = {}
     if fixes:
-        print("Suggested config:")
         params = {
             "goal": model.max_goal_reward,
             "penalty": model.total_step_penalty,
@@ -272,6 +273,42 @@ def _run_doctor(args):
             "routing_floor": config.routing_floor,
             "actors": config.n_actors,
         }
+        for key, val in params.items():
+            if key in fixes:
+                new_val, _, _ = fixes[key]
+                suggested_config[key] = new_val
+            else:
+                suggested_config[key] = val
+
+    # JSON output mode
+    if getattr(args, 'json', False):
+        diagnosis = "no issues found" if not issues else f"{len(issues)} issue(s) found"
+        output = {"diagnosis": diagnosis, "issues": issue_dicts}
+        if suggested_config:
+            output["suggested_config"] = suggested_config
+        print(json.dumps(output, indent=2))
+        return
+
+    # Text output mode
+    print(f"goodhart doctor: {model.name}")
+    print()
+
+    if not issues:
+        print("Diagnosis: no issues found. Configuration looks good.")
+        return
+
+    print(f"Diagnosis: {len(issues)} issue(s) found")
+    print()
+
+    for i, v in enumerate(issues, 1):
+        print(f"  {i}. {v.message}")
+        if v.recommendation:
+            print(f"     Fix: {v.recommendation}")
+        print()
+
+    # Print suggested config
+    if fixes:
+        print("Suggested config:")
         def _fmt(v):
             """Format values for human readability."""
             if isinstance(v, float):
@@ -280,6 +317,17 @@ def _run_doctor(args):
                 return f"{v:g}"
             return str(v)
 
+        params = {
+            "goal": model.max_goal_reward,
+            "penalty": model.total_step_penalty,
+            "steps": model.max_steps,
+            "lr": config.lr,
+            "critic_lr": config.critic_lr or config.lr,
+            "entropy": config.entropy_coeff,
+            "specialists": config.num_specialists,
+            "routing_floor": config.routing_floor,
+            "actors": config.n_actors,
+        }
         for key, val in params.items():
             if key in fixes:
                 new_val, old_val, comment = fixes[key]
@@ -416,6 +464,9 @@ What it can't catch:
   - Adversarial action space attacks (tic-tac-toe crash)
   - Semantic specification errors (sorting by truncation)
   - Emergent multi-agent strategies
+
+Tab completion (bash):
+  eval "$(register-python-argcomplete goodhart)"
         """,
     )
 
@@ -483,6 +534,8 @@ What it can't catch:
                         help="Treat warnings as errors (exit code 1 on warnings too)")
     parser.add_argument("--ignore", type=str, metavar="RULES",
                         help="Comma-separated rules to suppress (e.g. --ignore idle_exploit,reward_dominance_imbalance)")
+    parser.add_argument("--format", choices=["default", "compact"], default="default",
+                        help="Output format: 'compact' for one-line-per-finding (grep-friendly)")
     parser.add_argument("--viz", action="store_true",
                         help="Generate a reward landscape visualization")
     parser.add_argument("--ascii", action="store_true",
