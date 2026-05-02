@@ -223,7 +223,7 @@ Reward structure rules (19) are algorithm-agnostic — they analyze the MDP rewa
 
 ## Examples
 
-66 cookbook examples spanning 40+ published papers from 1983-2025:
+66 built-in examples from published papers (1983-2025), plus the [Reward Failure Dataset](https://huggingface.co/datasets/audieleon/reward-failure-dataset) with 212 entries from 133 papers:
 
 ```bash
 goodhart --examples              # list all
