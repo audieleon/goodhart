@@ -294,7 +294,7 @@ def reward_landscape_ascii(model: EnvironmentModel,
                     term_width = os.get_terminal_size().columns
                 except (AttributeError, ValueError, OSError):
                     term_width = 80
-                max_width = max(40, term_width - len(indent) - 2)
+                max_width = max(40, min(term_width, 80) - len(indent) - 2)
                 words = detail.split()
                 wrapped_lines = []
                 current = ""
