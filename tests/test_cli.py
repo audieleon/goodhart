@@ -65,7 +65,8 @@ def test_cli_version_import():
         capture_output=True, text=True, cwd=GOODHART_DIR,
     )
     assert result.returncode == 0
-    assert "0.1.0" in result.stdout
+    from goodhart import __version__
+    assert __version__ in result.stdout
 
 
 def test_cli_quiet_pass():
