@@ -286,11 +286,15 @@ def reward_landscape_ascii(model: EnvironmentModel,
 
                 lines.append(
                     f"  {color_v}{icon} [{label}] {v.rule_name}{RESET}")
-                # Wrap recommendation/message to fit with indent
+                # Wrap recommendation/message to fit terminal
                 detail = v.recommendation or v.message
                 detail = detail.replace('\n', ' ').strip()
                 indent = "    "
-                max_width = 68
+                try:
+                    term_width = os.get_terminal_size().columns
+                except (AttributeError, ValueError, OSError):
+                    term_width = 80
+                max_width = max(40, term_width - len(indent) - 2)
                 words = detail.split()
                 wrapped_lines = []
                 current = ""
