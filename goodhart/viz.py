@@ -25,55 +25,91 @@ def _compute_strategy_evs(model: EnvironmentModel) -> Dict[str, float]:
     """Compute expected value for canonical agent strategies.
 
     Returns a dict mapping strategy name to expected total episode return.
-    Uses discounted EVs consistent with the analysis rules.
+    Accounts for all reward sources: passive per-step, active per-step,
+    terminal, on-event, and shaping rewards.
     """
-    step_penalty = model.total_step_penalty  # negative or zero
-    goal_reward = model.max_goal_reward      # positive or zero
     gamma = model.gamma
+    T = model.max_steps
 
-    # Goal discovery probability (use first goal source, or 0)
-    goal_sources = model.goal_sources
-    disc_prob = goal_sources[0].discovery_probability if goal_sources else 0.0
+    # Classify reward sources
+    passive_perstep = 0.0  # earned by doing nothing (alive bonus)
+    active_perstep = 0.0   # earned by acting (velocity, tracking)
+    penalties = 0.0         # per-step costs (ctrl_cost, etc.)
+    goal_reward = 0.0       # terminal/on-event goal rewards
+    loop_reward = 0.0       # respawning/loopable rewards per step
+    disc_prob = 0.0         # best goal discovery probability
+
+    for s in model.reward_sources:
+        if s.reward_type.name in ("TERMINAL", "ON_EVENT"):
+            if s.value > 0:
+                goal_reward += s.value
+                disc_prob = max(disc_prob, s.discovery_probability)
+        elif s.reward_type.name in ("PER_STEP", "SHAPING"):
+            if not s.requires_action and s.value > 0:
+                passive_perstep += s.value
+            elif s.requires_action and s.intentional and s.value > 0:
+                active_perstep += s.value
+            elif s.value < 0:
+                penalties += s.value  # negative
+
+        # Loopable rewards (any type)
+        if s.can_loop and s.value > 0:
+            if s.reward_type.name in ("ON_EVENT", "SHAPING"):
+                # Estimate per-step equivalent from loop period
+                period = max(1, s.loop_period) if s.loop_period > 0 else 5
+                loop_reward += s.value / period
+            elif s.reward_type.name == "PER_STEP":
+                loop_reward += s.value
+
+    disc_full = _discounted_steps(gamma, T)
+    avg_discovery = max(1, T // 2)
+    gamma_disc_goal = gamma ** avg_discovery if gamma < 1.0 else 1.0
 
     strategies = {}
 
-    # 1. Die fast -- agent terminates as quickly as possible (1 step)
-    strategies["die_fast"] = step_penalty * _discounted_steps(gamma, 1)
+    # 1. Die immediately -- 1 step of everything, then done
+    disc_1 = _discounted_steps(gamma, 1)
+    strategies["die_fast"] = (passive_perstep + penalties) * disc_1
 
-    # 2. Stand still -- agent does nothing, accumulates step penalty
-    #    but never reaches goal. Survives full episode.
-    disc_full = _discounted_steps(gamma, model.max_steps)
-    strategies["stand_still"] = step_penalty * disc_full
+    # 2. Stand still -- collect passive rewards, pay no action costs,
+    #    never reach goal. Full episode.
+    strategies["stand_still"] = passive_perstep * disc_full + penalties * disc_full
 
-    # 3. Explore (random) -- agent explores randomly
-    #    Has discovery_probability chance of finding goal, pays full penalty
-    avg_discovery = max(1, model.max_steps // 2)
-    gamma_disc_goal = gamma ** avg_discovery if gamma < 1.0 else 1.0
+    # 3. Random exploration -- random walk, might find goal
     strategies["explore_random"] = (
-        step_penalty * disc_full + disc_prob * goal_reward * gamma_disc_goal
+        (passive_perstep + penalties) * disc_full
+        + disc_prob * goal_reward * gamma_disc_goal
     )
 
-    # 4. Explore (full) -- agent explores exhaustively
-    #    Assumes goal IS found at avg_steps/2
+    # 4. Full exploration -- explore exhaustively, find goal at T/2
     disc_half = _discounted_steps(gamma, avg_discovery)
     strategies["explore_full"] = (
-        step_penalty * disc_half + goal_reward * gamma_disc_goal
+        (passive_perstep + active_perstep * 0.3 + penalties) * disc_half
+        + goal_reward * gamma_disc_goal
     )
 
-    # 5. Optimal -- agent reaches goal efficiently (~30% of max_steps)
-    optimal_steps = max(1, int(model.max_steps * 0.3))
+    # 5. Solve the task -- reach goal efficiently (~30% of T),
+    #    earn active rewards along the way
+    optimal_steps = max(1, int(T * 0.3))
     disc_opt = _discounted_steps(gamma, optimal_steps)
     gamma_disc_opt = gamma ** optimal_steps if gamma < 1.0 else 1.0
     strategies["optimal"] = (
-        step_penalty * disc_opt + goal_reward * gamma_disc_opt
+        (passive_perstep + active_perstep + penalties) * disc_opt
+        + goal_reward * gamma_disc_opt
     )
+
+    # 6. Loop exploit -- if loopable rewards exist, farm them
+    if loop_reward > 0:
+        strategies["loop"] = (
+            (passive_perstep + loop_reward + penalties) * disc_full
+        )
 
     return strategies
 
 
 def _classify_strategy(name: str) -> str:
     """Return color class for a strategy: 'red', 'yellow', or 'green'."""
-    if name in ("die_fast", "stand_still"):
+    if name in ("die_fast", "stand_still", "loop"):
         return "red"
     elif name in ("explore_random", "explore_full"):
         return "yellow"
@@ -121,6 +157,7 @@ def reward_landscape_ascii(model: EnvironmentModel,
         "explore_random": ("Random exploration", "random walk, might find the goal"),
         "explore_full": ("Full exploration", "explore exhaustively, find the goal"),
         "optimal": ("Solve the task", "reach the goal efficiently"),
+        "loop": ("Farm loop", "cycle through respawning rewards forever"),
     }
 
     # Bar rendering
@@ -183,6 +220,8 @@ def reward_landscape_ascii(model: EnvironmentModel,
             lines.append(f"  {DIM}Fix: reduce step penalty or add a survival bonus{RESET}")
         elif winner_name == "stand_still":
             lines.append(f"  {DIM}Fix: reduce passive rewards or increase active reward{RESET}")
+        elif winner_name == "loop":
+            lines.append(f"  {DIM}Fix: make loopable rewards non-cyclable or add a terminal goal that dominates{RESET}")
     elif winner_class == "yellow":
         lines.append(f"  {YELLOW}{BOLD}Caution:{RESET} {YELLOW}Exploration may "
                      f"outperform the intended strategy.{RESET}")
@@ -191,18 +230,6 @@ def reward_landscape_ascii(model: EnvironmentModel,
     else:
         lines.append(f"  {GREEN}{BOLD}Good:{RESET} {GREEN}Solving the task has "
                      f"the highest expected value.{RESET}")
-
-    # Note if model has per-step rewards beyond simple penalty
-    passive_sources = [s for s in model.reward_sources
-                       if s.reward_type.name == "PER_STEP" and not s.requires_action
-                       and s.value > 0]
-    active_perstep = [s for s in model.reward_sources
-                      if s.reward_type.name == "PER_STEP" and s.intentional]
-    if passive_sources or active_perstep:
-        names = [s.name for s in passive_sources + active_perstep]
-        lines.append(f"  {DIM}Note: this chart shows goal vs penalty tradeoffs.")
-        lines.append(f"  Per-step rewards ({', '.join(names)}) are analyzed")
-        lines.append(f"  by the rule engine above, not this chart.{RESET}")
 
     lines.append("")
     return "\n".join(lines)
