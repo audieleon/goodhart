@@ -267,7 +267,7 @@ def reward_landscape_ascii(model: EnvironmentModel,
     # Show rule engine findings if available
     if result and result.verdicts:
         from goodhart.models import Severity
-        # Group by severity, skip rules already reflected in the chart
+        # Skip rules already reflected in the chart
         chart_rules = {"idle_exploit", "death_beats_survival",
                        "respawning_exploit", "compound_trap"}
         other_verdicts = [v for v in result.verdicts
@@ -275,25 +275,25 @@ def reward_landscape_ascii(model: EnvironmentModel,
 
         if other_verdicts:
             lines.append(f"  {DIM}{'─' * 55}{RESET}")
+            lines.append(f"  {BOLD}Also found:{RESET}")
             for v in other_verdicts:
                 if v.severity == Severity.CRITICAL:
-                    icon, color_v = "✗", RED
+                    icon, color_v, label = "✗", RED, "CRITICAL"
                 elif v.severity == Severity.WARNING:
-                    icon, color_v = "!", YELLOW
+                    icon, color_v, label = "!", YELLOW, "warning"
                 else:
-                    icon, color_v = "·", DIM
+                    icon, color_v, label = "·", DIM, "advisory"
 
-                # Truncate message to one readable line
-                msg = v.message.replace('\n', ' ')
-                if len(msg) > 70:
-                    # Cut at last space before 70 chars
-                    cut = msg[:70].rfind(' ')
-                    if cut > 30:
-                        msg = msg[:cut] + "..."
-                    else:
-                        msg = msg[:67] + "..."
                 lines.append(
-                    f"  {color_v}{icon} {v.rule_name}: {msg}{RESET}")
+                    f"  {color_v}{icon} [{label}] {v.rule_name}{RESET}")
+                # Show recommendation if available, otherwise message
+                detail = v.recommendation or v.message
+                detail = detail.replace('\n', ' ').strip()
+                if len(detail) > 72:
+                    cut = detail[:72].rfind(' ')
+                    detail = detail[:cut] + "..." if cut > 30 else detail[:69] + "..."
+                lines.append(
+                    f"    {DIM}{detail}{RESET}")
             lines.append("")
 
     lines.append("")
