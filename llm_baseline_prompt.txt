@@ -1,0 +1,194 @@
+I'm going to show you 20 reinforcement learning reward function configurations. For each one, analyze the reward structure and identify any structural traps — cases where the mathematical structure of the reward guarantees or strongly incentivizes degenerate behavior (standing still, dying immediately, cycling through states, ignoring the goal, etc.).
+
+For each configuration, respond with one of:
+- FAIL: You identify a structural trap that would likely cause degenerate behavior
+- WARN: You see a structural concern that could cause problems depending on dynamics
+- INFO: Something worth noting but not necessarily a problem
+- PASS: The reward structure looks sound
+
+Give a brief explanation for each verdict (1-2 sentences).
+
+Here are the 20 configurations:
+
+## taxi_penalty
+Environment: Taxi-v3
+max_steps=200, gamma=0.99, death_probability=0.0
+n_states=500, n_actions=6, action_type=auto
+Reward sources:
+  - step_penalty: PER_STEP, value=-1.0 [requires_action, shaping/auxiliary]
+  - dropoff_success: TERMINAL, value=20.0 [requires_action, shaping/auxiliary]
+  - illegal_action: ON_EVENT, value=-10.0 [requires_action, shaping/auxiliary]
+
+## dmc_dog
+Environment: DM Control Dog (run)
+max_steps=1000, gamma=0.99, death_probability=0.0
+n_states=200000, n_actions=38, action_type=auto
+Reward sources:
+  - velocity_tracking: PER_STEP, value=1.0 [requires_action, THIS IS THE GOAL, state_dependent]
+  - upright_bonus: PER_STEP, value=0.1 [passive, shaping/auxiliary, state_dependent]
+  - posture_reward: PER_STEP, value=0.1 [passive, shaping/auxiliary, state_dependent]
+  - joint_limit_penalty: PER_STEP, value=-0.05 [requires_action, shaping/auxiliary, state_dependent]
+  - torque_penalty: PER_STEP, value=-0.001 [requires_action, shaping/auxiliary]
+  - foot_contact: PER_STEP, value=0.05 [passive, shaping/auxiliary]
+
+## choppercommand_rnd
+Environment: ChopperCommand RND
+max_steps=18000, gamma=0.99, death_probability=0.05
+n_states=1000, n_actions=18, action_type=discrete
+Reward sources:
+  - score: ON_EVENT, value=100.0 [requires_action, THIS IS THE GOAL]
+  - rnd_bonus: PER_STEP, value=0.005 [requires_action, shaping/auxiliary, respawn=INFINITE]
+
+## humanoid_idle
+Environment: Humanoid-v4
+max_steps=1000, gamma=0.99, death_probability=0.03
+n_states=100000, n_actions=17, action_type=continuous
+Reward sources:
+  - healthy_reward: PER_STEP, value=5.0 [passive, shaping/auxiliary, respawn=INFINITE]
+  - forward_velocity: PER_STEP, value=1.25 [requires_action, THIS IS THE GOAL, state_dependent]
+  - ctrl_cost: PER_STEP, value=-0.1 [requires_action, shaping/auxiliary]
+  - contact_cost: PER_STEP, value=-5e-07 [passive, shaping/auxiliary]
+
+## montezuma_credit
+Environment: Montezuma's Revenge
+max_steps=18000, gamma=0.99, death_probability=0.1
+n_states=1000000, n_actions=18, action_type=auto
+Reward sources:
+  - item_pickup: ON_EVENT, value=100.0 [requires_action, shaping/auxiliary]
+  - room_complete: ON_EVENT, value=300.0 [requires_action, shaping/auxiliary]
+
+## minigrid_noisy_tv
+Environment: MiniGrid 6-Room + Noisy TV
+max_steps=500, gamma=0.99, death_probability=0.0
+n_states=1000, n_actions=7, action_type=discrete
+Reward sources:
+  - room_goal: TERMINAL, value=1.0 [requires_action, THIS IS THE GOAL]
+  - mse_curiosity: PER_STEP, value=0.05 [requires_action, shaping/auxiliary, respawn=INFINITE]
+
+## ant_v4_gymnasium
+Environment: Ant-v4 (default ctrl_cost=0.5)
+max_steps=1000, gamma=0.99, death_probability=0.02
+n_states=100000, n_actions=8, action_type=auto
+Reward sources:
+  - forward_velocity: PER_STEP, value=1.0 [requires_action, THIS IS THE GOAL, state_dependent]
+  - healthy_reward: PER_STEP, value=1.0 [passive, shaping/auxiliary, respawn=INFINITE]
+  - ctrl_cost: PER_STEP, value=-0.5 [requires_action, shaping/auxiliary]
+  - contact_cost: PER_STEP, value=-0.0005 [passive, shaping/auxiliary]
+
+## lunar_lander
+Environment: LunarLander-v2
+max_steps=1000, gamma=0.99, death_probability=0.1
+n_states=10000, n_actions=4, action_type=auto
+Reward sources:
+  - distance_shaping: SHAPING, value=1.0 [requires_action, shaping/auxiliary, state_dependent]
+  - velocity_shaping: SHAPING, value=0.5 [requires_action, shaping/auxiliary, state_dependent]
+  - landing_bonus: TERMINAL, value=100.0 [requires_action, shaping/auxiliary]
+  - crash_penalty: ON_EVENT, value=-100.0 [passive, shaping/auxiliary]
+  - leg_contact: ON_EVENT, value=10.0 [requires_action, shaping/auxiliary]
+  - fuel_cost: PER_STEP, value=-0.03 [requires_action, shaping/auxiliary]
+
+## sparse_reward_traps
+Environment: Montezuma's Revenge
+max_steps=18000, gamma=0.99, death_probability=0.002
+n_states=500000, n_actions=8, action_type=auto
+Reward sources:
+  - room reward: ON_EVENT, value=100.0 [requires_action, shaping/auxiliary]
+  - key pickup: ON_EVENT, value=50.0 [requires_action, shaping/auxiliary]
+
+## bank_heist_explosions
+Environment: Bank Heist IDF Curiosity
+max_steps=18000, gamma=0.99, death_probability=0.05
+n_states=1000, n_actions=18, action_type=discrete
+Reward sources:
+  - bank_robbery: ON_EVENT, value=10.0 [requires_action, THIS IS THE GOAL]
+  - idf_curiosity: PER_STEP, value=0.05 [requires_action, shaping/auxiliary, respawn=INFINITE]
+
+## road_runner_replay
+Environment: Atari Road Runner
+max_steps=10000, gamma=0.99, death_probability=0.001
+n_states=50000, n_actions=18, action_type=auto
+Reward sources:
+  - level completion: TERMINAL, value=100.0 [requires_action, shaping/auxiliary]
+  - level 1 collectibles: ON_EVENT, value=80.0 [requires_action, shaping/auxiliary, respawn=ON_DEATH]
+
+## dota2_openai_five
+Environment: Dota 2 (OpenAI Five, 2019)
+max_steps=80000, gamma=0.99, death_probability=0.0001
+n_states=1000000000000000, n_actions=170000, action_type=auto
+Reward sources:
+  - win/loss: TERMINAL, value=1.0 [requires_action, shaping/auxiliary]
+  - gold advantage: SHAPING, value=0.006 [requires_action, shaping/auxiliary]
+  - xp advantage: SHAPING, value=0.004 [requires_action, shaping/auxiliary]
+  - hero kill: ON_EVENT, value=0.5 [requires_action, shaping/auxiliary, respawn=TIMED]
+  - hero death: ON_EVENT, value=-0.5 [requires_action, shaping/auxiliary]
+  - tower damage: ON_EVENT, value=0.2 [requires_action, shaping/auxiliary]
+  - creep last hit: ON_EVENT, value=0.01 [requires_action, shaping/auxiliary, respawn=TIMED]
+
+## bicycle_circles
+Environment: Bicycle navigation (Weng 2024)
+max_steps=1000, gamma=0.99, death_probability=0.01
+n_states=10000, n_actions=4, action_type=auto
+Reward sources:
+  - reach goal: TERMINAL, value=1.0 [requires_action, shaping/auxiliary]
+  - distance decrease: SHAPING, value=0.1 [requires_action, shaping/auxiliary, can_loop]
+
+## breakout_tunnel
+Environment: Breakout (tunnel strategy)
+max_steps=18000, gamma=0.99, death_probability=0.05
+n_states=100000, n_actions=4, action_type=auto
+Reward sources:
+  - brick_low_tier: ON_EVENT, value=1.0 [requires_action, shaping/auxiliary]
+  - brick_mid_tier: ON_EVENT, value=4.0 [requires_action, shaping/auxiliary]
+  - brick_high_tier: ON_EVENT, value=7.0 [requires_action, shaping/auxiliary]
+
+## fetch_reach
+Environment: Fetch Reach (sparse)
+max_steps=50, gamma=0.98, death_probability=0.0
+n_states=10000, n_actions=4, action_type=auto
+Reward sources:
+  - step_penalty: PER_STEP, value=-1.0 [requires_action, shaping/auxiliary]
+  - goal_reached: TERMINAL, value=50.0 [requires_action, shaping/auxiliary]
+
+## multiroom_traps
+Environment: MultiRoom (default penalty — stand still)
+max_steps=120, gamma=0.99, death_probability=0.01
+n_states=2000, n_actions=8, action_type=auto
+Reward sources:
+  - goal: TERMINAL, value=1.0 [requires_action, shaping/auxiliary]
+  - wasted step penalty: PER_STEP, value=-0.01 [requires_action, shaping/auxiliary]
+
+## pbrs_vs_naive
+Environment: Humanoid + PBRS
+max_steps=1000, gamma=0.99, death_probability=0.03
+n_states=100000, n_actions=17, action_type=auto
+Reward sources:
+  - velocity: PER_STEP, value=1.25 [requires_action, THIS IS THE GOAL, state_dependent]
+  - pbrs_distance_shaping: SHAPING, value=1.0 [passive, shaping/auxiliary]
+  - ctrl_cost: PER_STEP, value=-0.1 [requires_action, shaping/auxiliary]
+
+## atari_exploits
+Environment: Q*bert score loop
+max_steps=50000, gamma=0.99, death_probability=0.01
+n_states=10000, n_actions=8, action_type=auto
+Reward sources:
+  - level completion: TERMINAL, value=1000.0 [requires_action, shaping/auxiliary]
+  - platform color change: ON_EVENT, value=25.0 [requires_action, shaping/auxiliary, can_loop, respawn=INFINITE]
+
+## block_stacking
+Environment: Block Stacking (height proxy)
+max_steps=200, gamma=0.99, death_probability=0.0
+n_states=50000, n_actions=6, action_type=auto
+Reward sources:
+  - bottom_face_height: SHAPING, value=1.0 [requires_action, THIS IS THE GOAL, state_dependent]
+  - grasp_shaping: SHAPING, value=0.5 [requires_action, shaping/auxiliary]
+
+## montezuma_dancing
+Environment: Montezuma's Revenge RND
+max_steps=4500, gamma=0.999, death_probability=0.1
+n_states=1000, n_actions=18, action_type=discrete
+Reward sources:
+  - score: ON_EVENT, value=100.0 [requires_action, THIS IS THE GOAL]
+  - rnd_intrinsic: PER_STEP, value=0.5 [requires_action, shaping/auxiliary, respawn=INFINITE]
+
+---
+For each configuration above, give your verdict (FAIL/WARN/INFO/PASS) and a brief explanation. Be specific about which structural property causes the problem.

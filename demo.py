@@ -195,7 +195,7 @@ def main():
     print("    6. Formal LEAN proofs backing each rule")
     print()
     from goodhart.rules import RULE_COUNT
-    print(f"  {RULE_COUNT} rules | 57 examples from 40+ papers")
+    print(f"  {RULE_COUNT} rules | 212 encodings from 133 papers")
     print(f"  Formally verified (LEAN 4, zero sorry)")
     print("  Takes milliseconds. Saves days.")
     print()

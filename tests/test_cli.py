@@ -21,7 +21,7 @@ def _run_cli(args, check=True):
 
 def test_cli_quick_check():
     result = _run_cli(["--goal", "1.0", "--penalty", "-0.01", "--steps", "500"])
-    assert "Pre-flight Check" in result.stdout
+    assert "FULL ANALYSIS" in result.stdout
 
 
 def test_cli_rules():

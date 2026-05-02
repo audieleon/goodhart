@@ -38,13 +38,6 @@ pytest
 3. Run `pytest tests/test_examples.py` to verify it executes cleanly.
 4. If the example demonstrates a specific rule, add it to that rule's `examples` list in `goodhart/rules/explanations.py`.
 
-## Adding a preset
-
-1. Add a function in `goodhart/presets.py` returning `(EnvironmentModel, TrainingConfig)`.
-2. Add it to the `PRESETS` dict at the bottom of the file.
-3. Include the source paper in the function's docstring.
-4. Set `algorithm` to match what the paper actually used (PPO, DQN, SAC, etc.).
-
 ## LEAN proofs
 
 Proofs are in `proofs/GoodhartProofs/`. To verify:
