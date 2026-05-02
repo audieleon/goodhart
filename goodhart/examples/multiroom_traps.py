@@ -86,14 +86,22 @@ def run_example():
         n_actions=8,
         death_probability=0.01,
     )
-    model1.add_reward_source(RewardSource(
-        name="goal", reward_type=RewardType.TERMINAL, value=1.0,
-        discovery_probability=0.01,
-    ))
-    model1.add_reward_source(RewardSource(
-        name="wasted step penalty", reward_type=RewardType.PER_STEP,
-        value=-0.01, requires_action=True,
-    ))
+    model1.add_reward_source(
+        RewardSource(
+            name="goal",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            discovery_probability=0.01,
+        )
+    )
+    model1.add_reward_source(
+        RewardSource(
+            name="wasted step penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.01,
+            requires_action=True,
+        )
+    )
     TrainingAnalysisEngine().add_all_rules().print_report(model1)
 
     print()
@@ -110,14 +118,21 @@ def run_example():
         n_actions=8,
         death_probability=0.01,
     )
-    model2.add_reward_source(RewardSource(
-        name="goal", reward_type=RewardType.TERMINAL, value=1.0,
-        discovery_probability=0.01,
-    ))
-    model2.add_reward_source(RewardSource(
-        name="step penalty", reward_type=RewardType.PER_STEP,
-        value=-0.01,
-    ))
+    model2.add_reward_source(
+        RewardSource(
+            name="goal",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            discovery_probability=0.01,
+        )
+    )
+    model2.add_reward_source(
+        RewardSource(
+            name="step penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.01,
+        )
+    )
     TrainingAnalysisEngine().add_all_rules().print_report(model2)
 
     print()
@@ -134,14 +149,21 @@ def run_example():
         n_actions=8,
         death_probability=0.01,
     )
-    model3.add_reward_source(RewardSource(
-        name="goal", reward_type=RewardType.TERMINAL, value=1.0,
-        discovery_probability=0.01,
-    ))
-    model3.add_reward_source(RewardSource(
-        name="step penalty", reward_type=RewardType.PER_STEP,
-        value=-0.001,
-    ))
+    model3.add_reward_source(
+        RewardSource(
+            name="goal",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            discovery_probability=0.01,
+        )
+    )
+    model3.add_reward_source(
+        RewardSource(
+            name="step penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.001,
+        )
+    )
     TrainingAnalysisEngine().add_all_rules().print_report(model3)
 
     print()

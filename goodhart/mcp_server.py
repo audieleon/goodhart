@@ -25,7 +25,10 @@ import sys
 
 from goodhart import __version__
 from goodhart.models import (
-    EnvironmentModel, RewardSource, RewardType, RespawnBehavior,
+    EnvironmentModel,
+    RewardSource,
+    RewardType,
+    RespawnBehavior,
     TrainingConfig,
 )
 from goodhart.engine import TrainingAnalysisEngine
@@ -65,23 +68,45 @@ def _build_training_config(params: dict) -> TrainingConfig:
     """Build TrainingConfig from params, reading all supported fields."""
     kwargs = {}
     field_map = {
-        "algorithm": str, "lr": float, "critic_lr": float,
-        "entropy_coeff": float, "entropy_coeff_final": float,
-        "num_specialists": int, "routing_floor": float, "balance_coef": float,
-        "n_actors": int, "num_envs": int, "num_workers": int,
-        "total_steps": int, "num_epochs": int, "minibatch_size": int,
-        "rollout_length": int, "clip_epsilon": float, "target_kl": float,
-        "model_params": int, "embed_dim": int,
-        "use_rnn": bool, "rnn_type": str, "rnn_size": int,
-        "max_grad_norm": float, "value_coef": float, "gae_lambda": float,
+        "algorithm": str,
+        "lr": float,
+        "critic_lr": float,
+        "entropy_coeff": float,
+        "entropy_coeff_final": float,
+        "num_specialists": int,
+        "routing_floor": float,
+        "balance_coef": float,
+        "n_actors": int,
+        "num_envs": int,
+        "num_workers": int,
+        "total_steps": int,
+        "num_epochs": int,
+        "minibatch_size": int,
+        "rollout_length": int,
+        "clip_epsilon": float,
+        "target_kl": float,
+        "model_params": int,
+        "embed_dim": int,
+        "use_rnn": bool,
+        "rnn_type": str,
+        "rnn_size": int,
+        "max_grad_norm": float,
+        "value_coef": float,
+        "gae_lambda": float,
         # Off-policy
-        "replay_buffer_size": int, "target_update_freq": int,
-        "tau": float, "epsilon_start": float, "epsilon_end": float,
+        "replay_buffer_size": int,
+        "target_update_freq": int,
+        "tau": float,
+        "epsilon_start": float,
+        "epsilon_end": float,
         "epsilon_decay_steps": int,
         # SAC
-        "alpha": float, "auto_alpha": bool,
+        "alpha": float,
+        "auto_alpha": bool,
         # TD3
-        "policy_noise": float, "noise_clip": float, "policy_delay": int,
+        "policy_noise": float,
+        "noise_clip": float,
+        "policy_delay": int,
     }
     for field, type_fn in field_map.items():
         if field in params:
@@ -106,28 +131,41 @@ def handle_check(params: dict) -> dict:
 
     # Shorthand: goal_reward and step_penalty at top level
     if params.get("goal_reward", 0) > 0:
-        model.add_reward_source(RewardSource(
-            name="goal",
-            reward_type=RewardType.TERMINAL,
-            value=params["goal_reward"],
-            discovery_probability=float(params.get("discovery_probability", 0.1)),
-        ))
+        model.add_reward_source(
+            RewardSource(
+                name="goal",
+                reward_type=RewardType.TERMINAL,
+                value=params["goal_reward"],
+                discovery_probability=float(params.get("discovery_probability", 0.1)),
+            )
+        )
 
     if params.get("step_penalty", 0) != 0:
-        model.add_reward_source(RewardSource(
-            name="step_penalty",
-            reward_type=RewardType.PER_STEP,
-            value=params["step_penalty"],
-        ))
+        model.add_reward_source(
+            RewardSource(
+                name="step_penalty",
+                reward_type=RewardType.PER_STEP,
+                value=params["step_penalty"],
+            )
+        )
 
     # Full reward sources
     for src in params.get("reward_sources", []):
         model.add_reward_source(_build_reward_source(src))
 
     # Training config (built if any training field present)
-    training_fields = {"lr", "entropy_coeff", "num_specialists", "num_envs",
-                       "total_steps", "algorithm", "num_epochs", "clip_epsilon",
-                       "use_rnn", "n_actors"}
+    training_fields = {
+        "lr",
+        "entropy_coeff",
+        "num_specialists",
+        "num_envs",
+        "total_steps",
+        "algorithm",
+        "num_epochs",
+        "clip_epsilon",
+        "use_rnn",
+        "n_actors",
+    }
     config = None
     if any(k in params for k in training_fields):
         config = _build_training_config(params)
@@ -167,8 +205,10 @@ def handle_explain(params: dict) -> dict:
 
     rule = rule_map.get(rule_name)
     if not rule:
-        return {"error": f"Unknown rule: {rule_name}",
-                "available": sorted(rule_map.keys())}
+        return {
+            "error": f"Unknown rule: {rule_name}",
+            "available": sorted(rule_map.keys()),
+        }
 
     result = {
         "name": rule.name,
@@ -200,8 +240,9 @@ def handle_list_examples(params: dict) -> dict:
     import goodhart.examples
 
     examples = []
-    for m in sorted(pkgutil.iter_modules(goodhart.examples.__path__),
-                    key=lambda m: m.name):
+    for m in sorted(
+        pkgutil.iter_modules(goodhart.examples.__path__), key=lambda m: m.name
+    ):
         if m.name == "__init__" or m.name.startswith("sample"):
             continue
         try:
@@ -229,11 +270,13 @@ def handle_get_example(params: dict) -> dict:
     except ModuleNotFoundError:
         import pkgutil
         import goodhart.examples
-        available = sorted(m.name for m in pkgutil.iter_modules(
-            goodhart.examples.__path__) if m.name != "__init__"
-            and not m.name.startswith("sample"))
-        return {"error": f"Unknown example: {name}",
-                "available": available}
+
+        available = sorted(
+            m.name
+            for m in pkgutil.iter_modules(goodhart.examples.__path__)
+            if m.name != "__init__" and not m.name.startswith("sample")
+        )
+        return {"error": f"Unknown example: {name}", "available": available}
 
     result = {
         "name": name,
@@ -243,7 +286,7 @@ def handle_get_example(params: dict) -> dict:
     # Check for @reward_function-decorated functions in the module
     for attr_name in dir(mod):
         obj = getattr(mod, attr_name)
-        if callable(obj) and hasattr(obj, 'goodhart_model'):
+        if callable(obj) and hasattr(obj, "goodhart_model"):
             model = obj.goodhart_model
             config = obj.goodhart_config
             engine = TrainingAnalysisEngine().add_all_rules()
@@ -257,8 +300,12 @@ def handle_get_example(params: dict) -> dict:
                 "n_actions": model.n_actions,
                 "n_sources": len(model.reward_sources),
                 "sources": [
-                    {"name": s.name, "type": s.reward_type.value,
-                     "value": s.value, "intentional": s.intentional}
+                    {
+                        "name": s.name,
+                        "type": s.reward_type.value,
+                        "value": s.value,
+                        "intentional": s.intentional,
+                    }
                     for s in model.reward_sources
                 ],
             }
@@ -269,6 +316,7 @@ def handle_get_example(params: dict) -> dict:
 
     # Check the explanations DB for related rules
     from goodhart.rules.explanations import EXPLANATIONS
+
     related_rules = []
     for rule_name, entry in EXPLANATIONS.items():
         if name in entry.get("examples", []):
@@ -298,23 +346,42 @@ def handle_doctor(params: dict) -> dict:
     )
 
     if params.get("goal_reward", 0) > 0:
-        model.add_reward_source(RewardSource(
-            name="goal", reward_type=RewardType.TERMINAL,
-            value=params["goal_reward"],
-            discovery_probability=float(params.get("discovery_probability", 0.1)),
-        ))
+        model.add_reward_source(
+            RewardSource(
+                name="goal",
+                reward_type=RewardType.TERMINAL,
+                value=params["goal_reward"],
+                discovery_probability=float(params.get("discovery_probability", 0.1)),
+            )
+        )
     if params.get("step_penalty", 0) != 0:
-        model.add_reward_source(RewardSource(
-            name="step_penalty", reward_type=RewardType.PER_STEP,
-            value=params["step_penalty"],
-        ))
+        model.add_reward_source(
+            RewardSource(
+                name="step_penalty",
+                reward_type=RewardType.PER_STEP,
+                value=params["step_penalty"],
+            )
+        )
     for src in params.get("reward_sources", []):
         model.add_reward_source(_build_reward_source(src))
 
-    training_fields = {"lr", "entropy_coeff", "num_specialists", "num_envs",
-                       "total_steps", "algorithm", "num_epochs", "clip_epsilon",
-                       "use_rnn", "n_actors", "replay_buffer_size",
-                       "target_update_freq", "tau", "alpha", "auto_alpha"}
+    training_fields = {
+        "lr",
+        "entropy_coeff",
+        "num_specialists",
+        "num_envs",
+        "total_steps",
+        "algorithm",
+        "num_epochs",
+        "clip_epsilon",
+        "use_rnn",
+        "n_actors",
+        "replay_buffer_size",
+        "target_update_freq",
+        "tau",
+        "alpha",
+        "auto_alpha",
+    }
     config = None
     if any(k in params for k in training_fields):
         config = _build_training_config(params)
@@ -358,35 +425,113 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "name": {"type": "string", "description": "Experiment name"},
-                "goal_reward": {"type": "number", "description": "Terminal goal reward (shorthand)"},
-                "step_penalty": {"type": "number", "description": "Per-step penalty (shorthand, negative)"},
-                "max_steps": {"type": "integer", "description": "Max steps per episode"},
+                "goal_reward": {
+                    "type": "number",
+                    "description": "Terminal goal reward (shorthand)",
+                },
+                "step_penalty": {
+                    "type": "number",
+                    "description": "Per-step penalty (shorthand, negative)",
+                },
+                "max_steps": {
+                    "type": "integer",
+                    "description": "Max steps per episode",
+                },
                 "gamma": {"type": "number", "description": "Discount factor"},
-                "discovery_probability": {"type": "number", "description": "P(finding goal per episode)"},
-                "n_states": {"type": "integer", "description": "Approximate state space size"},
-                "n_actions": {"type": "integer", "description": "Number of actions/actuators"},
-                "action_type": {"type": "string", "enum": ["discrete", "continuous", "auto"]},
-                "death_probability": {"type": "number", "description": "P(death per step)"},
+                "discovery_probability": {
+                    "type": "number",
+                    "description": "P(finding goal per episode)",
+                },
+                "n_states": {
+                    "type": "integer",
+                    "description": "Approximate state space size",
+                },
+                "n_actions": {
+                    "type": "integer",
+                    "description": "Number of actions/actuators",
+                },
+                "action_type": {
+                    "type": "string",
+                    "enum": ["discrete", "continuous", "auto"],
+                },
+                "death_probability": {
+                    "type": "number",
+                    "description": "P(death per step)",
+                },
                 "lr": {"type": "number", "description": "Learning rate"},
-                "entropy_coeff": {"type": "number", "description": "Entropy coefficient"},
-                "num_envs": {"type": "integer", "description": "Number of parallel environments"},
-                "total_steps": {"type": "integer", "description": "Total training steps"},
+                "entropy_coeff": {
+                    "type": "number",
+                    "description": "Entropy coefficient",
+                },
+                "num_envs": {
+                    "type": "integer",
+                    "description": "Number of parallel environments",
+                },
+                "total_steps": {
+                    "type": "integer",
+                    "description": "Total training steps",
+                },
                 "num_epochs": {"type": "integer", "description": "PPO reuse epochs"},
                 "clip_epsilon": {"type": "number", "description": "PPO clip epsilon"},
-                "num_specialists": {"type": "integer", "description": "Number of specialist networks"},
-                "routing_floor": {"type": "number", "description": "Min routing weight per specialist"},
-                "algorithm": {"type": "string", "enum": ["PPO", "APPO", "A2C", "IMPALA", "DQN", "SAC", "DDPG", "TD3"],
-                              "description": "Training algorithm"},
-                "use_rnn": {"type": "boolean", "description": "Whether to use recurrent network"},
-                "replay_buffer_size": {"type": "integer", "description": "Off-policy replay buffer size (0=on-policy)"},
-                "target_update_freq": {"type": "integer", "description": "DQN target network update frequency"},
-                "tau": {"type": "number", "description": "Soft update coefficient (SAC/DDPG/TD3)"},
-                "epsilon_start": {"type": "number", "description": "DQN initial exploration epsilon"},
-                "epsilon_end": {"type": "number", "description": "DQN final exploration epsilon"},
-                "epsilon_decay_steps": {"type": "integer", "description": "DQN epsilon decay duration"},
+                "num_specialists": {
+                    "type": "integer",
+                    "description": "Number of specialist networks",
+                },
+                "routing_floor": {
+                    "type": "number",
+                    "description": "Min routing weight per specialist",
+                },
+                "algorithm": {
+                    "type": "string",
+                    "enum": [
+                        "PPO",
+                        "APPO",
+                        "A2C",
+                        "IMPALA",
+                        "DQN",
+                        "SAC",
+                        "DDPG",
+                        "TD3",
+                    ],
+                    "description": "Training algorithm",
+                },
+                "use_rnn": {
+                    "type": "boolean",
+                    "description": "Whether to use recurrent network",
+                },
+                "replay_buffer_size": {
+                    "type": "integer",
+                    "description": "Off-policy replay buffer size (0=on-policy)",
+                },
+                "target_update_freq": {
+                    "type": "integer",
+                    "description": "DQN target network update frequency",
+                },
+                "tau": {
+                    "type": "number",
+                    "description": "Soft update coefficient (SAC/DDPG/TD3)",
+                },
+                "epsilon_start": {
+                    "type": "number",
+                    "description": "DQN initial exploration epsilon",
+                },
+                "epsilon_end": {
+                    "type": "number",
+                    "description": "DQN final exploration epsilon",
+                },
+                "epsilon_decay_steps": {
+                    "type": "integer",
+                    "description": "DQN epsilon decay duration",
+                },
                 "alpha": {"type": "number", "description": "SAC entropy temperature"},
-                "auto_alpha": {"type": "boolean", "description": "SAC: learn alpha automatically"},
-                "verbose": {"type": "boolean", "description": "Include learn_more explanations (default: true)"},
+                "auto_alpha": {
+                    "type": "boolean",
+                    "description": "SAC: learn alpha automatically",
+                },
+                "verbose": {
+                    "type": "boolean",
+                    "description": "Include learn_more explanations (default: true)",
+                },
                 "reward_sources": {
                     "type": "array",
                     "description": "Reward source components",
@@ -395,22 +540,50 @@ TOOLS = [
                         "required": ["name", "type", "value"],
                         "properties": {
                             "name": {"type": "string"},
-                            "type": {"type": "string", "enum": ["terminal", "per_step", "on_event", "shaping"]},
+                            "type": {
+                                "type": "string",
+                                "enum": ["terminal", "per_step", "on_event", "shaping"],
+                            },
                             "value": {"type": "number"},
-                            "respawn": {"type": "string", "enum": ["none", "timed", "on_death", "on_episode", "infinite"]},
+                            "respawn": {
+                                "type": "string",
+                                "enum": [
+                                    "none",
+                                    "timed",
+                                    "on_death",
+                                    "on_episode",
+                                    "infinite",
+                                ],
+                            },
                             "respawn_time": {"type": "integer"},
                             "max_occurrences": {"type": "integer"},
-                            "requires_action": {"type": "boolean", "description": "Agent must act to earn this"},
+                            "requires_action": {
+                                "type": "boolean",
+                                "description": "Agent must act to earn this",
+                            },
                             "requires_exploration": {"type": "boolean"},
                             "discovery_probability": {"type": "number"},
                             "can_loop": {"type": "boolean"},
                             "loop_period": {"type": "integer"},
-                            "intentional": {"type": "boolean", "description": "This reward IS the goal"},
-                            "explore_fraction": {"type": "number", "description": "Fraction earned by random exploration (0-1)"},
+                            "intentional": {
+                                "type": "boolean",
+                                "description": "This reward IS the goal",
+                            },
+                            "explore_fraction": {
+                                "type": "number",
+                                "description": "Fraction earned by random exploration (0-1)",
+                            },
                             "state_dependent": {"type": "boolean"},
                             "scales_with": {"type": "string"},
-                            "value_range": {"type": "array", "items": {"type": "number"}, "description": "[min, max]"},
-                            "prerequisite": {"type": "string", "description": "Name of prerequisite reward source"},
+                            "value_range": {
+                                "type": "array",
+                                "items": {"type": "number"},
+                                "description": "[min, max]",
+                            },
+                            "prerequisite": {
+                                "type": "string",
+                                "description": "Name of prerequisite reward source",
+                            },
                         },
                     },
                 },
@@ -433,7 +606,10 @@ TOOLS = [
             "type": "object",
             "required": ["rule"],
             "properties": {
-                "rule": {"type": "string", "description": "Rule name (e.g., idle_exploit)"},
+                "rule": {
+                    "type": "string",
+                    "description": "Rule name (e.g., idle_exploit)",
+                },
             },
         },
     },
@@ -454,7 +630,10 @@ TOOLS = [
             "type": "object",
             "required": ["name"],
             "properties": {
-                "name": {"type": "string", "description": "Example name (e.g., humanoid_idle, coast_runners)"},
+                "name": {
+                    "type": "string",
+                    "description": "Example name (e.g., humanoid_idle, coast_runners)",
+                },
             },
         },
     },
@@ -476,7 +655,10 @@ TOOLS = [
                 "discovery_probability": {"type": "number"},
                 "n_states": {"type": "integer"},
                 "n_actions": {"type": "integer"},
-                "action_type": {"type": "string", "enum": ["discrete", "continuous", "auto"]},
+                "action_type": {
+                    "type": "string",
+                    "enum": ["discrete", "continuous", "auto"],
+                },
                 "death_probability": {"type": "number"},
                 "lr": {"type": "number"},
                 "entropy_coeff": {"type": "number"},
@@ -545,17 +727,22 @@ def main():
                         "jsonrpc": "2.0",
                         "id": request_id,
                         "result": {
-                            "content": [{
-                                "type": "text",
-                                "text": json.dumps(result, indent=2),
-                            }],
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": json.dumps(result, indent=2),
+                                }
+                            ],
                         },
                     }
                 else:
                     response = {
                         "jsonrpc": "2.0",
                         "id": request_id,
-                        "error": {"code": -32601, "message": f"Unknown tool: {tool_name}"},
+                        "error": {
+                            "code": -32601,
+                            "message": f"Unknown tool: {tool_name}",
+                        },
                     }
 
             else:

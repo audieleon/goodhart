@@ -55,7 +55,7 @@ SOURCES = [
         state_dependent=True,
         scales_with="velocity",
         requires_action=True,
-        intentional=True,       # velocity IS the goal
+        intentional=True,  # velocity IS the goal
     ),
     RewardSource(
         name="alive_bonus",
@@ -63,7 +63,7 @@ SOURCES = [
         value=ALIVE_BONUS,
         respawn=RespawnBehavior.INFINITE,
         requires_action=False,
-        intentional=False,      # staying alive is a means, not the end
+        intentional=False,  # staying alive is a means, not the end
     ),
     RewardSource(
         name="torque_penalty",
@@ -77,6 +77,7 @@ SOURCES = [
 # =========================================================================
 # The reward function — uses the same constants
 # =========================================================================
+
 
 @reward_function(
     max_steps=MAX_STEPS,
@@ -96,7 +97,7 @@ def compute_reward(obs, action, info):
     velocity_error = abs(obs["velocity"] - obs["command_velocity"])
     tracking = VELOCITY_SCALE * (1.0 - velocity_error)
     alive = ALIVE_BONUS
-    torque = TORQUE_COST * sum(a ** 2 for a in action)
+    torque = TORQUE_COST * sum(a**2 for a in action)
     return tracking + alive + torque
 
 

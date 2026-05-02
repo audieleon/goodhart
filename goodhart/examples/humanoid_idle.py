@@ -37,9 +37,9 @@ METADATA = {
 # Reward config — matches Gymnasium Humanoid-v4 defaults
 # =========================================================================
 
-HEALTHY_REWARD = 5.0      # per step, passive (Gymnasium default)
-VELOCITY_SCALE = 1.25     # forward_reward_weight
-CTRL_COST_WEIGHT = 0.1    # ctrl_cost_weight (applied to ||action||^2)
+HEALTHY_REWARD = 5.0  # per step, passive (Gymnasium default)
+VELOCITY_SCALE = 1.25  # forward_reward_weight
+CTRL_COST_WEIGHT = 0.1  # ctrl_cost_weight (applied to ||action||^2)
 CONTACT_COST_WEIGHT = 5e-7  # contact_cost_weight
 CONTACT_COST_RANGE = (-1.0, 0.0)
 
@@ -84,6 +84,7 @@ SOURCES = [
 # The reward function — uses the same constants
 # =========================================================================
 
+
 @reward_function(
     name="Humanoid-v4",
     max_steps=MAX_STEPS,
@@ -105,9 +106,10 @@ def compute_reward(obs, action, info):
     """Gymnasium Humanoid-v4 reward (matches source)."""
     healthy = HEALTHY_REWARD if info.get("is_healthy", True) else 0.0
     velocity = VELOCITY_SCALE * obs.get("x_velocity", 0.0)
-    ctrl = -CTRL_COST_WEIGHT * sum(a ** 2 for a in action)
-    contact = max(CONTACT_COST_RANGE[0],
-                  -CONTACT_COST_WEIGHT * obs.get("contact_force", 0.0))
+    ctrl = -CTRL_COST_WEIGHT * sum(a**2 for a in action)
+    contact = max(
+        CONTACT_COST_RANGE[0], -CONTACT_COST_WEIGHT * obs.get("contact_force", 0.0)
+    )
     return healthy + velocity + ctrl + contact
 
 
@@ -118,8 +120,10 @@ def run_example():
     print()
     print("Source: Todorov et al. 2012, Brockman et al. 2016")
     print("Known issue: agent stands still because")
-    print(f"  healthy_reward ({HEALTHY_REWARD}/step)"
-          f" >> velocity_reward (~{VELOCITY_SCALE}/step)")
+    print(
+        f"  healthy_reward ({HEALTHY_REWARD}/step)"
+        f" >> velocity_reward (~{VELOCITY_SCALE}/step)"
+    )
     print()
     print("Constants (from Gymnasium defaults):")
     print(f"  HEALTHY_REWARD     = {HEALTHY_REWARD}")
@@ -141,7 +145,7 @@ def run_example():
         {"is_healthy": True},
     )
     print(f"Test call (standing still): {idle:.4f}")
-    print(f"Standing still earns {idle/test:.1f}x more than walking.")
+    print(f"Standing still earns {idle / test:.1f}x more than walking.")
     print()
 
     compute_reward.goodhart_check()

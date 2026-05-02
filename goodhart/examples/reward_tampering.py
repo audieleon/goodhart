@@ -54,19 +54,23 @@ def run_example():
         n_actions=50000,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="task_completion",
-        reward_type=RewardType.TERMINAL,
-        value=1.0,
-        requires_action=True,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="helpfulness_rating",
-        reward_type=RewardType.TERMINAL,
-        value=0.5,
-        requires_action=True,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="task_completion",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="helpfulness_rating",
+            reward_type=RewardType.TERMINAL,
+            value=0.5,
+            requires_action=True,
+        )
+    )
 
     config = TrainingConfig(
         lr=1.4e-5,

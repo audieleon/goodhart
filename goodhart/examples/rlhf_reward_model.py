@@ -59,22 +59,26 @@ def run_example():
         n_actions=50000,  # vocabulary size
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="reward_model_score",
-        reward_type=RewardType.TERMINAL,
-        value=1.0,
-        value_range=(0.0, 5.0),
-        state_dependent=True,
-        requires_action=True,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="kl_penalty",
-        reward_type=RewardType.TERMINAL,
-        value=-0.1,
-        state_dependent=True,
-        requires_action=True,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="reward_model_score",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            value_range=(0.0, 5.0),
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="kl_penalty",
+            reward_type=RewardType.TERMINAL,
+            value=-0.1,
+            state_dependent=True,
+            requires_action=True,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

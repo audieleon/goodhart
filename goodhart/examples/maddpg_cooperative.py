@@ -55,22 +55,26 @@ def run_example():
         n_actions=5,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="distance_penalty",
-        reward_type=RewardType.PER_STEP,
-        value=-1.0,
-        value_range=(-3.0, 0.0),
-        state_dependent=True,
-        scales_with="distance",
-        requires_action=True,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="collision_penalty",
-        reward_type=RewardType.ON_EVENT,
-        value=-1.0,
-        requires_action=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="distance_penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-1.0,
+            value_range=(-3.0, 0.0),
+            state_dependent=True,
+            scales_with="distance",
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="collision_penalty",
+            reward_type=RewardType.ON_EVENT,
+            value=-1.0,
+            requires_action=False,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

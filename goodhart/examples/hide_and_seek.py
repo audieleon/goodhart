@@ -41,27 +41,33 @@ METADATA = {
 
 # ---- Multi-agent specific rules ----
 
+
 class ZeroSumArmsRace(PrecedentRule):
     """Zero-sum multi-agent reward creates escalating arms race."""
 
     @property
-    def name(self): return "zero_sum_arms_race"
+    def name(self):
+        return "zero_sum_arms_race"
+
     @property
     def description(self):
-        return ("Zero-sum reward in multi-agent setting drives "
-                "escalating counterstrategies that may exploit "
-                "environment physics")
+        return (
+            "Zero-sum reward in multi-agent setting drives "
+            "escalating counterstrategies that may exploit "
+            "environment physics"
+        )
+
     @property
     def precedents(self):
         return [
             Precedent(
                 source="Baker et al. 2019 — Emergent Tool Use (ICLR 2020)",
                 setting="Hiders: +1 if hidden, -1 if seen. "
-                        "Seekers: opposite. Zero-sum.",
+                "Seekers: opposite. Zero-sum.",
                 outcome="6 emergent strategies including box surfing "
-                        "(riding boxes through walls via physics bug). "
-                        "Each strategy forced a counter-strategy. Arms "
-                        "race escalated beyond intended complexity.",
+                "(riding boxes through walls via physics bug). "
+                "Each strategy forced a counter-strategy. Arms "
+                "race escalated beyond intended complexity.",
                 year=2020,
             ),
         ]
@@ -75,21 +81,25 @@ class ZeroSumArmsRace(PrecedentRule):
             pos_total = sum(s.value for s in pos)
             neg_total = sum(abs(s.value) for s in neg)
             if 0.8 < pos_total / max(neg_total, 0.001) < 1.2:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.WARNING,
-                    message=(f"Near zero-sum reward structure "
-                             f"(+{pos_total:.1f} / -{neg_total:.1f}). "
-                             f"Multi-agent competition may produce "
-                             f"escalating exploits of environment physics."),
-                    recommendation=(
-                        "Precedent: OpenAI Hide-and-Seek — zero-sum reward "
-                        "drove agents to discover box surfing (physics bug). "
-                        "Consider: (1) physics engine robustness testing, "
-                        "(2) action space constraints, (3) runtime exploit "
-                        "monitoring."
-                    ),
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.WARNING,
+                        message=(
+                            f"Near zero-sum reward structure "
+                            f"(+{pos_total:.1f} / -{neg_total:.1f}). "
+                            f"Multi-agent competition may produce "
+                            f"escalating exploits of environment physics."
+                        ),
+                        recommendation=(
+                            "Precedent: OpenAI Hide-and-Seek — zero-sum reward "
+                            "drove agents to discover box surfing (physics bug). "
+                            "Consider: (1) physics engine robustness testing, "
+                            "(2) action space constraints, (3) runtime exploit "
+                            "monitoring."
+                        ),
+                    )
+                )
         return verdicts
 
 
@@ -97,30 +107,33 @@ class MultiAgentRewardAsymmetry(PrecedentRule):
     """Check for reward asymmetries in competitive settings."""
 
     @property
-    def name(self): return "multi_agent_asymmetry"
+    def name(self):
+        return "multi_agent_asymmetry"
+
     @property
     def description(self):
         return "Reward asymmetry between agents in competitive settings"
+
     @property
     def precedents(self):
         return [
             Precedent(
                 source="OpenAI Five — Dota 2 (2019)",
                 setting="Reward includes gold advantage, XP advantage, "
-                        "kills, tower damage. Each component weighted.",
+                "kills, tower damage. Each component weighted.",
                 outcome="Reward shaping required 'surgery' — continuing "
-                        "training across reward function changes. Getting "
-                        "the weights wrong caused degenerate strategies "
-                        "(e.g., not last-hitting creeps, ignoring courier).",
+                "training across reward function changes. Getting "
+                "the weights wrong caused degenerate strategies "
+                "(e.g., not last-hitting creeps, ignoring courier).",
                 year=2019,
             ),
             Precedent(
                 source="Vinyals et al. 2019 — AlphaStar",
                 setting="Win/loss reward only (sparse). But with league "
-                        "training: each agent trains against a population.",
+                "training: each agent trains against a population.",
                 outcome="Sparse reward worked BECAUSE league training "
-                        "provides diverse opponents. Single opponent "
-                        "causes co-adaptation and strategy collapse.",
+                "provides diverse opponents. Single opponent "
+                "causes co-adaptation and strategy collapse.",
                 year=2019,
             ),
         ]
@@ -133,10 +146,13 @@ class PhysicsExploitRisk(PrecedentRule):
     """Flag environments with complex physics for exploit risk."""
 
     @property
-    def name(self): return "physics_exploit_risk"
+    def name(self):
+        return "physics_exploit_risk"
+
     @property
     def description(self):
         return "Complex physics simulation creates exploit surface"
+
     @property
     def precedents(self):
         return [
@@ -144,24 +160,24 @@ class PhysicsExploitRisk(PrecedentRule):
                 source="Baker et al. 2019 — Hide-and-Seek box surfing",
                 setting="MuJoCo physics with moveable objects, ramps, walls",
                 outcome="Agents discovered that applying force while on top "
-                        "of a box moves the box — not physically realistic "
-                        "but allowed by the simulator. Led to 'surfing' "
-                        "through walls.",
+                "of a box moves the box — not physically realistic "
+                "but allowed by the simulator. Led to 'surfing' "
+                "through walls.",
                 year=2020,
             ),
             Precedent(
                 source="Lilian Weng 2024 — Reward Hacking survey",
                 setting="Robot jumping task in physics simulator",
                 outcome="Agent exploited physics simulator bug to achieve "
-                        "unrealistic jump height for maximum reward.",
+                "unrealistic jump height for maximum reward.",
                 year=2024,
             ),
             Precedent(
                 source="DeepMind 2017 — Robot grasping",
                 setting="Grasping reward with wrong reference point on brick",
                 outcome="Agent flipped the brick because reward was "
-                        "calculated from wrong reference point. Technically "
-                        "maximized reward without grasping.",
+                "calculated from wrong reference point. Technically "
+                "maximized reward without grasping.",
                 year=2017,
             ),
         ]
@@ -172,6 +188,7 @@ class PhysicsExploitRisk(PrecedentRule):
 
 
 # ---- The example ----
+
 
 def run_example():
     """Model OpenAI's Hide-and-Seek environment."""
@@ -185,44 +202,52 @@ def run_example():
     )
 
     # Hider reward: +1 per step hidden, -1 per step seen
-    model.add_reward_source(RewardSource(
-        name="hidden bonus",
-        reward_type=RewardType.PER_STEP,
-        value=1.0,
-        respawn=RespawnBehavior.INFINITE,
-        requires_action=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="seen penalty",
-        reward_type=RewardType.PER_STEP,
-        value=-1.0,
-        respawn=RespawnBehavior.INFINITE,
-        requires_action=False,  # happens when seeker finds you
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="hidden bonus",
+            reward_type=RewardType.PER_STEP,
+            value=1.0,
+            respawn=RespawnBehavior.INFINITE,
+            requires_action=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="seen penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-1.0,
+            respawn=RespawnBehavior.INFINITE,
+            requires_action=False,  # happens when seeker finds you
+        )
+    )
     # Boundary penalty
-    model.add_reward_source(RewardSource(
-        name="boundary penalty",
-        reward_type=RewardType.PER_STEP,
-        value=-0.1,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="boundary penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.1,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",
         lr=1.5e-4,
         num_envs=512,  # they used 512 parallel games
         num_workers=1,
-          # ~500M steps per agent
+        # ~500M steps per agent
         model_params=5_000_000,
         entropy_coeff=0.01,
     )
 
     # Build engine with standard + multi-agent rules
     engine = TrainingAnalysisEngine().add_all_rules()
-    engine.add_rules([
-        ZeroSumArmsRace(),
-        MultiAgentRewardAsymmetry(),
-        PhysicsExploitRisk(),
-    ])
+    engine.add_rules(
+        [
+            ZeroSumArmsRace(),
+            MultiAgentRewardAsymmetry(),
+            PhysicsExploitRisk(),
+        ]
+    )
 
     engine.print_report(model, config)
 

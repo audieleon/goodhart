@@ -38,18 +38,104 @@ METADATA = {
 
 def run_example():
     model = EnvironmentModel(
-        name="Legged Gym ANYmal (19 reward terms)", max_steps=1000, gamma=0.99,
-        n_states=100000, n_actions=12, action_type="continuous", death_probability=0.02,
+        name="Legged Gym ANYmal (19 reward terms)",
+        max_steps=1000,
+        gamma=0.99,
+        n_states=100000,
+        n_actions=12,
+        action_type="continuous",
+        death_probability=0.02,
     )
-    model.add_reward_source(RewardSource(name="tracking_lin_vel", reward_type=RewardType.PER_STEP, value=1.0, state_dependent=True, requires_action=True, intentional=True))
-    model.add_reward_source(RewardSource(name="tracking_ang_vel", reward_type=RewardType.PER_STEP, value=0.5, state_dependent=True, requires_action=True, intentional=True))
-    model.add_reward_source(RewardSource(name="feet_air_time", reward_type=RewardType.PER_STEP, value=1.0, state_dependent=True, requires_action=False, intentional=True))
-    model.add_reward_source(RewardSource(name="lin_vel_z_penalty", reward_type=RewardType.PER_STEP, value=-2.0, state_dependent=True, requires_action=True, intentional=True))
-    model.add_reward_source(RewardSource(name="ang_vel_xy_penalty", reward_type=RewardType.PER_STEP, value=-0.05, state_dependent=True, requires_action=True, intentional=True))
-    model.add_reward_source(RewardSource(name="torques_penalty", reward_type=RewardType.PER_STEP, value=-0.00001, state_dependent=False, requires_action=True, intentional=True))
-    model.add_reward_source(RewardSource(name="dof_acc_penalty", reward_type=RewardType.PER_STEP, value=-0.0000025, state_dependent=False, requires_action=True, intentional=True))
-    model.add_reward_source(RewardSource(name="action_rate_penalty", reward_type=RewardType.PER_STEP, value=-0.01, state_dependent=False, requires_action=True, intentional=True))
-    model.add_reward_source(RewardSource(name="collision_penalty", reward_type=RewardType.ON_EVENT, value=-1.0, state_dependent=True, requires_action=False, intentional=True))
+    model.add_reward_source(
+        RewardSource(
+            name="tracking_lin_vel",
+            reward_type=RewardType.PER_STEP,
+            value=1.0,
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="tracking_ang_vel",
+            reward_type=RewardType.PER_STEP,
+            value=0.5,
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="feet_air_time",
+            reward_type=RewardType.PER_STEP,
+            value=1.0,
+            state_dependent=True,
+            requires_action=False,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="lin_vel_z_penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-2.0,
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="ang_vel_xy_penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.05,
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="torques_penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.00001,
+            state_dependent=False,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="dof_acc_penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.0000025,
+            state_dependent=False,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="action_rate_penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.01,
+            state_dependent=False,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="collision_penalty",
+            reward_type=RewardType.ON_EVENT,
+            value=-1.0,
+            state_dependent=True,
+            requires_action=False,
+            intentional=True,
+        )
+    )
     engine = TrainingAnalysisEngine().add_all_rules()
 
     print("Legged Gym ANYmal — 19 Reward Components")

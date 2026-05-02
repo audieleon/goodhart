@@ -52,25 +52,31 @@ def run_example():
         n_actions=6,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="step_penalty",
-        reward_type=RewardType.PER_STEP,
-        value=-1.0,
-    ))
-    model.add_reward_source(RewardSource(
-        name="dropoff_success",
-        reward_type=RewardType.TERMINAL,
-        value=20.0,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.1,
-    ))
-    model.add_reward_source(RewardSource(
-        name="illegal_action",
-        reward_type=RewardType.ON_EVENT,
-        value=-10.0,
-        requires_action=True,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="step_penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-1.0,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="dropoff_success",
+            reward_type=RewardType.TERMINAL,
+            value=20.0,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.1,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="illegal_action",
+            reward_type=RewardType.ON_EVENT,
+            value=-10.0,
+            requires_action=True,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

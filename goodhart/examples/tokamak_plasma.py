@@ -52,32 +52,38 @@ def run_example():
         n_actions=10,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="plasma_shape_accuracy",
-        reward_type=RewardType.PER_STEP,
-        value=1.0,
-        value_type="exponential",
-        value_params={"sigma": 0.1},
-        state_dependent=True,
-        requires_action=True,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="plasma_current_accuracy",
-        reward_type=RewardType.PER_STEP,
-        value=0.5,
-        state_dependent=True,
-        requires_action=True,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="xpoint_location",
-        reward_type=RewardType.PER_STEP,
-        value=0.3,
-        state_dependent=True,
-        requires_action=True,
-        intentional=True,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="plasma_shape_accuracy",
+            reward_type=RewardType.PER_STEP,
+            value=1.0,
+            value_type="exponential",
+            value_params={"sigma": 0.1},
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="plasma_current_accuracy",
+            reward_type=RewardType.PER_STEP,
+            value=0.5,
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="xpoint_location",
+            reward_type=RewardType.PER_STEP,
+            value=0.3,
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+        )
+    )
     # NOTE: No coil balance term. This is the bug.
     # The agent used asymmetric coil currents to achieve the same
     # plasma shape, creating dangerous electromagnetic forces.

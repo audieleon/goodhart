@@ -14,6 +14,7 @@ from goodhart.models import EnvironmentModel, FormalBasis, Result, Severity, Ver
 # Rule base class
 # =====================================================================
 
+
 class Rule(ABC):
     """Base class for all analysis rules.
 
@@ -26,13 +27,11 @@ class Rule(ABC):
 
     @property
     @abstractmethod
-    def name(self) -> str:
-        ...
+    def name(self) -> str: ...
 
     @property
     @abstractmethod
-    def description(self) -> str:
-        ...
+    def description(self) -> str: ...
 
     @property
     def proof(self) -> Optional[FormalBasis]:
@@ -62,6 +61,7 @@ class Rule(ABC):
 # Analysis engine -- composes rules
 # =====================================================================
 
+
 class AnalysisEngine:
     """Composes and runs analysis rules over an environment model."""
 
@@ -76,6 +76,7 @@ class AnalysisEngine:
     def add_all_rules(self):
         """Set the standard reward rule library (replaces any existing rules)."""
         from goodhart.rules.reward import REWARD_RULES
+
         existing_names = {r.name for r in self.rules}
         for rule in REWARD_RULES:
             if rule.name not in existing_names:
@@ -90,9 +91,13 @@ class AnalysisEngine:
                 try:
                     verdicts.extend(rule.check(model, config))
                 except Exception as e:
-                    verdicts.append(Verdict(
-                        rule_name=rule.name, severity=Severity.WARNING,
-                        message=f"Rule crashed: {e}"))
+                    verdicts.append(
+                        Verdict(
+                            rule_name=rule.name,
+                            severity=Severity.WARNING,
+                            message=f"Rule crashed: {e}",
+                        )
+                    )
         verdicts.extend(self._check_contradictions(verdicts))
         # Enrich verdicts with educational content from explanations DB
         self._enrich_verdicts(verdicts)
@@ -103,6 +108,7 @@ class AnalysisEngine:
     def _enrich_verdicts(verdicts: List[Verdict]):
         """Inject learn_more from explanations DB into verdicts that lack it."""
         from goodhart.rules.explanations import get_learn_more
+
         for v in verdicts:
             if v.learn_more is None:
                 learn_more = get_learn_more(v.rule_name)
@@ -125,19 +131,27 @@ class AnalysisEngine:
             # Penalty contradictions
             (
                 lambda r: "add" in r and "penalty" in r,
-                lambda r: ("remove" in r and "penalty" in r) or (r.startswith("set") and "penalty" in r and "0" in r),
+                lambda r: (
+                    ("remove" in r and "penalty" in r)
+                    or (r.startswith("set") and "penalty" in r and "0" in r)
+                ),
                 "One rule says add step penalty, another says remove it",
             ),
             # Entropy contradictions
             (
                 lambda r: "increase" in r and "entropy" in r,
-                lambda r: ("decrease" in r and "entropy" in r) or ("entropy" in r and "too high" in r),
+                lambda r: (
+                    ("decrease" in r and "entropy" in r)
+                    or ("entropy" in r and "too high" in r)
+                ),
                 "One rule says increase entropy, another says decrease it",
             ),
             # Intrinsic motivation contradictions
             (
                 lambda r: "add" in r and "intrinsic" in r,
-                lambda r: "intrinsic" in r and ("too" in r or "exceed" in r or "reduce" in r),
+                lambda r: (
+                    "intrinsic" in r and ("too" in r or "exceed" in r or "reduce" in r)
+                ),
                 "One rule says add intrinsic motivation, another says it is already too strong",
             ),
         ]
@@ -148,21 +162,31 @@ class AnalysisEngine:
             if rules_a and rules_b:
                 # Avoid self-contradictions from the same rule
                 if set(rules_a) != set(rules_b) or len(rules_a) > 1:
-                    contradiction_verdicts.append(Verdict(
-                        rule_name="contradiction",
-                        severity=Severity.WARNING,
-                        message=(f"Contradictory recommendations: {description}. "
-                                 f"Rules involved: {', '.join(sorted(set(rules_a + rules_b)))}"),
-                        details={"rules_a": rules_a, "rules_b": rules_b},
-                        recommendation="Review these rules manually; the fix for one may worsen the other",
-                    ))
+                    contradiction_verdicts.append(
+                        Verdict(
+                            rule_name="contradiction",
+                            severity=Severity.WARNING,
+                            message=(
+                                f"Contradictory recommendations: {description}. "
+                                f"Rules involved: {', '.join(sorted(set(rules_a + rules_b)))}"
+                            ),
+                            details={"rules_a": rules_a, "rules_b": rules_b},
+                            recommendation="Review these rules manually; the fix for one may worsen the other",
+                        )
+                    )
 
         return contradiction_verdicts
 
     def print_report(self, model: EnvironmentModel, config=None, verbose=False):
         """Run analysis and print formatted report."""
-        from goodhart.fmt import (header, section, verdict as fmt_verdict,
-                                  summary, passed_banner)
+        from goodhart.fmt import (
+            header,
+            section,
+            verdict as fmt_verdict,
+            summary,
+            passed_banner,
+        )
+
         result = self.analyze(model, config)
 
         header(f"REWARD ANALYSIS: {model.name}")
@@ -203,9 +227,14 @@ class TrainingAnalysisEngine(AnalysisEngine):
         from goodhart.rules.training import TRAINING_RULES
         from goodhart.rules.architecture import ARCHITECTURE_RULES
         from goodhart.rules.advisories import ADVISORY_RULES
+
         existing_names = {r.name for r in self.rules}
-        for rule in (list(REWARD_RULES) + list(TRAINING_RULES)
-                     + list(ARCHITECTURE_RULES) + list(ADVISORY_RULES)):
+        for rule in (
+            list(REWARD_RULES)
+            + list(TRAINING_RULES)
+            + list(ARCHITECTURE_RULES)
+            + list(ADVISORY_RULES)
+        ):
             if rule.name not in existing_names:
                 self.rules.append(rule)
                 existing_names.add(rule.name)
@@ -221,9 +250,19 @@ class TrainingAnalysisEngine(AnalysisEngine):
         return self
 
     def print_report(self, model: EnvironmentModel, config=None, verbose=False):
-        from goodhart.fmt import (header, section, verdict as fmt_verdict,
-                                  summary, passed_banner, DIM_COLOR, RULE_COLOR,
-                                  RESET, HEADER_COLOR, REC_COLOR)
+        from goodhart.fmt import (
+            header,
+            section,
+            verdict as fmt_verdict,
+            summary,
+            passed_banner,
+            DIM_COLOR,
+            RULE_COLOR,
+            RESET,
+            HEADER_COLOR,
+            REC_COLOR,
+        )
+
         result = self.analyze(model, config)
 
         subtitle = None
@@ -236,13 +275,19 @@ class TrainingAnalysisEngine(AnalysisEngine):
             print(f"  {HEADER_COLOR}Reward sources:{RESET}")
             for s in model.reward_sources:
                 intent = f" {REC_COLOR}(intentional){RESET}" if s.intentional else ""
-                passive = f" {DIM_COLOR}(passive){RESET}" if not s.requires_action else ""
-                print(f"    {RULE_COLOR}{s.name:28s}{RESET} "
-                      f"{s.value:+8.4f}  {DIM_COLOR}{s.reward_type.value}{RESET}"
-                      f"{intent}{passive}")
-            print(f"  {DIM_COLOR}max_steps={model.max_steps}, "
-                  f"gamma={model.gamma}, "
-                  f"death_prob={model.death_probability}{RESET}")
+                passive = (
+                    f" {DIM_COLOR}(passive){RESET}" if not s.requires_action else ""
+                )
+                print(
+                    f"    {RULE_COLOR}{s.name:28s}{RESET} "
+                    f"{s.value:+8.4f}  {DIM_COLOR}{s.reward_type.value}{RESET}"
+                    f"{intent}{passive}"
+                )
+            print(
+                f"  {DIM_COLOR}max_steps={model.max_steps}, "
+                f"gamma={model.gamma}, "
+                f"death_prob={model.death_probability}{RESET}"
+            )
             print()
 
         if result.criticals:

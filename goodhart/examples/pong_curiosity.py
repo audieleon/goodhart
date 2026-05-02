@@ -54,22 +54,26 @@ def run_example():
         action_type="discrete",
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="score",
-        reward_type=RewardType.ON_EVENT,
-        value=1.0,
-        requires_action=True,
-        intentional=True,
-        discovery_probability=0.1,
-    ))
-    model.add_reward_source(RewardSource(
-        name="curiosity_bonus",
-        reward_type=RewardType.PER_STEP,
-        value=0.1,
-        respawn=RespawnBehavior.INFINITE,
-        requires_action=True,
-        intentional=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="score",
+            reward_type=RewardType.ON_EVENT,
+            value=1.0,
+            requires_action=True,
+            intentional=True,
+            discovery_probability=0.1,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="curiosity_bonus",
+            reward_type=RewardType.PER_STEP,
+            value=0.1,
+            respawn=RespawnBehavior.INFINITE,
+            requires_action=True,
+            intentional=False,
+        )
+    )
 
     engine.print_report(model)
 

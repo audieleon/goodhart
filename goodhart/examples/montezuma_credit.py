@@ -57,24 +57,28 @@ def run_example():
         n_actions=18,
         death_probability=0.1,
     )
-    model.add_reward_source(RewardSource(
-        name="item_pickup",
-        reward_type=RewardType.ON_EVENT,
-        value=100.0,
-        max_occurrences=10,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.001,  # extremely rare by random play
-    ))
-    model.add_reward_source(RewardSource(
-        name="room_complete",
-        reward_type=RewardType.ON_EVENT,
-        value=300.0,
-        max_occurrences=24,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.0001,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="item_pickup",
+            reward_type=RewardType.ON_EVENT,
+            value=100.0,
+            max_occurrences=10,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.001,  # extremely rare by random play
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="room_complete",
+            reward_type=RewardType.ON_EVENT,
+            value=300.0,
+            max_occurrences=24,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.0001,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

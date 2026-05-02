@@ -55,36 +55,44 @@ def run_example():
         n_actions=4,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="distance_decrease",
-        reward_type=RewardType.SHAPING,
-        value=1.0,
-        value_range=(-0.25, 0.25),
-        state_dependent=True,
-        scales_with="distance",
-        requires_action=True,
-        can_loop=False,  # potential-based
-    ))
-    model.add_reward_source(RewardSource(
-        name="success_reward",
-        reward_type=RewardType.TERMINAL,
-        value=10.0,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.2,
-    ))
-    model.add_reward_source(RewardSource(
-        name="slack_reward",
-        reward_type=RewardType.ON_EVENT,
-        value=2.5,
-        requires_action=True,
-        discovery_probability=0.2,
-    ))
-    model.add_reward_source(RewardSource(
-        name="step_penalty",
-        reward_type=RewardType.PER_STEP,
-        value=-0.01,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="distance_decrease",
+            reward_type=RewardType.SHAPING,
+            value=1.0,
+            value_range=(-0.25, 0.25),
+            state_dependent=True,
+            scales_with="distance",
+            requires_action=True,
+            can_loop=False,  # potential-based
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="success_reward",
+            reward_type=RewardType.TERMINAL,
+            value=10.0,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.2,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="slack_reward",
+            reward_type=RewardType.ON_EVENT,
+            value=2.5,
+            requires_action=True,
+            discovery_probability=0.2,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="step_penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.01,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

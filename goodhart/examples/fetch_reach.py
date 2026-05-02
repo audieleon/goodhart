@@ -54,19 +54,23 @@ def run_example():
         n_actions=4,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="step_penalty",
-        reward_type=RewardType.PER_STEP,
-        value=-1.0,
-    ))
-    model.add_reward_source(RewardSource(
-        name="goal_reached",
-        reward_type=RewardType.TERMINAL,
-        value=50.0,  # offsets all step penalties when reached
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.05,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="step_penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-1.0,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="goal_reached",
+            reward_type=RewardType.TERMINAL,
+            value=50.0,  # offsets all step penalties when reached
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.05,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

@@ -55,14 +55,16 @@ def run_example():
         n_actions=2,
         death_probability=0.05,
     )
-    model_default.add_reward_source(RewardSource(
-        name="alive_reward",
-        reward_type=RewardType.PER_STEP,
-        value=1.0,
-        respawn=RespawnBehavior.INFINITE,
-        requires_action=False,
-        intentional=True,  # survival IS the goal
-    ))
+    model_default.add_reward_source(
+        RewardSource(
+            name="alive_reward",
+            reward_type=RewardType.PER_STEP,
+            value=1.0,
+            respawn=RespawnBehavior.INFINITE,
+            requires_action=False,
+            intentional=True,  # survival IS the goal
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",
@@ -93,12 +95,14 @@ def run_example():
         n_actions=2,
         death_probability=0.05,
     )
-    model_sb.add_reward_source(RewardSource(
-        name="termination_penalty",
-        reward_type=RewardType.ON_EVENT,
-        value=-1.0,
-        requires_action=False,
-    ))
+    model_sb.add_reward_source(
+        RewardSource(
+            name="termination_penalty",
+            reward_type=RewardType.ON_EVENT,
+            value=-1.0,
+            requires_action=False,
+        )
+    )
 
     config_sb = TrainingConfig(
         algorithm="PPO",

@@ -40,10 +40,14 @@ def run_example():
     print()
 
     model = EnvironmentModel(name="Tic-tac-toe crash", max_steps=50)
-    model.add_reward_source(RewardSource(
-        name="win", reward_type=RewardType.TERMINAL,
-        value=1.0, discovery_probability=0.5,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="win",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            discovery_probability=0.5,
+        )
+    )
 
     engine = AnalysisEngine().add_all_rules()
     result = engine.analyze(model)

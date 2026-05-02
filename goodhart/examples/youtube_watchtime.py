@@ -46,22 +46,24 @@ def run_example():
 
     model = EnvironmentModel(
         name="YouTube Watch Time Optimization",
-        max_steps=10000,       # user session length
+        max_steps=10000,  # user session length
         gamma=0.99,
-        n_states=10000000,     # content catalog
-        n_actions=1000000,     # videos to recommend
+        n_states=10000000,  # content catalog
+        n_actions=1000000,  # videos to recommend
         death_probability=0.0,  # session can continue indefinitely
     )
-    model.add_reward_source(RewardSource(
-        name="watch_time",
-        reward_type=RewardType.PER_STEP,
-        value=1.0,
-        respawn=RespawnBehavior.INFINITE,
-        can_loop=True,
-        loop_period=1,
-        requires_action=True,
-        intentional=False,  # Watch time is a PROXY, not the real goal
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="watch_time",
+            reward_type=RewardType.PER_STEP,
+            value=1.0,
+            respawn=RespawnBehavior.INFINITE,
+            can_loop=True,
+            loop_period=1,
+            requires_action=True,
+            intentional=False,  # Watch time is a PROXY, not the real goal
+        )
+    )
     # No goal reward for user satisfaction, learning, or wellbeing.
     # That's the structural problem.
 

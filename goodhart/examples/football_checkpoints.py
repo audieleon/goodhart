@@ -54,30 +54,36 @@ def run_example():
         n_actions=19,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="goal_scored",
-        reward_type=RewardType.TERMINAL,
-        value=1.0,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.1,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="goal_scored",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.1,
+        )
+    )
     # 10 checkpoint zones, each gives +0.1 once per episode
-    model.add_reward_source(RewardSource(
-        name="checkpoint_shaping",
-        reward_type=RewardType.ON_EVENT,
-        value=0.1,
-        max_occurrences=10,
-        respawn=RespawnBehavior.NONE,
-        requires_action=True,
-        can_loop=False,
-    ))
-    model.add_reward_source(RewardSource(
-        name="goal_conceded",
-        reward_type=RewardType.ON_EVENT,
-        value=-1.0,
-        requires_action=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="checkpoint_shaping",
+            reward_type=RewardType.ON_EVENT,
+            value=0.1,
+            max_occurrences=10,
+            respawn=RespawnBehavior.NONE,
+            requires_action=True,
+            can_loop=False,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="goal_conceded",
+            reward_type=RewardType.ON_EVENT,
+            value=-1.0,
+            requires_action=False,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="APPO",

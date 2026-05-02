@@ -66,35 +66,70 @@ from goodhart.rules.advisories import (
     ADVISORY_RULES,
 )
 
-ALL_RULES = (list(REWARD_RULES) + list(TRAINING_RULES)
-             + list(ARCHITECTURE_RULES) + list(ADVISORY_RULES))
+ALL_RULES = (
+    list(REWARD_RULES)
+    + list(TRAINING_RULES)
+    + list(ARCHITECTURE_RULES)
+    + list(ADVISORY_RULES)
+)
 RULE_COUNT = len(ALL_RULES)
 
 __all__ = [
     # Reward rules
-    "PenaltyDominatesGoal", "DeathBeatsSurvival", "IdleExploit",
-    "ExplorationThreshold", "RespawningExploit", "DeathResetExploit",
-    "ShapingLoopExploit", "ShapingNotPotentialBased", "ProxyRewardHackability",
-    "IntrinsicSufficiency", "BudgetSufficiency", "CompoundTrap",
-    "StagedRewardPlateau", "RewardDominanceImbalance", "ExponentialSaturation", "IntrinsicDominance",
-    "DiscountHorizonMismatch", "NegativeOnlyReward", "RewardDelayHorizon",
+    "PenaltyDominatesGoal",
+    "DeathBeatsSurvival",
+    "IdleExploit",
+    "ExplorationThreshold",
+    "RespawningExploit",
+    "DeathResetExploit",
+    "ShapingLoopExploit",
+    "ShapingNotPotentialBased",
+    "ProxyRewardHackability",
+    "IntrinsicSufficiency",
+    "BudgetSufficiency",
+    "CompoundTrap",
+    "StagedRewardPlateau",
+    "RewardDominanceImbalance",
+    "ExponentialSaturation",
+    "IntrinsicDominance",
+    "DiscountHorizonMismatch",
+    "NegativeOnlyReward",
+    "RewardDelayHorizon",
     "REWARD_RULES",
     # Training rules
-    "LearningRateRegime", "CriticLearningRate", "EntropyCollapse",
-    "ClipFractionPrediction", "ExpertCollapse", "BatchSizeInteraction",
-    "ParallelismEffect", "MemoryCapacity",
-    "ReplayBufferRatio", "TargetNetworkUpdate", "EpsilonSchedule",
-    "SoftUpdateRate", "SACAlpha", "TRAINING_RULES",
+    "LearningRateRegime",
+    "CriticLearningRate",
+    "EntropyCollapse",
+    "ClipFractionPrediction",
+    "ExpertCollapse",
+    "BatchSizeInteraction",
+    "ParallelismEffect",
+    "MemoryCapacity",
+    "ReplayBufferRatio",
+    "TargetNetworkUpdate",
+    "EpsilonSchedule",
+    "SoftUpdateRate",
+    "SACAlpha",
+    "TRAINING_RULES",
     # Architecture rules
-    "PrecedentRule", "Precedent", "EmbedDimCapacity",
-    "RoutingFloorNecessity", "RecurrenceType", "ActorCountEffect",
+    "PrecedentRule",
+    "Precedent",
+    "EmbedDimCapacity",
+    "RoutingFloorNecessity",
+    "RecurrenceType",
+    "ActorCountEffect",
     "ARCHITECTURE_RULES",
     # Advisory rules
-    "PhysicsExploitAdvisory", "GoalMisgeneralizationAdvisory",
-    "CreditAssignmentAdvisory", "ConstrainedRLAdvisory",
-    "NonStationarityAdvisory", "LearnedRewardAdvisory",
-    "MissingConstraintAdvisory", "AggregationTrapAdvisory",
+    "PhysicsExploitAdvisory",
+    "GoalMisgeneralizationAdvisory",
+    "CreditAssignmentAdvisory",
+    "ConstrainedRLAdvisory",
+    "NonStationarityAdvisory",
+    "LearnedRewardAdvisory",
+    "MissingConstraintAdvisory",
+    "AggregationTrapAdvisory",
     "ADVISORY_RULES",
     # Aggregates
-    "ALL_RULES", "RULE_COUNT",
+    "ALL_RULES",
+    "RULE_COUNT",
 ]

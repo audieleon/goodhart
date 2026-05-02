@@ -55,14 +55,16 @@ def run_example():
         death_probability=0.0,
         wall_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="goal",
-        reward_type=RewardType.TERMINAL,
-        value=1.0,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.01,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="goal",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.01,
+        )
+    )
     # Note: no penalty for holes! This is actually a design issue —
     # without negative signal for holes, the agent has no feedback
     # on BAD actions, only on the rare GOOD outcome.

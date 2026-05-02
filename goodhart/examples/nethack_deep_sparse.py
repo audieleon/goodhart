@@ -54,23 +54,27 @@ def run_example():
         n_actions=77,
         death_probability=0.01,
     )
-    model.add_reward_source(RewardSource(
-        name="score",
-        reward_type=RewardType.ON_EVENT,
-        value=1.0,
-        max_occurrences=0,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.001,
-    ))
-    model.add_reward_source(RewardSource(
-        name="amulet",
-        reward_type=RewardType.TERMINAL,
-        value=10000.0,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.0000001,  # essentially zero for random
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="score",
+            reward_type=RewardType.ON_EVENT,
+            value=1.0,
+            max_occurrences=0,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.001,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="amulet",
+            reward_type=RewardType.TERMINAL,
+            value=10000.0,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.0000001,  # essentially zero for random
+        )
+    )
 
     config = TrainingConfig(
         algorithm="APPO",

@@ -35,11 +35,35 @@ METADATA = {
 
 def run_example():
     model = EnvironmentModel(
-        name="Mountain Car (step penalty trap)", max_steps=200, gamma=1.0,
-        n_states=600, n_actions=3, action_type="discrete", death_probability=0.0,
+        name="Mountain Car (step penalty trap)",
+        max_steps=200,
+        gamma=1.0,
+        n_states=600,
+        n_actions=3,
+        action_type="discrete",
+        death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(name="reach flag", reward_type=RewardType.TERMINAL, value=1.0, requires_action=True, intentional=True, requires_exploration=True, discovery_probability=0.01))
-    model.add_reward_source(RewardSource(name="step penalty", reward_type=RewardType.PER_STEP, value=-1.0, state_dependent=False, requires_action=False, intentional=True))
+    model.add_reward_source(
+        RewardSource(
+            name="reach flag",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            requires_action=True,
+            intentional=True,
+            requires_exploration=True,
+            discovery_probability=0.01,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="step penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-1.0,
+            state_dependent=False,
+            requires_action=False,
+            intentional=True,
+        )
+    )
     engine = TrainingAnalysisEngine().add_all_rules()
 
     print("Mountain Car / CartPole Suicide Analysis")

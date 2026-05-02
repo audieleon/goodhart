@@ -49,20 +49,22 @@ def run_example():
 
     model = EnvironmentModel(
         name="Data Center Cooling",
-        max_steps=8760,    # hours in a year
+        max_steps=8760,  # hours in a year
         gamma=0.99,
         n_states=100000,
         n_actions=20,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="energy_cost",
-        reward_type=RewardType.PER_STEP,
-        value=-1.0,
-        state_dependent=True,
-        requires_action=True,
-        intentional=True,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="energy_cost",
+            reward_type=RewardType.PER_STEP,
+            value=-1.0,
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+        )
+    )
     # No other reward terms. Safety constraints are action masks,
     # not reward penalties. This is intentional and crucial.
 

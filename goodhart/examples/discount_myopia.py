@@ -52,14 +52,16 @@ def run_example():
         action_type="discrete",
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="task_goal",
-        reward_type=RewardType.TERMINAL,
-        value=10.0,
-        requires_action=True,
-        intentional=True,
-        discovery_probability=0.02,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="task_goal",
+            reward_type=RewardType.TERMINAL,
+            value=10.0,
+            requires_action=True,
+            intentional=True,
+            discovery_probability=0.02,
+        )
+    )
 
     engine.print_report(model)
 

@@ -56,20 +56,24 @@ def run_example():
         n_actions=8,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="win",
-        reward_type=RewardType.TERMINAL,
-        value=1.0,
-        requires_action=True,
-        discovery_probability=0.5,  # ~50% win rate at equilibrium
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="lose",
-        reward_type=RewardType.TERMINAL,
-        value=-1.0,
-        requires_action=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="win",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            requires_action=True,
+            discovery_probability=0.5,  # ~50% win rate at equilibrium
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="lose",
+            reward_type=RewardType.TERMINAL,
+            value=-1.0,
+            requires_action=False,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

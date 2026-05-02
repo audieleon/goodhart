@@ -44,22 +44,26 @@ def run_example():
     )
 
     # Level completion reward (advances to harder level)
-    model.add_reward_source(RewardSource(
-        name="level completion",
-        reward_type=RewardType.TERMINAL,
-        value=100.0,
-        discovery_probability=0.5,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="level completion",
+            reward_type=RewardType.TERMINAL,
+            value=100.0,
+            discovery_probability=0.5,
+        )
+    )
 
     # Level 1 collectibles — THIS IS THE TRAP
     # These reset when the agent dies, allowing re-collection
-    model.add_reward_source(RewardSource(
-        name="level 1 collectibles",
-        reward_type=RewardType.ON_EVENT,
-        value=80.0,
-        respawn=RespawnBehavior.ON_DEATH,  # resets on death
-        discovery_probability=0.9,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="level 1 collectibles",
+            reward_type=RewardType.ON_EVENT,
+            value=80.0,
+            respawn=RespawnBehavior.ON_DEATH,  # resets on death
+            discovery_probability=0.9,
+        )
+    )
 
     engine = TrainingAnalysisEngine().add_all_rules()
     engine.print_report(model)

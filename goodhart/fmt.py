@@ -46,11 +46,13 @@ RESET = _RESET
 # Terminal width — recalculated on each call to adapt to resizes
 INDENT = "     "
 
+
 def _term_width():
     try:
         return min(os.get_terminal_size().columns, 80) if sys.stdout.isatty() else 80
     except (OSError, ValueError, AttributeError):
         return 80
+
 
 def _wrap_width():
     return max(_term_width() - len(INDENT), 20)
@@ -142,7 +144,9 @@ def rule_list_item(name, description, width=32):
     # Wrap description to fit after the name column
     desc_width = _term_width() - width - 6
     desc_lines = textwrap.wrap(description, width=desc_width)
-    print(f"    {RULE_COLOR}{name:<{width}}{RESET} {desc_lines[0] if desc_lines else ''}")
+    print(
+        f"    {RULE_COLOR}{name:<{width}}{RESET} {desc_lines[0] if desc_lines else ''}"
+    )
     for line in desc_lines[1:]:
         print(f"    {' ' * width} {line}")
 

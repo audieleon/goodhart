@@ -55,24 +55,28 @@ def run_example():
         n_actions=5,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="checkpoint",
-        reward_type=RewardType.ON_EVENT,
-        value=1.0,
-        respawn=RespawnBehavior.TIMED,
-        respawn_time=10,
-        can_loop=True,
-        loop_period=30,  # 3 checkpoints * ~10 steps each
-        requires_action=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="finish_race",
-        reward_type=RewardType.TERMINAL,
-        value=10.0,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.05,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="checkpoint",
+            reward_type=RewardType.ON_EVENT,
+            value=1.0,
+            respawn=RespawnBehavior.TIMED,
+            respawn_time=10,
+            can_loop=True,
+            loop_period=30,  # 3 checkpoints * ~10 steps each
+            requires_action=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="finish_race",
+            reward_type=RewardType.TERMINAL,
+            value=10.0,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.05,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

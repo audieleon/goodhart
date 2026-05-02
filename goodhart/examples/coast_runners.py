@@ -35,19 +35,36 @@ METADATA = {
 
 def run_example():
     model = EnvironmentModel(
-        name="CoastRunners (reward loop)", max_steps=2000, gamma=0.99,
-        n_states=100000, n_actions=3, action_type="discrete", death_probability=0.01,
+        name="CoastRunners (reward loop)",
+        max_steps=2000,
+        gamma=0.99,
+        n_states=100000,
+        n_actions=3,
+        action_type="discrete",
+        death_probability=0.01,
     )
-    model.add_reward_source(RewardSource(
-        name="finish race", reward_type=RewardType.TERMINAL, value=100.0,
-        requires_action=True, intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="turbo powerup", reward_type=RewardType.ON_EVENT, value=20.0,
-        respawn=RespawnBehavior.TIMED, respawn_time=5,
-        can_loop=True, loop_period=10,
-        requires_action=True, intentional=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="finish race",
+            reward_type=RewardType.TERMINAL,
+            value=100.0,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="turbo powerup",
+            reward_type=RewardType.ON_EVENT,
+            value=20.0,
+            respawn=RespawnBehavior.TIMED,
+            respawn_time=5,
+            can_loop=True,
+            loop_period=10,
+            requires_action=True,
+            intentional=False,
+        )
+    )
     engine = TrainingAnalysisEngine().add_all_rules()
 
     print("CoastRunners Reward Analysis")

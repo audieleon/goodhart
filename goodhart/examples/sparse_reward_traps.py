@@ -49,18 +49,30 @@ def run_example():
     print("avoiding enemies. Reward only for reaching new rooms.")
     print()
 
-    model = EnvironmentModel(name="Montezuma's Revenge", max_steps=18000,
-                             n_states=500000, death_probability=0.002)
-    model.add_reward_source(RewardSource(
-        name="room reward", reward_type=RewardType.ON_EVENT,
-        value=100.0, max_occurrences=24,  # 24 rooms
-        discovery_probability=0.001,  # very hard to find
-    ))
-    model.add_reward_source(RewardSource(
-        name="key pickup", reward_type=RewardType.ON_EVENT,
-        value=50.0, max_occurrences=6,
-        discovery_probability=0.0005,
-    ))
+    model = EnvironmentModel(
+        name="Montezuma's Revenge",
+        max_steps=18000,
+        n_states=500000,
+        death_probability=0.002,
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="room reward",
+            reward_type=RewardType.ON_EVENT,
+            value=100.0,
+            max_occurrences=24,  # 24 rooms
+            discovery_probability=0.001,  # very hard to find
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="key pickup",
+            reward_type=RewardType.ON_EVENT,
+            value=50.0,
+            max_occurrences=6,
+            discovery_probability=0.0005,
+        )
+    )
     engine.print_report(model)
 
     print("No step penalty means no degenerate equilibrium — but")
@@ -75,13 +87,16 @@ def run_example():
     print("Achievements are sparse but INCREMENTALLY discoverable.")
     print()
 
-    model2 = EnvironmentModel(name="Crafter", max_steps=10000,
-                              n_states=100000)
-    model2.add_reward_source(RewardSource(
-        name="achievements", reward_type=RewardType.ON_EVENT,
-        value=1.0, max_occurrences=22,
-        discovery_probability=0.1,  # easier than Montezuma
-    ))
+    model2 = EnvironmentModel(name="Crafter", max_steps=10000, n_states=100000)
+    model2.add_reward_source(
+        RewardSource(
+            name="achievements",
+            reward_type=RewardType.ON_EVENT,
+            value=1.0,
+            max_occurrences=22,
+            discovery_probability=0.1,  # easier than Montezuma
+        )
+    )
     engine.print_report(model2)
 
     print("Crafter avoids the sparse reward trap by having many")
@@ -96,16 +111,24 @@ def run_example():
     print("the robot learns to do nothing or knock object off table.")
     print()
 
-    model3 = EnvironmentModel(name="Sparse Pick-and-Place",
-                              max_steps=200, n_states=50000)
-    model3.add_reward_source(RewardSource(
-        name="successful placement", reward_type=RewardType.TERMINAL,
-        value=1.0, discovery_probability=0.005,
-    ))
-    model3.add_reward_source(RewardSource(
-        name="step penalty", reward_type=RewardType.PER_STEP,
-        value=-0.01,
-    ))
+    model3 = EnvironmentModel(
+        name="Sparse Pick-and-Place", max_steps=200, n_states=50000
+    )
+    model3.add_reward_source(
+        RewardSource(
+            name="successful placement",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            discovery_probability=0.005,
+        )
+    )
+    model3.add_reward_source(
+        RewardSource(
+            name="step penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.01,
+        )
+    )
     engine.print_report(model3)
 
     print("Caught: penalty dominates goal, death beats survival,")

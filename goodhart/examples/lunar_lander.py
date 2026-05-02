@@ -54,50 +54,62 @@ def run_example():
         n_actions=4,
         death_probability=0.1,
     )
-    model.add_reward_source(RewardSource(
-        name="distance_shaping",
-        reward_type=RewardType.SHAPING,
-        value=1.0,
-        value_range=(-1.0, 1.0),
-        state_dependent=True,
-        scales_with="distance",
-        requires_action=True,
-        can_loop=False,  # potential-based: cycles net zero
-    ))
-    model.add_reward_source(RewardSource(
-        name="velocity_shaping",
-        reward_type=RewardType.SHAPING,
-        value=0.5,
-        state_dependent=True,
-        scales_with="velocity",
-        requires_action=True,
-        can_loop=False,  # potential-based
-    ))
-    model.add_reward_source(RewardSource(
-        name="landing_bonus",
-        reward_type=RewardType.TERMINAL,
-        value=100.0,
-        requires_action=True,
-        discovery_probability=0.3,
-    ))
-    model.add_reward_source(RewardSource(
-        name="crash_penalty",
-        reward_type=RewardType.ON_EVENT,
-        value=-100.0,
-        requires_action=False,
-    ))
-    model.add_reward_source(RewardSource(
-        name="leg_contact",
-        reward_type=RewardType.ON_EVENT,
-        value=10.0,
-        requires_action=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="fuel_cost",
-        reward_type=RewardType.PER_STEP,
-        value=-0.03,
-        requires_action=True,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="distance_shaping",
+            reward_type=RewardType.SHAPING,
+            value=1.0,
+            value_range=(-1.0, 1.0),
+            state_dependent=True,
+            scales_with="distance",
+            requires_action=True,
+            can_loop=False,  # potential-based: cycles net zero
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="velocity_shaping",
+            reward_type=RewardType.SHAPING,
+            value=0.5,
+            state_dependent=True,
+            scales_with="velocity",
+            requires_action=True,
+            can_loop=False,  # potential-based
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="landing_bonus",
+            reward_type=RewardType.TERMINAL,
+            value=100.0,
+            requires_action=True,
+            discovery_probability=0.3,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="crash_penalty",
+            reward_type=RewardType.ON_EVENT,
+            value=-100.0,
+            requires_action=False,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="leg_contact",
+            reward_type=RewardType.ON_EVENT,
+            value=10.0,
+            requires_action=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="fuel_cost",
+            reward_type=RewardType.PER_STEP,
+            value=-0.03,
+            requires_action=True,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

@@ -53,7 +53,10 @@ def analyze(goal=0.0, penalty=0.0, max_steps=500, **kwargs) -> Result:
     from goodhart.builders import build_model_and_config
 
     model, config = build_model_and_config(
-        goal=goal, penalty=penalty, max_steps=max_steps, **kwargs,
+        goal=goal,
+        penalty=penalty,
+        max_steps=max_steps,
+        **kwargs,
     )
     engine = TrainingAnalysisEngine().add_all_rules()
     return engine.analyze(model, config)

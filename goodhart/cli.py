@@ -24,11 +24,17 @@ import json
 import sys
 from goodhart.engine import TrainingAnalysisEngine
 from goodhart.rules import RULE_COUNT
-from goodhart.builders import build_model_and_config, load_config_file, build_from_config_dict
+from goodhart.builders import (
+    build_model_and_config,
+    load_config_file,
+    build_from_config_dict,
+)
+
 
 def _get_version():
     """Get version without circular import."""
     import importlib.metadata
+
     try:
         return importlib.metadata.version("goodhart")
     except importlib.metadata.PackageNotFoundError:
@@ -38,16 +44,25 @@ def _get_version():
 _build_model_and_config = build_model_and_config  # backward compat alias
 
 
-def preflight_check(goal: float = 0.0, penalty: float = 0.0,
-                    max_steps: int = 500, discovery_prob: float = 0.05,
-                    n_actors: int = 64, total_steps: int = 20_000_000,
-                    lr: float = 3e-4, critic_lr: float = None,
-                    entropy: float = 0.01, n_specialists: int = 1,
-                    routing_floor: float = 0.0, n_states: int = 1000,
-                    gamma: float = 0.99, name: str = "experiment",
-                    exit_on_critical: bool = False,
-                    quiet: bool = False,
-                    json_output: bool = False) -> bool:
+def preflight_check(
+    goal: float = 0.0,
+    penalty: float = 0.0,
+    max_steps: int = 500,
+    discovery_prob: float = 0.05,
+    n_actors: int = 64,
+    total_steps: int = 20_000_000,
+    lr: float = 3e-4,
+    critic_lr: float = None,
+    entropy: float = 0.01,
+    n_specialists: int = 1,
+    routing_floor: float = 0.0,
+    n_states: int = 1000,
+    gamma: float = 0.99,
+    name: str = "experiment",
+    exit_on_critical: bool = False,
+    quiet: bool = False,
+    json_output: bool = False,
+) -> bool:
     """Run pre-flight check. Returns True if no criticals found.
 
     Drop this into your training script:
@@ -61,11 +76,19 @@ def preflight_check(goal: float = 0.0, penalty: float = 0.0,
         json_output: Output results as JSON instead of text.
     """
     model, config = _build_model_and_config(
-        goal=goal, penalty=penalty, max_steps=max_steps,
-        discovery_prob=discovery_prob, n_actors=n_actors,
-        total_steps=total_steps, lr=lr, critic_lr=critic_lr,
-        entropy=entropy, n_specialists=n_specialists,
-        routing_floor=routing_floor, n_states=n_states, gamma=gamma,
+        goal=goal,
+        penalty=penalty,
+        max_steps=max_steps,
+        discovery_prob=discovery_prob,
+        n_actors=n_actors,
+        total_steps=total_steps,
+        lr=lr,
+        critic_lr=critic_lr,
+        entropy=entropy,
+        n_specialists=n_specialists,
+        routing_floor=routing_floor,
+        n_states=n_states,
+        gamma=gamma,
         name=name,
     )
 
@@ -75,11 +98,19 @@ def preflight_check(goal: float = 0.0, penalty: float = 0.0,
     if json_output:
         print(json.dumps(result.to_dict(), indent=2))
     elif not quiet:
-        from goodhart.fmt import (header, section, verdict as fmt_verdict,
-                                  summary, passed_banner)
-        header(f"Pre-flight Check: {name}",
-               f"goal={goal}, penalty={penalty}, steps={max_steps}, "
-               f"p(goal)={discovery_prob}, actors={n_actors}")
+        from goodhart.fmt import (
+            header,
+            section,
+            verdict as fmt_verdict,
+            summary,
+            passed_banner,
+        )
+
+        header(
+            f"Pre-flight Check: {name}",
+            f"goal={goal}, penalty={penalty}, steps={max_steps}, "
+            f"p(goal)={discovery_prob}, actors={n_actors}",
+        )
 
         if result.criticals:
             section("CRITICAL", len(result.criticals))
@@ -122,30 +153,30 @@ def _output_analysis(model, config, args):
 
     # Apply --ignore: remove suppressed rules before analysis
     ignored = set()
-    if getattr(args, 'ignore', None):
-        ignored = {r.strip() for r in args.ignore.split(',')}
+    if getattr(args, "ignore", None):
+        ignored = {r.strip() for r in args.ignore.split(",")}
         engine.rules = [r for r in engine.rules if r.name not in ignored]
 
-    output_format = getattr(args, 'format', 'default')
+    output_format = getattr(args, "format", "default")
 
     if args.json:
         result = engine.analyze(model, config)
-        verbose = getattr(args, 'verbose', False)
+        verbose = getattr(args, "verbose", False)
         print(json.dumps(result.to_dict(verbose=verbose), indent=2))
     elif args.quiet:
         result = engine.analyze(model, config)
-    elif output_format == 'compact':
+    elif output_format == "compact":
         result = engine.analyze(model, config)
         for v in result.verdicts:
             severity = v.severity.value.upper()
             print(f"{severity}:{v.rule_name}: {v.message}")
     else:
-        verbose = getattr(args, 'verbose', False)
+        verbose = getattr(args, "verbose", False)
         result = engine.print_report(model, config, verbose=verbose)
 
     # Determine exit code
-    strict = getattr(args, 'strict', False)
-    exit_on_critical = getattr(args, 'exit_on_critical', False)
+    strict = getattr(args, "strict", False)
+    exit_on_critical = getattr(args, "exit_on_critical", False)
 
     if strict and (result.criticals or result.warnings):
         sys.exit(1)
@@ -163,14 +194,20 @@ def _run_doctor(args):
         model, config = _build_from_config_dict(cfg, fallback_name=args.config)
     else:
         model, config = _build_model_and_config(
-            goal=args.goal or 0.0, penalty=args.penalty or 0.0,
+            goal=args.goal or 0.0,
+            penalty=args.penalty or 0.0,
             max_steps=args.steps or 500,
-            discovery_prob=args.discovery, n_actors=args.actors,
-            total_steps=args.budget, lr=args.lr,
-            critic_lr=args.critic_lr, entropy=args.entropy,
+            discovery_prob=args.discovery,
+            n_actors=args.actors,
+            total_steps=args.budget,
+            lr=args.lr,
+            critic_lr=args.critic_lr,
+            entropy=args.entropy,
             n_specialists=args.specialists,
-            routing_floor=args.floor, n_states=args.states,
-            gamma=args.gamma, name=args.name,
+            routing_floor=args.floor,
+            n_states=args.states,
+            gamma=args.gamma,
+            name=args.name,
         )
 
     engine = TrainingAnalysisEngine().add_all_rules()
@@ -218,7 +255,11 @@ def _run_doctor(args):
             else:
                 avg_ep_len = float(model.max_steps)
             avg_ep_len = max(1.0, avg_ep_len)
-            best_p = max(s.discovery_probability for s in model.goal_sources) if model.goal_sources else 0.0
+            best_p = (
+                max(s.discovery_probability for s in model.goal_sources)
+                if model.goal_sources
+                else 0.0
+            )
             if best_p > 0 and avg_ep_len > 0:
                 # Need: total_episodes * best_p >= 10
                 # total_episodes = total_steps / avg_ep_len
@@ -274,7 +315,7 @@ def _run_doctor(args):
                 suggested_config[key] = val
 
     # JSON output mode
-    if getattr(args, 'json', False):
+    if getattr(args, "json", False):
         diagnosis = "no issues found" if not issues else f"{len(issues)} issue(s) found"
         output = {"diagnosis": diagnosis, "issues": issue_dicts}
         if suggested_config:
@@ -302,6 +343,7 @@ def _run_doctor(args):
     # Print suggested config
     if fixes:
         print("Suggested config:")
+
         def _fmt(v):
             """Format values for human readability."""
             if isinstance(v, float):
@@ -376,11 +418,17 @@ def interactive():
 
     print()
     preflight_check(
-        goal=goal, penalty=penalty, max_steps=max_steps,
-        discovery_prob=discovery, n_actors=n_actors,
-        total_steps=total_steps, lr=lr, critic_lr=critic_lr,
+        goal=goal,
+        penalty=penalty,
+        max_steps=max_steps,
+        discovery_prob=discovery,
+        n_actors=n_actors,
+        total_steps=total_steps,
+        lr=lr,
+        critic_lr=critic_lr,
         entropy=entropy,
-        n_specialists=n_specialists, routing_floor=routing_floor,
+        n_specialists=n_specialists,
+        routing_floor=routing_floor,
         name=name,
     )
 
@@ -389,21 +437,21 @@ def main():
     parser = argparse.ArgumentParser(
         prog="goodhart",
         description=(
-            'goodhart -- catch reward traps before training.\n'
-            '\n'
+            "goodhart -- catch reward traps before training.\n"
+            "\n"
             '"When a measure becomes a target, it ceases to be a good measure."\n'
-            '-- Charles Goodhart (1975), generalized by Marilyn Strathern (1997)\n'
-            '\n'
-            'Your reward function is a measure of what you want. Your agent\n'
-            'will target it directly -- standing still, dying fast, going in\n'
-            'circles, exploiting physics. This tool catches those failure\n'
-            'modes from your configuration alone, before you spend compute.\n'
-            '\n'
-            f'{RULE_COUNT} composable rules covering reward structure, training\n'
-            'hyperparameters, architecture, and blind-spot advisories.\n'
-            'Validated against 212 encodings from 133 papers (1983-2025).\n'
-            '\n'
-            'Takes milliseconds. Catches structural reward traps before you spend compute.'
+            "-- Charles Goodhart (1975), generalized by Marilyn Strathern (1997)\n"
+            "\n"
+            "Your reward function is a measure of what you want. Your agent\n"
+            "will target it directly -- standing still, dying fast, going in\n"
+            "circles, exploiting physics. This tool catches those failure\n"
+            "modes from your configuration alone, before you spend compute.\n"
+            "\n"
+            f"{RULE_COUNT} composable rules covering reward structure, training\n"
+            "hyperparameters, architecture, and blind-spot advisories.\n"
+            "Validated against 212 encodings from 133 papers (1983-2025).\n"
+            "\n"
+            "Takes milliseconds. Catches structural reward traps before you spend compute."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
@@ -463,159 +511,333 @@ Tab completion (bash):
         """,
     )
 
-    parser.add_argument("--version", action="version",
-                        version=f"goodhart {_get_version()}")
-    parser.add_argument("--about", action="store_true",
-                        help="Learn about Goodhart's Law and this tool")
-    parser.add_argument("--fields", action="store_true",
-                        help="List all RewardSource and EnvironmentModel fields")
-    parser.add_argument("--field", type=str, metavar="NAME",
-                        help="Explain a specific field (e.g. --field intentional), or --field all")
-    parser.add_argument("--rules", action="store_true",
-                        help="List all analysis rules")
-    parser.add_argument("--examples", action="store_true",
-                        help="Browse cookbook examples from published papers")
-    parser.add_argument("--example", type=str, metavar="NAME",
-                        help="Run a specific example (e.g. --example coast_runners)")
-    parser.add_argument("--explain", type=str, metavar="RULE",
-                        help="Show detailed explanation for a rule (e.g. --explain idle_exploit)")
-    parser.add_argument("--check", type=str, metavar="MODULE:FUNC",
-                        help="Analyze a @reward_function-decorated Python function "
-                             "(e.g. --check my_env:compute_reward)")
-    parser.add_argument("--config", type=str, metavar="FILE",
-                        help="Load config from file (YAML, JSON, or TOML)")
-    parser.add_argument("--doctor", action="store_true",
-                        help="Diagnose issues and suggest a fixed configuration")
-    parser.add_argument("--quiet", "-q", action="store_true",
-                        help="Suppress output, just set exit code (0=pass, 1=critical)")
-    parser.add_argument("--verbose", "-v", action="store_true",
-                        help="Show extended explanations for each finding")
-    parser.add_argument("--json", "-j", action="store_true",
-                        help="Output results as JSON")
+    parser.add_argument(
+        "--version", action="version", version=f"goodhart {_get_version()}"
+    )
+    parser.add_argument(
+        "--about", action="store_true", help="Learn about Goodhart's Law and this tool"
+    )
+    parser.add_argument(
+        "--fields",
+        action="store_true",
+        help="List all RewardSource and EnvironmentModel fields",
+    )
+    parser.add_argument(
+        "--field",
+        type=str,
+        metavar="NAME",
+        help="Explain a specific field (e.g. --field intentional), or --field all",
+    )
+    parser.add_argument("--rules", action="store_true", help="List all analysis rules")
+    parser.add_argument(
+        "--examples",
+        action="store_true",
+        help="Browse cookbook examples from published papers",
+    )
+    parser.add_argument(
+        "--example",
+        type=str,
+        metavar="NAME",
+        help="Run a specific example (e.g. --example coast_runners)",
+    )
+    parser.add_argument(
+        "--explain",
+        type=str,
+        metavar="RULE",
+        help="Show detailed explanation for a rule (e.g. --explain idle_exploit)",
+    )
+    parser.add_argument(
+        "--check",
+        type=str,
+        metavar="MODULE:FUNC",
+        help="Analyze a @reward_function-decorated Python function "
+        "(e.g. --check my_env:compute_reward)",
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        metavar="FILE",
+        help="Load config from file (YAML, JSON, or TOML)",
+    )
+    parser.add_argument(
+        "--doctor",
+        action="store_true",
+        help="Diagnose issues and suggest a fixed configuration",
+    )
+    parser.add_argument(
+        "--quiet",
+        "-q",
+        action="store_true",
+        help="Suppress output, just set exit code (0=pass, 1=critical)",
+    )
+    parser.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Show extended explanations for each finding",
+    )
+    parser.add_argument(
+        "--json", "-j", action="store_true", help="Output results as JSON"
+    )
 
-    parser.add_argument("--goal", type=float, default=None,
-                        help="Goal/terminal reward value")
-    parser.add_argument("--penalty", type=float, default=None,
-                        help="Step penalty (negative number, or 0)")
-    parser.add_argument("--steps", type=int, default=None,
-                        help="Max steps per episode")
-    parser.add_argument("--discovery", type=float, default=0.05,
-                        help="P(finding goal per episode) (default: 0.05)")
-    parser.add_argument("--actors", type=int, default=64,
-                        help="Number of parallel actors (default: 64)")
-    parser.add_argument("--budget", type=int, default=20_000_000,
-                        help="Total training steps (default: 20M)")
-    parser.add_argument("--gamma", type=float, default=0.99,
-                        help="Discount factor (default: 0.99)")
-    parser.add_argument("--lr", type=float, default=3e-4,
-                        help="Learning rate")
-    parser.add_argument("--critic-lr", type=float, default=None,
-                        help="Critic learning rate (default: same as --lr)")
-    parser.add_argument("--entropy", type=float, default=0.01,
-                        help="Entropy coefficient")
-    parser.add_argument("--specialists", type=int, default=1,
-                        help="Number of specialist networks")
-    parser.add_argument("--floor", type=float, default=0.0,
-                        help="Routing floor per specialist")
-    parser.add_argument("--states", type=int, default=1000,
-                        help="Approximate state space size")
-    parser.add_argument("--name", type=str, default="experiment",
-                        help="Experiment name")
-    parser.add_argument("--exit-on-critical", action="store_true",
-                        help="Exit with code 1 if criticals found")
-    parser.add_argument("--strict", "-s", action="store_true",
-                        help="Treat warnings as errors (exit code 1 on warnings too)")
-    parser.add_argument("--ignore", type=str, metavar="RULES",
-                        help="Comma-separated rules to suppress (e.g. --ignore idle_exploit,reward_dominance_imbalance)")
-    parser.add_argument("--format", choices=["default", "compact"], default="default",
-                        help="Output format: 'compact' for one-line-per-finding (grep-friendly)")
-    parser.add_argument("--viz", action="store_true",
-                        help="Generate a reward landscape visualization")
-    parser.add_argument("--ascii", action="store_true",
-                        help="Use ASCII art instead of matplotlib for --viz")
-    parser.add_argument("--detect", type=str, metavar="ENV_ID",
-                        help="Auto-detect reward structure from a Gymnasium env")
+    parser.add_argument(
+        "--goal", type=float, default=None, help="Goal/terminal reward value"
+    )
+    parser.add_argument(
+        "--penalty",
+        type=float,
+        default=None,
+        help="Step penalty (negative number, or 0)",
+    )
+    parser.add_argument("--steps", type=int, default=None, help="Max steps per episode")
+    parser.add_argument(
+        "--discovery",
+        type=float,
+        default=0.05,
+        help="P(finding goal per episode) (default: 0.05)",
+    )
+    parser.add_argument(
+        "--actors", type=int, default=64, help="Number of parallel actors (default: 64)"
+    )
+    parser.add_argument(
+        "--budget",
+        type=int,
+        default=20_000_000,
+        help="Total training steps (default: 20M)",
+    )
+    parser.add_argument(
+        "--gamma", type=float, default=0.99, help="Discount factor (default: 0.99)"
+    )
+    parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate")
+    parser.add_argument(
+        "--critic-lr",
+        type=float,
+        default=None,
+        help="Critic learning rate (default: same as --lr)",
+    )
+    parser.add_argument(
+        "--entropy", type=float, default=0.01, help="Entropy coefficient"
+    )
+    parser.add_argument(
+        "--specialists", type=int, default=1, help="Number of specialist networks"
+    )
+    parser.add_argument(
+        "--floor", type=float, default=0.0, help="Routing floor per specialist"
+    )
+    parser.add_argument(
+        "--states", type=int, default=1000, help="Approximate state space size"
+    )
+    parser.add_argument(
+        "--name", type=str, default="experiment", help="Experiment name"
+    )
+    parser.add_argument(
+        "--exit-on-critical",
+        action="store_true",
+        help="Exit with code 1 if criticals found",
+    )
+    parser.add_argument(
+        "--strict",
+        "-s",
+        action="store_true",
+        help="Treat warnings as errors (exit code 1 on warnings too)",
+    )
+    parser.add_argument(
+        "--ignore",
+        type=str,
+        metavar="RULES",
+        help="Comma-separated rules to suppress (e.g. --ignore idle_exploit,reward_dominance_imbalance)",
+    )
+    parser.add_argument(
+        "--format",
+        choices=["default", "compact"],
+        default="default",
+        help="Output format: 'compact' for one-line-per-finding (grep-friendly)",
+    )
+    parser.add_argument(
+        "--viz", action="store_true", help="Generate a reward landscape visualization"
+    )
+    parser.add_argument(
+        "--ascii",
+        action="store_true",
+        help="Use ASCII art instead of matplotlib for --viz",
+    )
+    parser.add_argument(
+        "--detect",
+        type=str,
+        metavar="ENV_ID",
+        help="Auto-detect reward structure from a Gymnasium env",
+    )
 
     args = parser.parse_args()
 
     # Field reference data (shared by --fields and --field)
     _FIELD_REF = {
         # RewardSource fields
-        "name": ("RewardSource", "str", "required",
-                 "A human-readable label for this reward component.",
-                 "Use something descriptive: 'forward_velocity', 'alive_bonus', 'collision_penalty'."),
-        "reward_type": ("RewardSource", "RewardType", "required",
-                        "When this reward is given: TERMINAL (end of episode), PER_STEP (every step), ON_EVENT (when something happens), or SHAPING (guidance toward goal).",
-                        "Terminal for goal completion. Per-step for tracking rewards and penalties. On-event for collectibles and triggers. Shaping for distance-decrease and checkpoint guidance."),
-        "value": ("RewardSource", "float", "required",
-                  "The magnitude of this reward. Positive = good, negative = penalty.",
-                  "Use the actual number from your reward function. The tool compares magnitudes across components to find dominance and imbalance."),
-        "intentional": ("RewardSource", "bool", "False",
-                        "Is this the actual goal, or is it there to help?",
-                        "Set True for the thing you want the agent to accomplish (forward velocity in locomotion, goal reaching in navigation). Set False for shaping, penalties, alive bonuses, and auxiliary signals. This one flag changes which rules fire: a passive +5/step marked intentional is a survival task. Marked non-intentional, it's an idle exploit."),
-        "requires_action": ("RewardSource", "bool", "True",
-                            "Does the agent need to DO something to earn this reward?",
-                            "Set False for alive bonuses, passive tracking, and anything earned by existing. Set True for velocity rewards, goal reaching, and anything requiring deliberate behavior. This determines the idle floor: passive rewards accumulate even when the agent does nothing."),
-        "can_loop": ("RewardSource", "bool", "False",
-                     "Can the agent harvest this reward repeatedly by cycling through states?",
-                     "Set True for shaping rewards where the agent can move toward a target then away then toward again (distance decrease, checkpoint crossing). Set False for terminal rewards, one-time events, and potential-based shaping (which nets to zero over cycles). Triggers shaping_loop_exploit."),
-        "respawn": ("RewardSource", "RespawnBehavior", "NONE",
-                    "What happens to this reward after it's collected?",
-                    "NONE = gone forever. TIMED = reappears after respawn_time steps. ON_DEATH = resets when the agent dies. ON_EPISODE = resets each episode. INFINITE = always available (per-step rewards). Respawning rewards can be farmed; the tool checks whether farming beats completing the task."),
-        "discovery_probability": ("RewardSource", "float", "1.0",
-                                  "How likely is a random agent to encounter this reward?",
-                                  "Set 1.0 for per-step rewards the agent always sees. Set low (0.001-0.05) for sparse goals that require deliberate exploration. Drives exploration threshold analysis."),
-        "state_dependent": ("RewardSource", "bool", "False",
-                            "Does the reward value change based on environment state?",
-                            "Set True for tracking rewards (-||error||^2), velocity rewards, and anything that varies with performance. Set False for fixed bonuses and constant penalties. Affects negative_only_reward severity."),
-        "explore_fraction": ("RewardSource", "float", "0.0",
-                             "What fraction of this reward does a random agent earn?",
-                             "Set 0.0 if random actions produce zero reward (precise tracking). Set 0.5 if random actions earn about half (stumbling forward). Used by idle_exploit to estimate whether exploration is net-positive."),
-        "respawn_time": ("RewardSource", "int", "0",
-                         "Steps until a TIMED reward respawns.",
-                         "Only used when respawn=TIMED. A respawn_time of 10 means the reward reappears 10 steps after collection."),
-        "max_occurrences": ("RewardSource", "int", "1",
-                            "Maximum times this reward can fire per episode (0 = unlimited).",
-                            "Set to the number of collectibles, enemies, or events. Set 0 for unlimited per-step rewards."),
-        "loop_period": ("RewardSource", "int", "0",
-                        "Steps per cycle when can_loop=True.",
-                        "How many steps it takes the agent to complete one loop (e.g., 2 for back-and-forth on an arrow tile)."),
+        "name": (
+            "RewardSource",
+            "str",
+            "required",
+            "A human-readable label for this reward component.",
+            "Use something descriptive: 'forward_velocity', 'alive_bonus', 'collision_penalty'.",
+        ),
+        "reward_type": (
+            "RewardSource",
+            "RewardType",
+            "required",
+            "When this reward is given: TERMINAL (end of episode), PER_STEP (every step), ON_EVENT (when something happens), or SHAPING (guidance toward goal).",
+            "Terminal for goal completion. Per-step for tracking rewards and penalties. On-event for collectibles and triggers. Shaping for distance-decrease and checkpoint guidance.",
+        ),
+        "value": (
+            "RewardSource",
+            "float",
+            "required",
+            "The magnitude of this reward. Positive = good, negative = penalty.",
+            "Use the actual number from your reward function. The tool compares magnitudes across components to find dominance and imbalance.",
+        ),
+        "intentional": (
+            "RewardSource",
+            "bool",
+            "False",
+            "Is this the actual goal, or is it there to help?",
+            "Set True for the thing you want the agent to accomplish (forward velocity in locomotion, goal reaching in navigation). Set False for shaping, penalties, alive bonuses, and auxiliary signals. This one flag changes which rules fire: a passive +5/step marked intentional is a survival task. Marked non-intentional, it's an idle exploit.",
+        ),
+        "requires_action": (
+            "RewardSource",
+            "bool",
+            "True",
+            "Does the agent need to DO something to earn this reward?",
+            "Set False for alive bonuses, passive tracking, and anything earned by existing. Set True for velocity rewards, goal reaching, and anything requiring deliberate behavior. This determines the idle floor: passive rewards accumulate even when the agent does nothing.",
+        ),
+        "can_loop": (
+            "RewardSource",
+            "bool",
+            "False",
+            "Can the agent harvest this reward repeatedly by cycling through states?",
+            "Set True for shaping rewards where the agent can move toward a target then away then toward again (distance decrease, checkpoint crossing). Set False for terminal rewards, one-time events, and potential-based shaping (which nets to zero over cycles). Triggers shaping_loop_exploit.",
+        ),
+        "respawn": (
+            "RewardSource",
+            "RespawnBehavior",
+            "NONE",
+            "What happens to this reward after it's collected?",
+            "NONE = gone forever. TIMED = reappears after respawn_time steps. ON_DEATH = resets when the agent dies. ON_EPISODE = resets each episode. INFINITE = always available (per-step rewards). Respawning rewards can be farmed; the tool checks whether farming beats completing the task.",
+        ),
+        "discovery_probability": (
+            "RewardSource",
+            "float",
+            "1.0",
+            "How likely is a random agent to encounter this reward?",
+            "Set 1.0 for per-step rewards the agent always sees. Set low (0.001-0.05) for sparse goals that require deliberate exploration. Drives exploration threshold analysis.",
+        ),
+        "state_dependent": (
+            "RewardSource",
+            "bool",
+            "False",
+            "Does the reward value change based on environment state?",
+            "Set True for tracking rewards (-||error||^2), velocity rewards, and anything that varies with performance. Set False for fixed bonuses and constant penalties. Affects negative_only_reward severity.",
+        ),
+        "explore_fraction": (
+            "RewardSource",
+            "float",
+            "0.0",
+            "What fraction of this reward does a random agent earn?",
+            "Set 0.0 if random actions produce zero reward (precise tracking). Set 0.5 if random actions earn about half (stumbling forward). Used by idle_exploit to estimate whether exploration is net-positive.",
+        ),
+        "respawn_time": (
+            "RewardSource",
+            "int",
+            "0",
+            "Steps until a TIMED reward respawns.",
+            "Only used when respawn=TIMED. A respawn_time of 10 means the reward reappears 10 steps after collection.",
+        ),
+        "max_occurrences": (
+            "RewardSource",
+            "int",
+            "1",
+            "Maximum times this reward can fire per episode (0 = unlimited).",
+            "Set to the number of collectibles, enemies, or events. Set 0 for unlimited per-step rewards.",
+        ),
+        "loop_period": (
+            "RewardSource",
+            "int",
+            "0",
+            "Steps per cycle when can_loop=True.",
+            "How many steps it takes the agent to complete one loop (e.g., 2 for back-and-forth on an arrow tile).",
+        ),
         # EnvironmentModel fields
-        "max_steps": ("EnvironmentModel", "int", "500",
-                      "Maximum episode length in steps.",
-                      "Affects discount horizon analysis and penalty accumulation. Longer episodes amplify per-step rewards relative to terminal rewards."),
-        "gamma": ("EnvironmentModel", "float", "0.99",
-                  "Discount factor.",
-                  "Lower values make the agent more myopic. At gamma=0.9, rewards 20 steps away are worth 12%. At gamma=0.99, they're worth 82%. At gamma=1.0, no discounting."),
-        "n_states": ("EnvironmentModel", "int", "1000",
-                     "Approximate state space size.",
-                     "Affects exploration analysis and capacity checks. Atari ~100K, MuJoCo ~100K, gridworld ~100-1000."),
-        "n_actions": ("EnvironmentModel", "int", "8",
-                      "Number of actions available.",
-                      "Atari: 18, continuous control: 2-30, gridworld: 4-8. Affects entropy and exploration analysis."),
-        "death_probability": ("EnvironmentModel", "float", "0.01",
-                              "Probability of episode termination per step from agent failure.",
-                              "High values make death-beats-survival traps more likely. Set 0.0 for environments where the agent cannot die."),
+        "max_steps": (
+            "EnvironmentModel",
+            "int",
+            "500",
+            "Maximum episode length in steps.",
+            "Affects discount horizon analysis and penalty accumulation. Longer episodes amplify per-step rewards relative to terminal rewards.",
+        ),
+        "gamma": (
+            "EnvironmentModel",
+            "float",
+            "0.99",
+            "Discount factor.",
+            "Lower values make the agent more myopic. At gamma=0.9, rewards 20 steps away are worth 12%. At gamma=0.99, they're worth 82%. At gamma=1.0, no discounting.",
+        ),
+        "n_states": (
+            "EnvironmentModel",
+            "int",
+            "1000",
+            "Approximate state space size.",
+            "Affects exploration analysis and capacity checks. Atari ~100K, MuJoCo ~100K, gridworld ~100-1000.",
+        ),
+        "n_actions": (
+            "EnvironmentModel",
+            "int",
+            "8",
+            "Number of actions available.",
+            "Atari: 18, continuous control: 2-30, gridworld: 4-8. Affects entropy and exploration analysis.",
+        ),
+        "death_probability": (
+            "EnvironmentModel",
+            "float",
+            "0.01",
+            "Probability of episode termination per step from agent failure.",
+            "High values make death-beats-survival traps more likely. Set 0.0 for environments where the agent cannot die.",
+        ),
     }
 
-    if getattr(args, 'fields', False):
-        from goodhart.fmt import header, rule_list_item, category_header, DIM_COLOR, RESET
+    if getattr(args, "fields", False):
+        from goodhart.fmt import (
+            header,
+            rule_list_item,
+            category_header,
+            DIM_COLOR,
+            RESET,
+        )
+
         header("Fields Reference")
         print()
         for section_name in ["RewardSource", "EnvironmentModel"]:
             category_header(section_name)
             for fname, (owner, ftype, default, short, _) in _FIELD_REF.items():
                 if owner == section_name:
-                    rule_list_item(fname, f"{short} {DIM_COLOR}[{ftype}, default={default}]{RESET}")
+                    rule_list_item(
+                        fname, f"{short} {DIM_COLOR}[{ftype}, default={default}]{RESET}"
+                    )
             print()
-        print(f"  {DIM_COLOR}Use --field <name> for details (e.g., --field intentional){RESET}")
+        print(
+            f"  {DIM_COLOR}Use --field <name> for details (e.g., --field intentional){RESET}"
+        )
         print(f"  {DIM_COLOR}Use --field all for the complete reference{RESET}")
         print()
         return
 
-    if getattr(args, 'field', None):
-        from goodhart.fmt import (header, explain_header, explain_section,
-                                  DIM_COLOR, RESET, HEADER_COLOR)
+    if getattr(args, "field", None):
+        from goodhart.fmt import (
+            header,
+            explain_header,
+            explain_section,
+            DIM_COLOR,
+            RESET,
+            HEADER_COLOR,
+        )
+
         field_name = args.field
 
         if field_name == "all":
@@ -649,7 +871,13 @@ Tab completion (bash):
         return
 
     if args.rules:
-        from goodhart.fmt import header, category_header, rule_list_item, DIM_COLOR, RESET
+        from goodhart.fmt import (
+            header,
+            category_header,
+            rule_list_item,
+            DIM_COLOR,
+            RESET,
+        )
 
         header("Analysis Rules")
 
@@ -657,28 +885,46 @@ Tab completion (bash):
 
         categories = {
             "Reward Structure": [
-                "penalty_dominates_goal", "death_beats_survival",
-                "idle_exploit", "exploration_threshold",
-                "respawning_exploit", "death_reset_exploit",
-                "shaping_loop_exploit", "shaping_not_potential_based",
-                "proxy_reward_hackability", "intrinsic_sufficiency",
-                "budget_sufficiency", "compound_trap",
-                "staged_reward_plateau", "reward_dominance_imbalance",
-                "exponential_saturation", "intrinsic_dominance",
-                "discount_horizon_mismatch", "negative_only_reward",
+                "penalty_dominates_goal",
+                "death_beats_survival",
+                "idle_exploit",
+                "exploration_threshold",
+                "respawning_exploit",
+                "death_reset_exploit",
+                "shaping_loop_exploit",
+                "shaping_not_potential_based",
+                "proxy_reward_hackability",
+                "intrinsic_sufficiency",
+                "budget_sufficiency",
+                "compound_trap",
+                "staged_reward_plateau",
+                "reward_dominance_imbalance",
+                "exponential_saturation",
+                "intrinsic_dominance",
+                "discount_horizon_mismatch",
+                "negative_only_reward",
                 "reward_delay_horizon",
             ],
             "Training Hyperparameters": [
-                "lr_regime", "critic_lr_ratio", "entropy_regime",
-                "clip_fraction_risk", "expert_collapse",
-                "batch_size_interaction", "parallelism_effect",
+                "lr_regime",
+                "critic_lr_ratio",
+                "entropy_regime",
+                "clip_fraction_risk",
+                "expert_collapse",
+                "batch_size_interaction",
+                "parallelism_effect",
                 "memory_capacity",
-                "replay_buffer_ratio", "target_network_update",
-                "epsilon_schedule", "soft_update_rate", "sac_alpha",
+                "replay_buffer_ratio",
+                "target_network_update",
+                "epsilon_schedule",
+                "soft_update_rate",
+                "sac_alpha",
             ],
             "Architecture (precedent-based)": [
-                "embed_dim_capacity", "routing_floor_necessity",
-                "recurrence_type", "actor_count_effect",
+                "embed_dim_capacity",
+                "routing_floor_necessity",
+                "recurrence_type",
+                "actor_count_effect",
             ],
             "Blind-Spot Advisories (cannot check, can hint)": [
                 "advisory_physics_exploit",
@@ -705,12 +951,15 @@ Tab completion (bash):
 
         print()
         print(f"  {DIM_COLOR}Total: {total} rules{RESET}")
-        print(f"  Use {RESET}--explain <rule>{DIM_COLOR} for deep explanation of any rule.{RESET}")
+        print(
+            f"  Use {RESET}--explain <rule>{DIM_COLOR} for deep explanation of any rule.{RESET}"
+        )
         print()
         return
 
     if args.explain:
         from goodhart.rules.explanations import get_explanation
+
         engine = TrainingAnalysisEngine().add_all_rules()
         rule_map = {r.name: r for r in engine.rules}
 
@@ -722,8 +971,15 @@ Tab completion (bash):
             print("Use --rules to see all available rules.")
             return
 
-        from goodhart.fmt import (explain_header, explain_section,
-                                  RULE_COLOR, DIM_COLOR, REC_COLOR, HEADER_COLOR, RESET)
+        from goodhart.fmt import (
+            explain_header,
+            explain_section,
+            RULE_COLOR,
+            DIM_COLOR,
+            REC_COLOR,
+            HEADER_COLOR,
+            RESET,
+        )
 
         explain_header(rule.name, rule.description)
 
@@ -752,7 +1008,7 @@ Tab completion (bash):
             print(f"  {DIM_COLOR}(No extended explanation available yet.){RESET}")
             print()
 
-        if hasattr(rule, 'proof') and rule.proof:
+        if hasattr(rule, "proof") and rule.proof:
             proof = rule.proof
             if proof.statement:
                 print(f"  {DIM_COLOR}Theorem: {proof.statement}{RESET}")
@@ -764,43 +1020,51 @@ Tab completion (bash):
     if args.examples:
         import pkgutil
         import goodhart.examples
-        from goodhart.fmt import (header, DIM_COLOR, RULE_COLOR, RESET,
-                                  rule_list_item)
+        from goodhart.fmt import header, DIM_COLOR, RULE_COLOR, RESET, rule_list_item
 
         header("Cookbook Examples")
         print(f"  Run any example: {RULE_COLOR}goodhart --example <name>{RESET}")
         print()
 
         examples = sorted(
-            m.name for m in pkgutil.iter_modules(goodhart.examples.__path__)
+            m.name
+            for m in pkgutil.iter_modules(goodhart.examples.__path__)
             if m.name != "__init__" and not m.name.startswith("sample")
         )
         for name in examples:
             try:
                 mod = __import__(f"goodhart.examples.{name}", fromlist=[name])
                 doc = (mod.__doc__ or "").strip().split("\n")[0]
-                doc = doc.replace("Example: ", "").replace("\"\"\"", "")
+                doc = doc.replace("Example: ", "").replace('"""', "")
             except Exception:
                 doc = ""
             rule_list_item(name, doc, width=35)
 
         print()
-        print(f"  {DIM_COLOR}{len(examples)} examples from published papers (1983-2025){RESET}")
-        print(f"  {DIM_COLOR}Includes failures, positive patterns, and limitation cases.{RESET}")
+        print(
+            f"  {DIM_COLOR}{len(examples)} examples from published papers (1983-2025){RESET}"
+        )
+        print(
+            f"  {DIM_COLOR}Includes failures, positive patterns, and limitation cases.{RESET}"
+        )
         print()
         return
 
     if args.example:
         import importlib
+
         try:
             mod = importlib.import_module(f"goodhart.examples.{args.example}")
             mod.run_example()
         except ModuleNotFoundError:
             import pkgutil
             import goodhart.examples
-            available = sorted(m.name for m in pkgutil.iter_modules(
-                goodhart.examples.__path__) if m.name != "__init__"
-                and not m.name.startswith("sample"))
+
+            available = sorted(
+                m.name
+                for m in pkgutil.iter_modules(goodhart.examples.__path__)
+                if m.name != "__init__" and not m.name.startswith("sample")
+            )
             print(f"Unknown example: {args.example}")
             print()
             print("Available examples:")
@@ -847,39 +1111,68 @@ Tab completion (bash):
         return
 
     if args.about:
-        from goodhart.fmt import (header, DIM_COLOR, HEADER_COLOR, RESET,
-                                  RULE_COLOR, REC_COLOR, WARNING_COLOR)
+        from goodhart.fmt import (
+            header,
+            DIM_COLOR,
+            HEADER_COLOR,
+            RESET,
+            RULE_COLOR,
+            REC_COLOR,
+            WARNING_COLOR,
+        )
+
         header("Reward Structure Analysis for Reinforcement Learning")
         print(f'  {DIM_COLOR}"When a measure becomes a target,')
         print(f'   it ceases to be a good measure."{RESET}')
-        print(f'  {DIM_COLOR}-- Charles Goodhart, 1975{RESET}')
+        print(f"  {DIM_COLOR}-- Charles Goodhart, 1975{RESET}")
         print()
         print("  In reinforcement learning, the reward function IS that measure.")
         print("  Your agent targets it directly. It finds ways to maximize the")
         print("  number without doing the task:")
         print()
-        print(f"    {WARNING_COLOR}-{RESET} Standing still {DIM_COLOR}(avoids step penalties){RESET}")
-        print(f"    {WARNING_COLOR}-{RESET} Dying immediately {DIM_COLOR}(stops accumulating costs){RESET}")
-        print(f"    {WARNING_COLOR}-{RESET} Going in circles {DIM_COLOR}(harvests respawning rewards){RESET}")
-        print(f"    {WARNING_COLOR}-{RESET} Exploiting physics {DIM_COLOR}(maximizes reward through simulator bugs){RESET}")
+        print(
+            f"    {WARNING_COLOR}-{RESET} Standing still {DIM_COLOR}(avoids step penalties){RESET}"
+        )
+        print(
+            f"    {WARNING_COLOR}-{RESET} Dying immediately {DIM_COLOR}(stops accumulating costs){RESET}"
+        )
+        print(
+            f"    {WARNING_COLOR}-{RESET} Going in circles {DIM_COLOR}(harvests respawning rewards){RESET}"
+        )
+        print(
+            f"    {WARNING_COLOR}-{RESET} Exploiting physics {DIM_COLOR}(maximizes reward through simulator bugs){RESET}"
+        )
         print()
         print("  This tool catches the mathematical signatures of these failures")
         print("  from your configuration alone — before you spend compute.")
         print()
         # Dataset counts updated at release (too slow to compute from JSONL)
-        proved = sum(1 for r in TrainingAnalysisEngine().add_all_rules().rules
-                     if hasattr(r, 'proof') and r.proof and r.proof.strength)
-        print(f"  {HEADER_COLOR}{RULE_COUNT} rules{RESET} tested against 212 encodings from 133 papers (1983-2025)")
-        print(f"  {HEADER_COLOR}{proved} rules{RESET} linked to LEAN 4 proofs (105 theorems, zero sorry)")
+        proved = sum(
+            1
+            for r in TrainingAnalysisEngine().add_all_rules().rules
+            if hasattr(r, "proof") and r.proof and r.proof.strength
+        )
+        print(
+            f"  {HEADER_COLOR}{RULE_COUNT} rules{RESET} tested against 212 encodings from 133 papers (1983-2025)"
+        )
+        print(
+            f"  {HEADER_COLOR}{proved} rules{RESET} linked to LEAN 4 proofs (105 theorems, zero sorry)"
+        )
         print()
         print(f"  {DIM_COLOR}Cannot catch: physics exploits, goal misgeneralization,")
         print("  learned-reward gaming, missing reward terms. When config patterns")
         print(f"  match these blind spots, advisory hints are emitted.{RESET}")
         print()
         print(f"  {DIM_COLOR}Sources:{RESET}")
-        print(f"    Goodhart, C.A.E. (1975) {DIM_COLOR}\"Problems of Monetary Management\"{RESET}")
-        print(f"    Ng et al. (1999) {DIM_COLOR}\"Policy invariance under reward transformations\"{RESET}")
-        print(f"    Skalse et al. (2022) {DIM_COLOR}\"Defining and Characterizing Reward Hacking\"{RESET}")
+        print(
+            f'    Goodhart, C.A.E. (1975) {DIM_COLOR}"Problems of Monetary Management"{RESET}'
+        )
+        print(
+            f'    Ng et al. (1999) {DIM_COLOR}"Policy invariance under reward transformations"{RESET}'
+        )
+        print(
+            f'    Skalse et al. (2022) {DIM_COLOR}"Defining and Characterizing Reward Hacking"{RESET}'
+        )
         print(f"    Krakovna et al. {DIM_COLOR}Specification Gaming Master List{RESET}")
         print()
         print(f"  {REC_COLOR}https://github.com/audieleon/goodhart{RESET}")
@@ -890,8 +1183,9 @@ Tab completion (bash):
         _run_doctor(args)
         return
 
-    if getattr(args, 'check', None):
+    if getattr(args, "check", None):
         from goodhart.annotate import load_annotated_function
+
         fn = load_annotated_function(args.check)
         _output_analysis(fn.goodhart_model, fn.goodhart_config, args)
         return
@@ -919,25 +1213,33 @@ Tab completion (bash):
         # quiet/json with no args: nothing to do
     else:
         model, config = _build_model_and_config(
-            goal=args.goal or 0.0, penalty=args.penalty or 0.0,
+            goal=args.goal or 0.0,
+            penalty=args.penalty or 0.0,
             max_steps=args.steps or 500,
-            discovery_prob=args.discovery, n_actors=args.actors,
-            total_steps=args.budget, lr=args.lr,
-            critic_lr=args.critic_lr, entropy=args.entropy,
+            discovery_prob=args.discovery,
+            n_actors=args.actors,
+            total_steps=args.budget,
+            lr=args.lr,
+            critic_lr=args.critic_lr,
+            entropy=args.entropy,
             n_specialists=args.specialists,
-            routing_floor=args.floor, n_states=args.states,
-            gamma=args.gamma, name=args.name,
+            routing_floor=args.floor,
+            n_states=args.states,
+            gamma=args.gamma,
+            name=args.name,
         )
         result = _output_analysis(model, config, args)
 
         if args.viz or args.ascii:
             if args.ascii:
                 from goodhart.viz import reward_landscape_ascii
+
                 print()
                 print(reward_landscape_ascii(model, config, result=result))
             else:
                 try:
                     from goodhart.viz import reward_landscape
+
                     path = reward_landscape(model, config)
                     print(f"\nReward landscape saved to: {path}")
                 except ImportError as e:

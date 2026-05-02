@@ -55,20 +55,24 @@ def run_example():
         death_probability=0.0,
         wall_probability=0.3,
     )
-    model.add_reward_source(RewardSource(
-        name="goal_reached",
-        reward_type=RewardType.TERMINAL,
-        value=1.0,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.02,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="goal_reached",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.02,
+        )
+    )
     # Time pressure modeled as step penalty
-    model.add_reward_source(RewardSource(
-        name="time_penalty",
-        reward_type=RewardType.PER_STEP,
-        value=-0.003,  # 0.9/300 = -0.003/step
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="time_penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.003,  # 0.9/300 = -0.003/step
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

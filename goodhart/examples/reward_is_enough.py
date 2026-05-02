@@ -52,29 +52,35 @@ def run_example():
         n_actions=10,
         death_probability=0.05,
     )
-    model.add_reward_source(RewardSource(
-        name="survival",
-        reward_type=RewardType.PER_STEP,
-        value=1.0,
-        respawn=RespawnBehavior.INFINITE,
-        requires_action=False,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="food_gathering",
-        reward_type=RewardType.ON_EVENT,
-        value=5.0,
-        respawn=RespawnBehavior.TIMED,
-        respawn_time=100,
-        requires_action=True,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="predator_avoidance",
-        reward_type=RewardType.ON_EVENT,
-        value=-10.0,
-        requires_action=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="survival",
+            reward_type=RewardType.PER_STEP,
+            value=1.0,
+            respawn=RespawnBehavior.INFINITE,
+            requires_action=False,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="food_gathering",
+            reward_type=RewardType.ON_EVENT,
+            value=5.0,
+            respawn=RespawnBehavior.TIMED,
+            respawn_time=100,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="predator_avoidance",
+            reward_type=RewardType.ON_EVENT,
+            value=-10.0,
+            requires_action=False,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

@@ -16,32 +16,50 @@ from goodhart.models import (
 )
 
 
-def build_model_and_config(goal=0.0, penalty=0.0, max_steps=500,
-                           discovery_prob=0.05, n_actors=64,
-                           total_steps=20_000_000, lr=3e-4,
-                           critic_lr=None, entropy=0.01,
-                           n_specialists=1, routing_floor=0.0,
-                           n_states=1000, gamma=0.99, name="experiment"):
+def build_model_and_config(
+    goal=0.0,
+    penalty=0.0,
+    max_steps=500,
+    discovery_prob=0.05,
+    n_actors=64,
+    total_steps=20_000_000,
+    lr=3e-4,
+    critic_lr=None,
+    entropy=0.01,
+    n_specialists=1,
+    routing_floor=0.0,
+    n_states=1000,
+    gamma=0.99,
+    name="experiment",
+):
     """Build EnvironmentModel and TrainingConfig from simple keyword args.
 
     This is the construction path used by the quick API (check/analyze)
     and the CLI when using --goal/--penalty/--steps flags.
     """
-    model = EnvironmentModel(name=name, max_steps=max_steps, n_states=n_states,
-                             gamma=gamma)
+    model = EnvironmentModel(
+        name=name, max_steps=max_steps, n_states=n_states, gamma=gamma
+    )
 
     if goal > 0:
-        model.add_reward_source(RewardSource(
-            name="goal", reward_type=RewardType.TERMINAL,
-            value=goal, discovery_probability=discovery_prob,
-        ))
+        model.add_reward_source(
+            RewardSource(
+                name="goal",
+                reward_type=RewardType.TERMINAL,
+                value=goal,
+                discovery_probability=discovery_prob,
+            )
+        )
 
     if penalty != 0:
-        model.add_reward_source(RewardSource(
-            name="step penalty", reward_type=RewardType.PER_STEP,
-            value=penalty,
-            requires_action=False,  # CLI penalty is constant (passive)
-        ))
+        model.add_reward_source(
+            RewardSource(
+                name="step penalty",
+                reward_type=RewardType.PER_STEP,
+                value=penalty,
+                requires_action=False,  # CLI penalty is constant (passive)
+            )
+        )
 
     config = TrainingConfig(
         lr=lr,
@@ -65,8 +83,9 @@ def load_config_file(path):
     import os
 
     # Read from stdin
-    if path == '-' or path == '/dev/stdin':
+    if path == "-" or path == "/dev/stdin":
         import sys
+
         content = sys.stdin.read()
         if not content.strip():
             raise ValueError("Empty input on stdin")
@@ -75,35 +94,38 @@ def load_config_file(path):
             return json.loads(content)
         except (json.JSONDecodeError, ValueError):
             import yaml
+
             return yaml.safe_load(content)
 
     if not os.path.exists(path):
         raise FileNotFoundError(f"Config file not found: {path}")
     if os.path.getsize(path) > 1_000_000:
-        raise ValueError(f"Config file too large (>{os.path.getsize(path)//1_000_000}MB). "
-                         f"Max 1MB to prevent denial-of-service.")
-    if path.endswith(('.yaml', '.yml')):
+        raise ValueError(
+            f"Config file too large (>{os.path.getsize(path) // 1_000_000}MB). "
+            f"Max 1MB to prevent denial-of-service."
+        )
+    if path.endswith((".yaml", ".yml")):
         import yaml
+
         # safe_load blocks code execution. YAML alias bombs are not
         # exploitable here: PyYAML creates shared Python references
         # (not copies), and build_from_config_dict only reads known
         # keys, so alias-expanded data is never traversed.
         with open(path) as f:
             return yaml.safe_load(f)
-    elif path.endswith('.json'):
+    elif path.endswith(".json"):
         with open(path) as f:
             return json.load(f)
-    elif path.endswith('.toml'):
+    elif path.endswith(".toml"):
         try:
             import tomllib
         except ModuleNotFoundError:
             import tomli as tomllib
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             return tomllib.load(f)
     else:
         raise ValueError(
-            f"Unsupported config format: {path}. "
-            f"Use .yaml, .yml, .json, or .toml"
+            f"Unsupported config format: {path}. Use .yaml, .yml, .json, or .toml"
         )
 
 
@@ -137,31 +159,37 @@ def build_from_config_dict(cfg, fallback_name="config"):
 
     for i, src in enumerate(env_cfg.get("reward_sources", [])):
         if not isinstance(src, dict):
-            raise ValueError(f"reward_sources[{i}] must be a dict, got {type(src).__name__}")
+            raise ValueError(
+                f"reward_sources[{i}] must be a dict, got {type(src).__name__}"
+            )
         rt_str = src.get("reward_type", src.get("type", "terminal"))
-        model.add_reward_source(RewardSource(
-            name=src.get("name", f"source_{i}"),
-            reward_type=RewardType(rt_str),
-            value=src.get("value", 0.0),
-            respawn=RespawnBehavior(src.get("respawn", "none")),
-            respawn_time=src.get("respawn_time", 0),
-            max_occurrences=src.get("max_occurrences", 1),
-            requires_action=src.get("requires_action", True),
-            requires_exploration=src.get("requires_exploration", False),
-            discovery_probability=float(src.get("discovery_probability", 1.0)),
-            can_loop=src.get("can_loop", False),
-            loop_period=src.get("loop_period", 0),
-            intentional=src.get("intentional", False),
-            value_range=tuple(src["value_range"][:2]) if "value_range" in src and len(src["value_range"]) >= 2 else None,
-            value_type=src.get("value_type", "constant"),
-            value_params=src.get("value_params"),
-            state_dependent=src.get("state_dependent", False),
-            scales_with=src.get("scales_with", None),
-            explore_fraction=float(src.get("explore_fraction", 0.0)),
-            prerequisite=src.get("prerequisite"),
-            modifies=src.get("modifies"),
-            modifier_type=src.get("modifier_type", "none"),
-        ))
+        model.add_reward_source(
+            RewardSource(
+                name=src.get("name", f"source_{i}"),
+                reward_type=RewardType(rt_str),
+                value=src.get("value", 0.0),
+                respawn=RespawnBehavior(src.get("respawn", "none")),
+                respawn_time=src.get("respawn_time", 0),
+                max_occurrences=src.get("max_occurrences", 1),
+                requires_action=src.get("requires_action", True),
+                requires_exploration=src.get("requires_exploration", False),
+                discovery_probability=float(src.get("discovery_probability", 1.0)),
+                can_loop=src.get("can_loop", False),
+                loop_period=src.get("loop_period", 0),
+                intentional=src.get("intentional", False),
+                value_range=tuple(src["value_range"][:2])
+                if "value_range" in src and len(src["value_range"]) >= 2
+                else None,
+                value_type=src.get("value_type", "constant"),
+                value_params=src.get("value_params"),
+                state_dependent=src.get("state_dependent", False),
+                scales_with=src.get("scales_with", None),
+                explore_fraction=float(src.get("explore_fraction", 0.0)),
+                prerequisite=src.get("prerequisite"),
+                modifies=src.get("modifies"),
+                modifier_type=src.get("modifier_type", "none"),
+            )
+        )
 
     config = TrainingConfig(
         algorithm=train_cfg.get("algorithm", "PPO"),

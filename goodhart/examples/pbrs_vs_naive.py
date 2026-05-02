@@ -55,31 +55,42 @@ def run_example():
         n_actions=17,
         death_probability=0.03,
     )
-    model_pbrs.add_reward_source(RewardSource(
-        name="velocity",
-        reward_type=RewardType.PER_STEP,
-        value=1.25,
-        state_dependent=True,
-        requires_action=True,
-        intentional=True,
-    ))
-    model_pbrs.add_reward_source(RewardSource(
-        name="pbrs_distance_shaping",
-        reward_type=RewardType.SHAPING,
-        value=1.0,
-        requires_action=False,  # Potential-based: state-only
-        can_loop=False,         # Cycles net zero by Ng 1999
-    ))
-    model_pbrs.add_reward_source(RewardSource(
-        name="ctrl_cost",
-        reward_type=RewardType.PER_STEP,
-        value=-0.1,
-        requires_action=True,
-    ))
+    model_pbrs.add_reward_source(
+        RewardSource(
+            name="velocity",
+            reward_type=RewardType.PER_STEP,
+            value=1.25,
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model_pbrs.add_reward_source(
+        RewardSource(
+            name="pbrs_distance_shaping",
+            reward_type=RewardType.SHAPING,
+            value=1.0,
+            requires_action=False,  # Potential-based: state-only
+            can_loop=False,  # Cycles net zero by Ng 1999
+        )
+    )
+    model_pbrs.add_reward_source(
+        RewardSource(
+            name="ctrl_cost",
+            reward_type=RewardType.PER_STEP,
+            value=-0.1,
+            requires_action=True,
+        )
+    )
 
     config = TrainingConfig(
-        lr=3e-4, num_envs=1, n_actors=1, total_steps=1_000_000,
-        num_epochs=10, rollout_length=2048, minibatch_size=64,
+        lr=3e-4,
+        num_envs=1,
+        n_actors=1,
+        total_steps=1_000_000,
+        num_epochs=10,
+        rollout_length=2048,
+        minibatch_size=64,
     )
     result_pbrs = engine.print_report(model_pbrs, config)
 
@@ -100,28 +111,34 @@ def run_example():
         n_actions=17,
         death_probability=0.03,
     )
-    model_naive.add_reward_source(RewardSource(
-        name="velocity",
-        reward_type=RewardType.PER_STEP,
-        value=1.25,
-        state_dependent=True,
-        requires_action=True,
-        intentional=True,
-    ))
-    model_naive.add_reward_source(RewardSource(
-        name="naive_distance_shaping",
-        reward_type=RewardType.SHAPING,
-        value=1.0,
-        requires_action=True,   # Action-dependent: NOT potential-based
-        can_loop=True,          # Cycles earn reward
-        loop_period=10,
-    ))
-    model_naive.add_reward_source(RewardSource(
-        name="ctrl_cost",
-        reward_type=RewardType.PER_STEP,
-        value=-0.1,
-        requires_action=True,
-    ))
+    model_naive.add_reward_source(
+        RewardSource(
+            name="velocity",
+            reward_type=RewardType.PER_STEP,
+            value=1.25,
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model_naive.add_reward_source(
+        RewardSource(
+            name="naive_distance_shaping",
+            reward_type=RewardType.SHAPING,
+            value=1.0,
+            requires_action=True,  # Action-dependent: NOT potential-based
+            can_loop=True,  # Cycles earn reward
+            loop_period=10,
+        )
+    )
+    model_naive.add_reward_source(
+        RewardSource(
+            name="ctrl_cost",
+            reward_type=RewardType.PER_STEP,
+            value=-0.1,
+            requires_action=True,
+        )
+    )
 
     result_naive = engine.print_report(model_naive, config)
 
@@ -131,8 +148,12 @@ def run_example():
     print("COMPARISON")
     print("=" * 70)
     print()
-    pbrs_rules = {v.rule_name for v in result_pbrs.verdicts if v.severity == Severity.CRITICAL}
-    naive_rules = {v.rule_name for v in result_naive.verdicts if v.severity == Severity.CRITICAL}
+    pbrs_rules = {
+        v.rule_name for v in result_pbrs.verdicts if v.severity == Severity.CRITICAL
+    }
+    naive_rules = {
+        v.rule_name for v in result_naive.verdicts if v.severity == Severity.CRITICAL
+    }
     extra = naive_rules - pbrs_rules
 
     print(f"PBRS criticals:  {sorted(pbrs_rules)}")

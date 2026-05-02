@@ -41,10 +41,10 @@ SOFA_SHAPING_SCALE = 1.0
 LACTATE_SHAPING_SCALE = 0.5
 
 # Clinical parameters
-SOFA_OSCILLATION_PERIOD = 4   # hours — SOFA can be gamed over ~4h cycles
+SOFA_OSCILLATION_PERIOD = 4  # hours — SOFA can be gamed over ~4h cycles
 LACTATE_OSCILLATION_PERIOD = 6  # hours — lactate responds slower
-MAX_HOURS = 48                # typical ICU observation window
-BASELINE_MORTALITY = 0.15     # ~15% ICU mortality for severe sepsis
+MAX_HOURS = 48  # typical ICU observation window
+BASELINE_MORTALITY = 0.15  # ~15% ICU mortality for severe sepsis
 SURVIVAL_RATE = 1 - BASELINE_MORTALITY
 
 SOURCES = [
@@ -66,8 +66,8 @@ SOURCES = [
         reward_type=RewardType.SHAPING,
         value=SOFA_SHAPING_SCALE,
         state_dependent=True,
-        requires_action=True,      # depends on drug choice
-        can_loop=True,             # SOFA can be gamed
+        requires_action=True,  # depends on drug choice
+        can_loop=True,  # SOFA can be gamed
         loop_period=SOFA_OSCILLATION_PERIOD,
     ),
     RewardSource(
@@ -86,12 +86,13 @@ SOURCES = [
 # The reward function
 # =========================================================================
 
+
 @reward_function(
     name="Sepsis Treatment RL",
     max_steps=MAX_HOURS,
     gamma=0.99,
     n_states=50000,
-    n_actions=25,       # 5 IV fluid levels x 5 vasopressor levels
+    n_actions=25,  # 5 IV fluid levels x 5 vasopressor levels
     action_type="discrete",
     death_probability=BASELINE_MORTALITY,
     sources=SOURCES,
@@ -111,8 +112,7 @@ def compute_reward(obs, action, info):
     sofa_delta = info.get("sofa_prev", 0) - info.get("sofa_current", 0)
     lactate_delta = info.get("lactate_prev", 0) - info.get("lactate_current", 0)
 
-    return (SOFA_SHAPING_SCALE * sofa_delta
-            + LACTATE_SHAPING_SCALE * lactate_delta)
+    return SOFA_SHAPING_SCALE * sofa_delta + LACTATE_SHAPING_SCALE * lactate_delta
 
 
 def run_example():
@@ -122,17 +122,25 @@ def run_example():
     print()
     print("Source: Raghu et al. 2017, Peng et al. 2023")
     print(f"Terminal: +{SURVIVAL_REWARD} survive, {DEATH_PENALTY} die")
-    print(f"Shaping: SOFA (scale {SOFA_SHAPING_SCALE},"
-          f" period {SOFA_OSCILLATION_PERIOD}h),"
-          f" lactate (scale {LACTATE_SHAPING_SCALE},"
-          f" period {LACTATE_OSCILLATION_PERIOD}h)")
+    print(
+        f"Shaping: SOFA (scale {SOFA_SHAPING_SCALE},"
+        f" period {SOFA_OSCILLATION_PERIOD}h),"
+        f" lactate (scale {LACTATE_SHAPING_SCALE},"
+        f" period {LACTATE_OSCILLATION_PERIOD}h)"
+    )
     print()
 
     # The function works normally
     test_survive = compute_reward({}, 0, {"discharged": True})
     test_shaping = compute_reward(
-        {}, 0, {"sofa_prev": 8, "sofa_current": 6,
-                "lactate_prev": 3.0, "lactate_current": 2.5},
+        {},
+        0,
+        {
+            "sofa_prev": 8,
+            "sofa_current": 6,
+            "lactate_prev": 3.0,
+            "lactate_current": 2.5,
+        },
     )
     print(f"Test (discharged): {test_survive}")
     print(f"Test (SOFA 8→6, lactate 3→2.5): {test_shaping}")

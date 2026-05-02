@@ -54,20 +54,24 @@ def run_example():
         action_type="discrete",
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="step_penalty",
-        reward_type=RewardType.PER_STEP,
-        value=-1.0,
-        requires_action=False,
-    ))
-    model.add_reward_source(RewardSource(
-        name="goal",
-        reward_type=RewardType.TERMINAL,
-        value=0.0,
-        requires_action=True,
-        intentional=True,
-        discovery_probability=0.01,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="step_penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-1.0,
+            requires_action=False,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="goal",
+            reward_type=RewardType.TERMINAL,
+            value=0.0,
+            requires_action=True,
+            intentional=True,
+            discovery_probability=0.01,
+        )
+    )
 
     engine.print_report(model)
 

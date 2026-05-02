@@ -55,29 +55,35 @@ def run_example():
         n_actions=5,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="catch",
-        reward_type=RewardType.TERMINAL,
-        value=10.0,
-        requires_action=True,
-        discovery_probability=0.3,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="timeout",
-        reward_type=RewardType.TERMINAL,
-        value=-10.0,
-        requires_action=False,
-    ))
-    model.add_reward_source(RewardSource(
-        name="distance_shaping",
-        reward_type=RewardType.SHAPING,
-        value=0.1,
-        state_dependent=True,
-        scales_with="distance",
-        requires_action=True,
-        can_loop=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="catch",
+            reward_type=RewardType.TERMINAL,
+            value=10.0,
+            requires_action=True,
+            discovery_probability=0.3,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="timeout",
+            reward_type=RewardType.TERMINAL,
+            value=-10.0,
+            requires_action=False,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="distance_shaping",
+            reward_type=RewardType.SHAPING,
+            value=0.1,
+            state_dependent=True,
+            scales_with="distance",
+            requires_action=True,
+            can_loop=False,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

@@ -51,30 +51,36 @@ def run_example():
         n_actions=15,
         death_probability=0.05,
     )
-    model.add_reward_source(RewardSource(
-        name="enemy_destroyed",
-        reward_type=RewardType.ON_EVENT,
-        value=1.0,
-        max_occurrences=0,  # unlimited
-        requires_action=True,
-        discovery_probability=0.8,
-    ))
-    model.add_reward_source(RewardSource(
-        name="star_collected",
-        reward_type=RewardType.ON_EVENT,
-        value=0.5,
-        max_occurrences=0,
-        requires_action=True,
-        discovery_probability=0.9,
-    ))
-    model.add_reward_source(RewardSource(
-        name="level_complete",
-        reward_type=RewardType.TERMINAL,
-        value=10.0,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.3,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="enemy_destroyed",
+            reward_type=RewardType.ON_EVENT,
+            value=1.0,
+            max_occurrences=0,  # unlimited
+            requires_action=True,
+            discovery_probability=0.8,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="star_collected",
+            reward_type=RewardType.ON_EVENT,
+            value=0.5,
+            max_occurrences=0,
+            requires_action=True,
+            discovery_probability=0.9,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="level_complete",
+            reward_type=RewardType.TERMINAL,
+            value=10.0,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.3,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

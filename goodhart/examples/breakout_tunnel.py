@@ -55,31 +55,37 @@ def run_example():
         death_probability=0.05,
     )
     # Three tiers of bricks with different values
-    model.add_reward_source(RewardSource(
-        name="brick_low_tier",
-        reward_type=RewardType.ON_EVENT,
-        value=1.0,
-        max_occurrences=60,
-        requires_action=True,
-        discovery_probability=0.5,
-    ))
-    model.add_reward_source(RewardSource(
-        name="brick_mid_tier",
-        reward_type=RewardType.ON_EVENT,
-        value=4.0,
-        max_occurrences=30,
-        requires_action=True,
-        discovery_probability=0.2,
-    ))
-    model.add_reward_source(RewardSource(
-        name="brick_high_tier",
-        reward_type=RewardType.ON_EVENT,
-        value=7.0,
-        max_occurrences=20,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.05,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="brick_low_tier",
+            reward_type=RewardType.ON_EVENT,
+            value=1.0,
+            max_occurrences=60,
+            requires_action=True,
+            discovery_probability=0.5,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="brick_mid_tier",
+            reward_type=RewardType.ON_EVENT,
+            value=4.0,
+            max_occurrences=30,
+            requires_action=True,
+            discovery_probability=0.2,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="brick_high_tier",
+            reward_type=RewardType.ON_EVENT,
+            value=7.0,
+            max_occurrences=20,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.05,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

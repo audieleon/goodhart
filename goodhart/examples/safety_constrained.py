@@ -56,21 +56,25 @@ def run_example():
         n_actions=2,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="goal_reward",
-        reward_type=RewardType.ON_EVENT,
-        value=1.0,
-        respawn=RespawnBehavior.ON_EPISODE,
-        requires_action=True,
-        discovery_probability=0.1,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="hazard_cost_approx",
-        reward_type=RewardType.ON_EVENT,
-        value=-0.5,  # how much penalty?
-        requires_action=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="goal_reward",
+            reward_type=RewardType.ON_EVENT,
+            value=1.0,
+            respawn=RespawnBehavior.ON_EPISODE,
+            requires_action=True,
+            discovery_probability=0.1,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="hazard_cost_approx",
+            reward_type=RewardType.ON_EVENT,
+            value=-0.5,  # how much penalty?
+            requires_action=False,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

@@ -7,8 +7,12 @@ degenerate equilibria and perverse incentives.
 import math
 
 from goodhart.models import (
-    FormalBasis, ProofStrength, RewardType, RespawnBehavior,
-    Severity, Verdict,
+    FormalBasis,
+    ProofStrength,
+    RewardType,
+    RespawnBehavior,
+    Severity,
+    Verdict,
 )
 from goodhart.engine import Rule
 
@@ -37,19 +41,22 @@ def _discounted_steps(gamma: float, n: int) -> float:
     """
     if gamma >= 1.0 or abs(1.0 - gamma) < 1e-12:
         return float(n)
-    return (1.0 - gamma ** n) / (1.0 - gamma)
+    return (1.0 - gamma**n) / (1.0 - gamma)
 
 
 class PenaltyDominatesGoal(Rule):
     """Check if cumulative step penalty exceeds goal reward."""
 
     @property
-    def name(self): return "penalty_dominates_goal"
+    def name(self):
+        return "penalty_dominates_goal"
 
     @property
     def description(self):
-        return ("Total step penalty over max episode exceeds goal reward, "
-                "making even optimal play potentially negative")
+        return (
+            "Total step penalty over max episode exceeds goal reward, "
+            "making even optimal play potentially negative"
+        )
 
     @property
     def proof(self):
@@ -66,49 +73,72 @@ class PenaltyDominatesGoal(Rule):
     def check(self, model, config=None):
         verdicts = []
         # Use worst-case values when ranges are available
-        penalty_sources = [s for s in model.reward_sources
-                           if s.reward_type == RewardType.PER_STEP and s.value < 0]
-        penalty_per_step = sum(abs(_worst_case_value(s)) for s in penalty_sources) \
-            if penalty_sources else abs(model.total_step_penalty)
-        total_penalty = penalty_per_step * _discounted_steps(model.gamma, model.max_steps)
+        penalty_sources = [
+            s
+            for s in model.reward_sources
+            if s.reward_type == RewardType.PER_STEP and s.value < 0
+        ]
+        penalty_per_step = (
+            sum(abs(_worst_case_value(s)) for s in penalty_sources)
+            if penalty_sources
+            else abs(model.total_step_penalty)
+        )
+        total_penalty = penalty_per_step * _discounted_steps(
+            model.gamma, model.max_steps
+        )
         goal = model.max_goal_reward
 
         if total_penalty > goal:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.CRITICAL,
-                message=(f"Total discounted penalty ({total_penalty:.2f}) > goal reward "
-                         f"({goal:.2f}). Even optimal play yields negative "
-                         f"return if it takes >{int(goal / penalty_per_step)} steps."),
-                details={"total_penalty": total_penalty, "goal_reward": goal,
-                         "breakeven_steps": goal / penalty_per_step},
-                recommendation=(f"Reduce step penalty to "
-                                f"{goal / _discounted_steps(model.gamma, model.max_steps) / 2:.6f} or less"),
-                learn_more=(
-                    f"The agent sees: every step costs {penalty_per_step:.4f}, reaching the "
-                    f"goal pays {goal:.2f}. If the optimal path is >{int(goal / penalty_per_step)} "
-                    f"steps, the agent LOSES reward by succeeding. The rational response "
-                    f"is to minimize steps — which often means doing nothing or dying early.\n"
-                    f"Classic example: Mountain Car with -1/step and +1 goal over 200 steps. "
-                    f"Every trajectory scores between -200 (timeout) and -199 (instant goal). "
-                    f"All are negative, so the agent has no incentive to learn.\n"
-                    f"Fix: either reduce the penalty so the goal is worth reaching, increase "
-                    f"the goal reward, or add potential-based shaping (Ng 1999) to create "
-                    f"gradient signal without changing the optimal policy.\n"
-                    f"Formally verified: LEAN proof penalty_breakeven_discounted."
-                ),
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.CRITICAL,
+                    message=(
+                        f"Total discounted penalty ({total_penalty:.2f}) > goal reward "
+                        f"({goal:.2f}). Even optimal play yields negative "
+                        f"return if it takes >{int(goal / penalty_per_step)} steps."
+                    ),
+                    details={
+                        "total_penalty": total_penalty,
+                        "goal_reward": goal,
+                        "breakeven_steps": goal / penalty_per_step,
+                    },
+                    recommendation=(
+                        f"Reduce step penalty to "
+                        f"{goal / _discounted_steps(model.gamma, model.max_steps) / 2:.6f} or less"
+                    ),
+                    learn_more=(
+                        f"The agent sees: every step costs {penalty_per_step:.4f}, reaching the "
+                        f"goal pays {goal:.2f}. If the optimal path is >{int(goal / penalty_per_step)} "
+                        f"steps, the agent LOSES reward by succeeding. The rational response "
+                        f"is to minimize steps — which often means doing nothing or dying early.\n"
+                        f"Classic example: Mountain Car with -1/step and +1 goal over 200 steps. "
+                        f"Every trajectory scores between -200 (timeout) and -199 (instant goal). "
+                        f"All are negative, so the agent has no incentive to learn.\n"
+                        f"Fix: either reduce the penalty so the goal is worth reaching, increase "
+                        f"the goal reward, or add potential-based shaping (Ng 1999) to create "
+                        f"gradient signal without changing the optimal policy.\n"
+                        f"Formally verified: LEAN proof penalty_breakeven_discounted."
+                    ),
+                )
+            )
         elif total_penalty > goal * 0.5:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.WARNING,
-                message=(f"Total discounted penalty ({total_penalty:.2f}) is >{total_penalty/goal*100:.0f}% "
-                         f"of goal reward ({goal:.2f}). Tight margin."),
-                details={"ratio": total_penalty / goal},
-                recommendation=("The margin between penalty and goal is thin. An agent that "
-                                "takes a slightly suboptimal path may earn negative return. "
-                                "Consider reducing the penalty or increasing the goal reward."),
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.WARNING,
+                    message=(
+                        f"Total discounted penalty ({total_penalty:.2f}) is >{total_penalty / goal * 100:.0f}% "
+                        f"of goal reward ({goal:.2f}). Tight margin."
+                    ),
+                    details={"ratio": total_penalty / goal},
+                    recommendation=(
+                        "The margin between penalty and goal is thin. An agent that "
+                        "takes a slightly suboptimal path may earn negative return. "
+                        "Consider reducing the penalty or increasing the goal reward."
+                    ),
+                )
+            )
         return verdicts
 
 
@@ -116,7 +146,8 @@ class DeathBeatsSurvival(Rule):
     """Check if dying is more rewarding than surviving."""
 
     @property
-    def name(self): return "death_beats_survival"
+    def name(self):
+        return "death_beats_survival"
 
     @property
     def description(self):
@@ -135,11 +166,14 @@ class DeathBeatsSurvival(Rule):
         # Only applies when death is possible AND there's a passive step penalty.
         # Without death, the comparison is meaningless (reward desert, not trap).
         # Without passive penalty, a dead/idle agent pays nothing.
-        passive_penalty = sum(s.value for s in model.reward_sources
-                              if s.reward_type == RewardType.PER_STEP
-                              and s.value < 0
-                              and not s.requires_action
-                              and s.modifier_type == "none")
+        passive_penalty = sum(
+            s.value
+            for s in model.reward_sources
+            if s.reward_type == RewardType.PER_STEP
+            and s.value < 0
+            and not s.requires_action
+            and s.modifier_type == "none"
+        )
         return passive_penalty < 0 and model.death_probability > 0
 
     def check(self, model, config=None):
@@ -148,11 +182,14 @@ class DeathBeatsSurvival(Rule):
         # Only count rewards that don't require action — a dead/idle agent
         # doesn't receive action-dependent bonuses like movement rewards.
         # Exclude modifiers — they scale other sources, not independent.
-        passive_positive = sum(s.value for s in model.reward_sources
-                               if s.reward_type == RewardType.PER_STEP
-                               and s.value > 0
-                               and not s.requires_action
-                               and s.modifier_type == "none")
+        passive_positive = sum(
+            s.value
+            for s in model.reward_sources
+            if s.reward_type == RewardType.PER_STEP
+            and s.value > 0
+            and not s.requires_action
+            and s.modifier_type == "none"
+        )
         net_per_step = model.total_step_penalty + passive_positive
         # If net per-step is positive even passively, surviving beats dying
         if net_per_step >= 0:
@@ -175,41 +212,55 @@ class DeathBeatsSurvival(Rule):
         ratio = ev_survive / ev_die
 
         if ratio > 2.0:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.CRITICAL,
-                message=(f"Dying at step 1 ({ev_die:+.4f}) beats "
-                         f"surviving {survive_steps} steps ({ev_survive:+.4f}) by "
-                         f"{ratio:.1f}x. Agent will learn to die immediately."),
-                details={"ev_die": ev_die, "ev_survive_10": ev_survive,
-                         "ratio": ratio},
-                recommendation="Remove step penalty or add survival reward",
-                learn_more=(
-                    "The agent discovers that dying is cheaper than living. With a "
-                    "negative per-step reward and no compensating positive reward for "
-                    "staying alive, every additional step of survival makes the total "
-                    "return worse. The optimal policy becomes: die as fast as possible.\n"
-                    "This is NOT the same as 'reward desert' (where all strategies are "
-                    "equal). Here, the agent actively learns a WORSE behavior than random.\n"
-                    "Classic example: CartPole with -1/step penalty and no +1 alive bonus "
-                    "learns to drop the pole immediately (Sutton & Barto 2018).\n"
-                    "Fix: add an alive bonus that exceeds the step penalty, or remove the "
-                    "step penalty entirely. If you need time pressure, use a terminal "
-                    "time bonus (reward = 1 - steps/max_steps) instead of per-step cost.\n"
-                    "Formally verified: LEAN proof death_beats_survival_discounted."
-                ),
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.CRITICAL,
+                    message=(
+                        f"Dying at step 1 ({ev_die:+.4f}) beats "
+                        f"surviving {survive_steps} steps ({ev_survive:+.4f}) by "
+                        f"{ratio:.1f}x. Agent will learn to die immediately."
+                    ),
+                    details={
+                        "ev_die": ev_die,
+                        "ev_survive_10": ev_survive,
+                        "ratio": ratio,
+                    },
+                    recommendation="Remove step penalty or add survival reward",
+                    learn_more=(
+                        "The agent discovers that dying is cheaper than living. With a "
+                        "negative per-step reward and no compensating positive reward for "
+                        "staying alive, every additional step of survival makes the total "
+                        "return worse. The optimal policy becomes: die as fast as possible.\n"
+                        "This is NOT the same as 'reward desert' (where all strategies are "
+                        "equal). Here, the agent actively learns a WORSE behavior than random.\n"
+                        "Classic example: CartPole with -1/step penalty and no +1 alive bonus "
+                        "learns to drop the pole immediately (Sutton & Barto 2018).\n"
+                        "Fix: add an alive bonus that exceeds the step penalty, or remove the "
+                        "step penalty entirely. If you need time pressure, use a terminal "
+                        "time bonus (reward = 1 - steps/max_steps) instead of per-step cost.\n"
+                        "Formally verified: LEAN proof death_beats_survival_discounted."
+                    ),
+                )
+            )
         elif ratio > 1.0:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.WARNING,
-                message=(f"Dying at step 1 ({ev_die:+.4f}) beats "
-                         f"surviving {survive_steps} steps ({ev_survive:+.4f}) by "
-                         f"{ratio:.1f}x. Marginal suicidal incentive."),
-                details={"ev_die": ev_die, "ev_survive_10": ev_survive,
-                         "ratio": ratio},
-                recommendation="Consider removing step penalty or adding survival reward",
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.WARNING,
+                    message=(
+                        f"Dying at step 1 ({ev_die:+.4f}) beats "
+                        f"surviving {survive_steps} steps ({ev_survive:+.4f}) by "
+                        f"{ratio:.1f}x. Marginal suicidal incentive."
+                    ),
+                    details={
+                        "ev_die": ev_die,
+                        "ev_survive_10": ev_survive,
+                        "ratio": ratio,
+                    },
+                    recommendation="Consider removing step penalty or adding survival reward",
+                )
+            )
         return verdicts
 
 
@@ -217,7 +268,8 @@ class IdleExploit(Rule):
     """Check if doing nothing is optimal."""
 
     @property
-    def name(self): return "idle_exploit"
+    def name(self):
+        return "idle_exploit"
 
     @property
     def description(self):
@@ -228,25 +280,36 @@ class IdleExploit(Rule):
         return FormalBasis(
             proof_name="idle_dominance_with_explore",
             strength=ProofStrength.VERIFIED,
-            statement=("∀ r_idle ≥ 0, f ∈ [0,1], r_idle ≥ f * r_intentional + r_nonintentional + penalty "
-                       "→ r_idle * T ≥ (f * r_intentional + r_nonintentional + penalty) * T"),
-            parameters={"idle_reward": "r_idle", "intentional": "r_intentional",
-                        "nonintentional": "r_nonintentional", "penalty": "penalty",
-                        "explore_fraction": "f"},
+            statement=(
+                "∀ r_idle ≥ 0, f ∈ [0,1], r_idle ≥ f * r_intentional + r_nonintentional + penalty "
+                "→ r_idle * T ≥ (f * r_intentional + r_nonintentional + penalty) * T"
+            ),
+            parameters={
+                "idle_reward": "r_idle",
+                "intentional": "r_intentional",
+                "nonintentional": "r_nonintentional",
+                "penalty": "penalty",
+                "explore_fraction": "f",
+            },
         )
 
     def applies_to(self, model):
-        return any(not s.requires_action for s in model.reward_sources) or \
-               model.total_step_penalty < 0
+        return (
+            any(not s.requires_action for s in model.reward_sources)
+            or model.total_step_penalty < 0
+        )
 
     def check(self, model, config=None):
         verdicts = []
         # Exclude multiplicative modifiers — they scale other sources,
         # not independent additive contributions
-        idle_sources = [s for s in model.reward_sources
-                        if not s.requires_action
-                        and s.reward_type == RewardType.PER_STEP
-                        and s.modifier_type == "none"]
+        idle_sources = [
+            s
+            for s in model.reward_sources
+            if not s.requires_action
+            and s.reward_type == RewardType.PER_STEP
+            and s.modifier_type == "none"
+        ]
 
         # State-dependent penalties with requires_action=True are
         # environmental — they happen based on state, not action.
@@ -254,13 +317,16 @@ class IdleExploit(Rule):
         # fire damage, etc. These must be counted in BOTH idle and
         # explore EVs, because the agent can influence severity but
         # cannot avoid them by doing nothing.
-        env_penalties = [s for s in model.reward_sources
-                         if s.requires_action
-                         and s.state_dependent
-                         and s.value < 0
-                         and s.reward_type == RewardType.PER_STEP
-                         and s.modifier_type == "none"
-                         and not s.intentional]
+        env_penalties = [
+            s
+            for s in model.reward_sources
+            if s.requires_action
+            and s.state_dependent
+            and s.value < 0
+            and s.reward_type == RewardType.PER_STEP
+            and s.modifier_type == "none"
+            and not s.intentional
+        ]
 
         # Combine: idle sources + environmental penalties apply to idle
         idle_sources + env_penalties
@@ -297,35 +363,39 @@ class IdleExploit(Rule):
         ev_explore = explore_per_step * disc
         # Discount goal reward to expected discovery time (avg_steps/2)
         avg_discovery = max(1, model.max_steps // 2)
-        gamma_discount = model.gamma ** avg_discovery if model.gamma < 1.0 else 1.0
+        gamma_discount = model.gamma**avg_discovery if model.gamma < 1.0 else 1.0
         for s in model.goal_sources:
             ev_explore += s.value * s.discovery_probability * gamma_discount
 
         if ev_idle > ev_explore and ev_idle >= 0:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.CRITICAL,
-                message=(f"Standing still (EV={ev_idle:+.4f}) beats "
-                         f"exploration (EV={ev_explore:+.4f}). "
-                         f"Agent will learn to do nothing."),
-                details={"ev_idle": ev_idle, "ev_explore": ev_explore},
-                recommendation="Add idle penalty or remove step penalty",
-                learn_more=(
-                    "The agent compares two strategies: (1) do nothing and collect "
-                    "passive rewards, (2) explore and pay action costs. If standing "
-                    "still earns more, the agent converges to the no-op policy.\n"
-                    "This is the most common reward design failure in locomotion tasks. "
-                    "MuJoCo Humanoid-v4 with healthy_reward=5.0 earns 5000/episode by "
-                    "standing still vs ~5500 for walking — not worth the fall risk.\n"
-                    "Three fixes: (1) Remove the passive reward (alive bonus) entirely. "
-                    "(2) Make the passive reward smaller than the active reward. "
-                    "(3) Add an idle penalty that makes standing still costly.\n"
-                    "The explore_fraction field on intentional rewards controls how much "
-                    "credit random exploration gets. If your locomotion reward gives "
-                    "partial credit for random stumbling (BipedalWalker), set "
-                    "explore_fraction=0.5 to reflect this."
-                ),
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.CRITICAL,
+                    message=(
+                        f"Standing still (EV={ev_idle:+.4f}) beats "
+                        f"exploration (EV={ev_explore:+.4f}). "
+                        f"Agent will learn to do nothing."
+                    ),
+                    details={"ev_idle": ev_idle, "ev_explore": ev_explore},
+                    recommendation="Add idle penalty or remove step penalty",
+                    learn_more=(
+                        "The agent compares two strategies: (1) do nothing and collect "
+                        "passive rewards, (2) explore and pay action costs. If standing "
+                        "still earns more, the agent converges to the no-op policy.\n"
+                        "This is the most common reward design failure in locomotion tasks. "
+                        "MuJoCo Humanoid-v4 with healthy_reward=5.0 earns 5000/episode by "
+                        "standing still vs ~5500 for walking — not worth the fall risk.\n"
+                        "Three fixes: (1) Remove the passive reward (alive bonus) entirely. "
+                        "(2) Make the passive reward smaller than the active reward. "
+                        "(3) Add an idle penalty that makes standing still costly.\n"
+                        "The explore_fraction field on intentional rewards controls how much "
+                        "credit random exploration gets. If your locomotion reward gives "
+                        "partial credit for random stumbling (BipedalWalker), set "
+                        "explore_fraction=0.5 to reflect this."
+                    ),
+                )
+            )
         return verdicts
 
 
@@ -333,12 +403,15 @@ class ExplorationThreshold(Rule):
     """Check if exploration can bootstrap learning."""
 
     @property
-    def name(self): return "exploration_threshold"
+    def name(self):
+        return "exploration_threshold"
 
     @property
     def description(self):
-        return ("Minimum goal discovery rate needed for exploration "
-                "to beat degenerate strategies")
+        return (
+            "Minimum goal discovery rate needed for exploration "
+            "to beat degenerate strategies"
+        )
 
     @property
     def proof(self):
@@ -357,11 +430,14 @@ class ExplorationThreshold(Rule):
 
         ev_die = model.total_step_penalty * _discounted_steps(model.gamma, 1)
         # Idle EV includes passive (no-action) per-step rewards
-        passive_per_step = sum(s.value for s in model.reward_sources
-                               if s.reward_type == RewardType.PER_STEP
-                               and not s.requires_action
-                               and not s.intentional
-                               and s.modifier_type == "none")
+        passive_per_step = sum(
+            s.value
+            for s in model.reward_sources
+            if s.reward_type == RewardType.PER_STEP
+            and not s.requires_action
+            and not s.intentional
+            and s.modifier_type == "none"
+        )
         idle_rate = model.total_step_penalty + passive_per_step
         disc_idle = _discounted_steps(model.gamma, model.max_steps)
         ev_idle = idle_rate * disc_idle
@@ -377,7 +453,7 @@ class ExplorationThreshold(Rule):
 
         denom = goal + penalty_per_step * (disc_avg - disc_max)
         if denom <= 0:
-            p_min = float('inf')
+            p_min = float("inf")
         else:
             numer = best_degenerate - penalty_per_step * disc_max
             p_min = max(0, numer / denom)
@@ -395,50 +471,72 @@ class ExplorationThreshold(Rule):
         p_actual = unique_states / model.n_states
 
         # Determine if this is a "desert" (no gradient) or "trap" (perverse incentive)
-        is_desert = (model.death_probability == 0 and
-                     best_degenerate <= 0 and penalty_per_step < 0)
+        is_desert = (
+            model.death_probability == 0
+            and best_degenerate <= 0
+            and penalty_per_step < 0
+        )
 
         if p_min > 1.0:
             if is_desert:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.CRITICAL,
-                    message="Reward desert: all non-goal strategies score equally. "
-                            "No gradient signal — agent cannot distinguish good from "
-                            "bad exploration. This is an exploration problem, not a "
-                            "reward trap.",
-                    details={"p_min": p_min, "p_actual": p_actual, "type": "desert"},
-                    recommendation="Add reward shaping (potential-based per Ng 1999), "
-                                   "intrinsic motivation (RND/curiosity), or curriculum",
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.CRITICAL,
+                        message="Reward desert: all non-goal strategies score equally. "
+                        "No gradient signal — agent cannot distinguish good from "
+                        "bad exploration. This is an exploration problem, not a "
+                        "reward trap.",
+                        details={
+                            "p_min": p_min,
+                            "p_actual": p_actual,
+                            "type": "desert",
+                        },
+                        recommendation="Add reward shaping (potential-based per Ng 1999), "
+                        "intrinsic motivation (RND/curiosity), or curriculum",
+                    )
+                )
             else:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.CRITICAL,
-                    message="Exploration can NEVER beat degenerate strategies "
-                            "under current reward structure.",
-                    details={"p_min": p_min, "p_actual": p_actual, "type": "trap"},
-                    recommendation="Restructure reward: add shaping or remove penalty",
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.CRITICAL,
+                        message="Exploration can NEVER beat degenerate strategies "
+                        "under current reward structure.",
+                        details={"p_min": p_min, "p_actual": p_actual, "type": "trap"},
+                        recommendation="Restructure reward: add shaping or remove penalty",
+                    )
+                )
         elif p_actual < p_min:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.WARNING,
-                message=(f"Need p(goal)>{p_min:.4f} ({p_min*100:.1f}%) but "
-                         f"random walk achieves ~{p_actual:.4f} ({p_actual*100:.1f}%). "
-                         f"Agent cannot bootstrap learning."),
-                details={"p_min": p_min, "p_actual": p_actual,
-                         "gap_ratio": p_min / max(p_actual, 1e-10)},
-                recommendation="Add intrinsic motivation or reduce step penalty",
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.WARNING,
+                    message=(
+                        f"Need p(goal)>{p_min:.4f} ({p_min * 100:.1f}%) but "
+                        f"random walk achieves ~{p_actual:.4f} ({p_actual * 100:.1f}%). "
+                        f"Agent cannot bootstrap learning."
+                    ),
+                    details={
+                        "p_min": p_min,
+                        "p_actual": p_actual,
+                        "gap_ratio": p_min / max(p_actual, 1e-10),
+                    },
+                    recommendation="Add intrinsic motivation or reduce step penalty",
+                )
+            )
         else:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.INFO,
-                message=(f"Exploration viable: p(goal)>{p_min:.4f} needed, "
-                         f"random walk achieves ~{p_actual:.4f}."),
-                details={"p_min": p_min, "p_actual": p_actual},
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.INFO,
+                    message=(
+                        f"Exploration viable: p(goal)>{p_min:.4f} needed, "
+                        f"random walk achieves ~{p_actual:.4f}."
+                    ),
+                    details={"p_min": p_min, "p_actual": p_actual},
+                )
+            )
         return verdicts
 
 
@@ -446,12 +544,15 @@ class RespawningExploit(Rule):
     """Check if respawning reward sources create loop exploits."""
 
     @property
-    def name(self): return "respawning_exploit"
+    def name(self):
+        return "respawning_exploit"
 
     @property
     def description(self):
-        return ("Respawning reward sources can be harvested in loops, "
-                "giving higher EV than reaching the goal")
+        return (
+            "Respawning reward sources can be harvested in loops, "
+            "giving higher EV than reaching the goal"
+        )
 
     @property
     def proof(self):
@@ -486,9 +587,11 @@ class RespawningExploit(Rule):
             # Only apply when the source uses timed respawn (not explicit
             # can_loop or infinite), since can_loop=True and infinite
             # sources are designed for repeated collection.
-            if (source.max_occurrences > 0
-                    and not source.can_loop
-                    and source.respawn != RespawnBehavior.INFINITE):
+            if (
+                source.max_occurrences > 0
+                and not source.can_loop
+                and source.respawn != RespawnBehavior.INFINITE
+            ):
                 cycles = min(cycles, source.max_occurrences)
                 ev_loop = source.value * cycles
 
@@ -497,32 +600,43 @@ class RespawningExploit(Rule):
                 # 0.01/step) are often designed to dominate sparse goals early
                 # in training. Downgrade to INFO when the per-step value is
                 # tiny and other positive reward sources exist alongside it.
-                other_positive = any(s.value > 0 and s is not source
-                                     for s in model.reward_sources)
+                other_positive = any(
+                    s.value > 0 and s is not source for s in model.reward_sources
+                )
                 is_small_value = source.value < 0.1 and other_positive
                 severity = Severity.INFO if is_small_value else Severity.CRITICAL
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=severity,
-                    message=(f"Looping '{source.name}' (EV={ev_loop:+.1f}) "
-                             f"beats goal reward ({goal:+.1f}). "
-                             + ("This may be intentional (e.g., intrinsic "
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=severity,
+                        message=(
+                            f"Looping '{source.name}' (EV={ev_loop:+.1f}) "
+                            f"beats goal reward ({goal:+.1f}). "
+                            + (
+                                "This may be intentional (e.g., intrinsic "
                                 "motivation designed to dominate early training)."
-                                if is_small_value else
-                                "Agent will loop instead of completing the task.")),
-                    details={"source": source.name, "ev_loop": ev_loop,
-                             "goal_reward": goal, "cycles": cycles},
-                    recommendation=(
-                        f"If '{source.name}' is intrinsic motivation, this is expected — "
-                        f"verify it decays as the agent learns. Otherwise, cap at "
-                        f"{int(goal / max(source.value, 0.001))} occurrences or make "
-                        f"non-respawning."
-                        if is_small_value else
-                        f"Cap '{source.name}' at "
-                        f"{int(goal / max(source.value, 0.001))} occurrences "
-                        f"or make non-respawning"
-                    ),
-                ))
+                                if is_small_value
+                                else "Agent will loop instead of completing the task."
+                            )
+                        ),
+                        details={
+                            "source": source.name,
+                            "ev_loop": ev_loop,
+                            "goal_reward": goal,
+                            "cycles": cycles,
+                        },
+                        recommendation=(
+                            f"If '{source.name}' is intrinsic motivation, this is expected — "
+                            f"verify it decays as the agent learns. Otherwise, cap at "
+                            f"{int(goal / max(source.value, 0.001))} occurrences or make "
+                            f"non-respawning."
+                            if is_small_value
+                            else f"Cap '{source.name}' at "
+                            f"{int(goal / max(source.value, 0.001))} occurrences "
+                            f"or make non-respawning"
+                        ),
+                    )
+                )
         return verdicts
 
 
@@ -530,12 +644,15 @@ class DeathResetExploit(Rule):
     """Check if dying resets reward sources for re-collection."""
 
     @property
-    def name(self): return "death_reset_exploit"
+    def name(self):
+        return "death_reset_exploit"
 
     @property
     def description(self):
-        return ("Dying resets collectible rewards, making deliberate death "
-                "more valuable than continuing")
+        return (
+            "Dying resets collectible rewards, making deliberate death "
+            "more valuable than continuing"
+        )
 
     @property
     def proof(self):
@@ -543,7 +660,12 @@ class DeathResetExploit(Rule):
             proof_name="death_reset_dominance",
             strength=ProofStrength.VERIFIED,
             statement="∀ c > 0, p > 0, g > 0, L > 0, c * p * T > g * L → c * p * T / L > g",
-            parameters={"collectible_value": "c", "collect_prob": "p", "goal": "g", "avg_life": "L"},
+            parameters={
+                "collectible_value": "c",
+                "collect_prob": "p",
+                "goal": "g",
+                "avg_life": "L",
+            },
         )
 
     def applies_to(self, model):
@@ -552,8 +674,11 @@ class DeathResetExploit(Rule):
     def check(self, model, config=None):
         verdicts = []
 
-        resettable_value = sum(s.value * s.discovery_probability
-                               for s in model.resettable_sources if s.value > 0)
+        resettable_value = sum(
+            s.value * s.discovery_probability
+            for s in model.resettable_sources
+            if s.value > 0
+        )
 
         if resettable_value <= 0:
             return verdicts
@@ -569,16 +694,23 @@ class DeathResetExploit(Rule):
         goal = model.max_goal_reward
 
         if ev_replay > goal:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.CRITICAL,
-                message=(f"Die-and-replay strategy (EV={ev_replay:+.1f}) "
-                         f"beats goal ({goal:+.1f}). Agent will deliberately "
-                         f"die to re-collect rewards."),
-                details={"ev_replay": ev_replay, "n_lives": n_lives,
-                         "resettable_value": resettable_value},
-                recommendation="Don't reset reward sources on death",
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.CRITICAL,
+                    message=(
+                        f"Die-and-replay strategy (EV={ev_replay:+.1f}) "
+                        f"beats goal ({goal:+.1f}). Agent will deliberately "
+                        f"die to re-collect rewards."
+                    ),
+                    details={
+                        "ev_replay": ev_replay,
+                        "n_lives": n_lives,
+                        "resettable_value": resettable_value,
+                    },
+                    recommendation="Don't reset reward sources on death",
+                )
+            )
         return verdicts
 
 
@@ -586,12 +718,15 @@ class ShapingLoopExploit(Rule):
     """Check if shaping rewards form exploitable cycles."""
 
     @property
-    def name(self): return "shaping_loop_exploit"
+    def name(self):
+        return "shaping_loop_exploit"
 
     @property
     def description(self):
-        return ("Shaping rewards (e.g. distance decrease) can be harvested "
-                "by cycling through states without reaching the goal")
+        return (
+            "Shaping rewards (e.g. distance decrease) can be harvested "
+            "by cycling through states without reaching the goal"
+        )
 
     @property
     def proof(self):
@@ -621,19 +756,28 @@ class ShapingLoopExploit(Rule):
                 ev_loop = source.value * cycles
 
                 if ev_loop > goal:
-                    verdicts.append(Verdict(
-                        rule_name=self.name,
-                        severity=Severity.CRITICAL,
-                        message=(f"Cycling '{source.name}' "
-                                 f"(EV={ev_loop:+.1f}) beats goal "
-                                 f"({goal:+.1f}). Agent will orbit "
-                                 f"instead of completing the task."),
-                        details={"source": source.name, "ev_loop": ev_loop,
-                                 "goal_reward": goal},
-                        recommendation=(f"Use potential-based shaping for "
-                                        f"'{source.name}' (Ng et al. 1999) "
-                                        f"to guarantee policy invariance"),
-                    ))
+                    verdicts.append(
+                        Verdict(
+                            rule_name=self.name,
+                            severity=Severity.CRITICAL,
+                            message=(
+                                f"Cycling '{source.name}' "
+                                f"(EV={ev_loop:+.1f}) beats goal "
+                                f"({goal:+.1f}). Agent will orbit "
+                                f"instead of completing the task."
+                            ),
+                            details={
+                                "source": source.name,
+                                "ev_loop": ev_loop,
+                                "goal_reward": goal,
+                            },
+                            recommendation=(
+                                f"Use potential-based shaping for "
+                                f"'{source.name}' (Ng et al. 1999) "
+                                f"to guarantee policy invariance"
+                            ),
+                        )
+                    )
         return verdicts
 
 
@@ -641,7 +785,8 @@ class IntrinsicSufficiency(Rule):
     """Check if intrinsic reward overcomes step penalty."""
 
     @property
-    def name(self): return "intrinsic_sufficiency"
+    def name(self):
+        return "intrinsic_sufficiency"
 
     @property
     def description(self):
@@ -653,34 +798,50 @@ class IntrinsicSufficiency(Rule):
             proof_name="intrinsic_insufficient",
             strength=ProofStrength.VERIFIED,
             statement="∀ intrinsic > 0, penalty > 0, intrinsic < penalty → intrinsic - penalty < 0",
-            parameters={"intrinsic_per_step": "intrinsic", "penalty_per_step": "penalty"},
+            parameters={
+                "intrinsic_per_step": "intrinsic",
+                "penalty_per_step": "penalty",
+            },
         )
 
     def applies_to(self, model):
-        return any(s.reward_type == RewardType.PER_STEP and s.value > 0
-                   for s in model.reward_sources)
+        return any(
+            s.reward_type == RewardType.PER_STEP and s.value > 0
+            for s in model.reward_sources
+        )
 
     def check(self, model, config=None):
         verdicts = []
-        intrinsic_sources = [s for s in model.reward_sources
-                             if s.reward_type == RewardType.PER_STEP and s.value > 0]
+        intrinsic_sources = [
+            s
+            for s in model.reward_sources
+            if s.reward_type == RewardType.PER_STEP and s.value > 0
+        ]
         intrinsic_per_step = sum(s.value for s in intrinsic_sources)
         penalty_per_step = abs(model.total_step_penalty)
 
         if intrinsic_per_step < penalty_per_step:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.WARNING,
-                message=(f"Intrinsic reward ({intrinsic_per_step:.5f}/step) < "
-                         f"step penalty ({penalty_per_step:.5f}/step). "
-                         f"Exploration is still punished on net."),
-                details={"intrinsic": intrinsic_per_step,
-                         "penalty": penalty_per_step,
-                         "ratio": intrinsic_per_step / max(penalty_per_step, 1e-10)},
-                recommendation=(f"Increase intrinsic coefficient to at least "
-                                f"{penalty_per_step / max(intrinsic_per_step, 1e-10):.1f}x "
-                                f"current value"),
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.WARNING,
+                    message=(
+                        f"Intrinsic reward ({intrinsic_per_step:.5f}/step) < "
+                        f"step penalty ({penalty_per_step:.5f}/step). "
+                        f"Exploration is still punished on net."
+                    ),
+                    details={
+                        "intrinsic": intrinsic_per_step,
+                        "penalty": penalty_per_step,
+                        "ratio": intrinsic_per_step / max(penalty_per_step, 1e-10),
+                    },
+                    recommendation=(
+                        f"Increase intrinsic coefficient to at least "
+                        f"{penalty_per_step / max(intrinsic_per_step, 1e-10):.1f}x "
+                        f"current value"
+                    ),
+                )
+            )
         return verdicts
 
 
@@ -688,7 +849,8 @@ class BudgetSufficiency(Rule):
     """Check if training budget allows enough goal discoveries."""
 
     @property
-    def name(self): return "budget_sufficiency"
+    def name(self):
+        return "budget_sufficiency"
 
     @property
     def description(self):
@@ -708,8 +870,8 @@ class BudgetSufficiency(Rule):
         if not model.goal_sources:
             return verdicts
 
-        n_actors = getattr(config, 'n_actors', None) if config else None
-        total_steps = getattr(config, 'total_steps', None) if config else None
+        n_actors = getattr(config, "n_actors", None) if config else None
+        total_steps = getattr(config, "total_steps", None) if config else None
         if n_actors is None or total_steps is None:
             return verdicts
 
@@ -729,27 +891,39 @@ class BudgetSufficiency(Rule):
             expected_discoveries = total_episodes * source.discovery_probability
 
             if expected_discoveries < 10:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.CRITICAL,
-                    message=(f"Expected only {expected_discoveries:.0f} goal "
-                             f"discoveries in {total_steps/1e6:.0f}M steps "
-                             f"with {n_actors} actors. Need >=10 to learn."),
-                    details={"expected_discoveries": expected_discoveries,
-                             "total_episodes": total_episodes,
-                             "p_discovery": source.discovery_probability},
-                    recommendation=(f"Increase budget to "
-                                    f"{int(10 / max(source.discovery_probability, 1e-10) * avg_episode_length / 1e6) + 1}M "
-                                    f"steps or add intrinsic motivation"),
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.CRITICAL,
+                        message=(
+                            f"Expected only {expected_discoveries:.0f} goal "
+                            f"discoveries in {total_steps / 1e6:.0f}M steps "
+                            f"with {n_actors} actors. Need >=10 to learn."
+                        ),
+                        details={
+                            "expected_discoveries": expected_discoveries,
+                            "total_episodes": total_episodes,
+                            "p_discovery": source.discovery_probability,
+                        },
+                        recommendation=(
+                            f"Increase budget to "
+                            f"{int(10 / max(source.discovery_probability, 1e-10) * avg_episode_length / 1e6) + 1}M "
+                            f"steps or add intrinsic motivation"
+                        ),
+                    )
+                )
             elif expected_discoveries < 100:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.WARNING,
-                    message=(f"Only ~{expected_discoveries:.0f} goal discoveries "
-                             f"expected. Learning will be slow and high-variance."),
-                    details={"expected_discoveries": expected_discoveries},
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.WARNING,
+                        message=(
+                            f"Only ~{expected_discoveries:.0f} goal discoveries "
+                            f"expected. Learning will be slow and high-variance."
+                        ),
+                        details={"expected_discoveries": expected_discoveries},
+                    )
+                )
         return verdicts
 
 
@@ -757,22 +931,31 @@ class CompoundTrap(Rule):
     """Detect traps from reward source interactions."""
 
     @property
-    def name(self): return "compound_trap"
+    def name(self):
+        return "compound_trap"
 
     @property
     def description(self):
-        return ("Detect traps arising from combinations of reward sources "
-                "that individual rules miss")
+        return (
+            "Detect traps arising from combinations of reward sources "
+            "that individual rules miss"
+        )
 
     @property
     def proof(self):
         return FormalBasis(
             proof_name="compound_trap",
             strength=ProofStrength.VERIFIED,
-            statement=("∀ goal > 0, penalty < 0, D > 0, loop_ev > 0, "
-                       "goal < -penalty * D → loop_ev > goal + penalty * D"),
-            parameters={"goal": "goal", "penalty": "penalty",
-                        "disc_steps": "D", "loop_ev": "loop_ev"},
+            statement=(
+                "∀ goal > 0, penalty < 0, D > 0, loop_ev > 0, "
+                "goal < -penalty * D → loop_ev > goal + penalty * D"
+            ),
+            parameters={
+                "goal": "goal",
+                "penalty": "penalty",
+                "disc_steps": "D",
+                "loop_ev": "loop_ev",
+            },
         )
 
     def applies_to(self, model):
@@ -788,7 +971,9 @@ class CompoundTrap(Rule):
             for source in model.loopable_sources:
                 if source.can_loop and source.loop_period > 0:
                     loop_reward_per_step = source.value / source.loop_period
-                elif source.respawn == RespawnBehavior.TIMED and source.respawn_time > 0:
+                elif (
+                    source.respawn == RespawnBehavior.TIMED and source.respawn_time > 0
+                ):
                     loop_reward_per_step = source.value / source.respawn_time
                 elif source.respawn == RespawnBehavior.INFINITE:
                     loop_reward_per_step = source.value
@@ -796,64 +981,90 @@ class CompoundTrap(Rule):
                     continue
                 # Respect max_occurrences for timed sources (same logic as RespawningExploit)
                 effective_steps = model.max_steps
-                if (source.max_occurrences > 0
-                        and not source.can_loop
-                        and source.respawn != RespawnBehavior.INFINITE):
-                    max_loop_steps = source.max_occurrences * max(source.respawn_time, 1)
+                if (
+                    source.max_occurrences > 0
+                    and not source.can_loop
+                    and source.respawn != RespawnBehavior.INFINITE
+                ):
+                    max_loop_steps = source.max_occurrences * max(
+                        source.respawn_time, 1
+                    )
                     effective_steps = min(model.max_steps, max_loop_steps)
                 loop_ev = (loop_reward_per_step - penalty_per_step) * effective_steps
                 if loop_ev > goal_ev and loop_ev > 0:
-                    verdicts.append(Verdict(
-                        rule_name=self.name,
-                        severity=Severity.CRITICAL,
-                        message=(f"Penalty + respawning '{source.name}' compound trap: "
-                                 f"loop EV ({loop_ev:+.1f}) > goal EV ({goal_ev:+.1f}). "
-                                 f"Looping is the only positive-EV strategy because "
-                                 f"the penalty makes exploration costly."),
-                        details={"loop_ev": loop_ev, "goal_ev": goal_ev,
-                                 "loop_reward_per_step": loop_reward_per_step,
-                                 "penalty_per_step": penalty_per_step},
-                        recommendation=(f"Remove step penalty or cap '{source.name}' "
-                                        f"occurrences"),
-                    ))
+                    verdicts.append(
+                        Verdict(
+                            rule_name=self.name,
+                            severity=Severity.CRITICAL,
+                            message=(
+                                f"Penalty + respawning '{source.name}' compound trap: "
+                                f"loop EV ({loop_ev:+.1f}) > goal EV ({goal_ev:+.1f}). "
+                                f"Looping is the only positive-EV strategy because "
+                                f"the penalty makes exploration costly."
+                            ),
+                            details={
+                                "loop_ev": loop_ev,
+                                "goal_ev": goal_ev,
+                                "loop_reward_per_step": loop_reward_per_step,
+                                "penalty_per_step": penalty_per_step,
+                            },
+                            recommendation=(
+                                f"Remove step penalty or cap '{source.name}' "
+                                f"occurrences"
+                            ),
+                        )
+                    )
 
         # 2. Shaping + no terminal: agent cycles shaping forever
         if model.shaping_sources and not model.goal_sources:
             shaping_names = [s.name for s in model.shaping_sources]
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.CRITICAL,
-                message=(f"Shaping rewards ({', '.join(shaping_names)}) with no "
-                         f"terminal goal. Agent will cycle the shaping reward "
-                         f"forever since there is no incentive to terminate."),
-                details={"shaping_sources": shaping_names},
-                recommendation="Add a terminal goal reward or remove shaping",
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.CRITICAL,
+                    message=(
+                        f"Shaping rewards ({', '.join(shaping_names)}) with no "
+                        f"terminal goal. Agent will cycle the shaping reward "
+                        f"forever since there is no incentive to terminate."
+                    ),
+                    details={"shaping_sources": shaping_names},
+                    recommendation="Add a terminal goal reward or remove shaping",
+                )
+            )
 
         # 3. Death reward + penalty: dying is doubly incentivized
         # Only fire when the resettable reward is significant relative
         # to the penalty — a 0.001 resettable with -0.00001 penalty
         # is not a meaningful compound trap.
         if model.resettable_sources and model.total_step_penalty < 0:
-            resettable_value = sum(s.value * s.discovery_probability
-                                  for s in model.resettable_sources if s.value > 0)
+            resettable_value = sum(
+                s.value * s.discovery_probability
+                for s in model.resettable_sources
+                if s.value > 0
+            )
             penalty_magnitude = abs(model.total_step_penalty)
             # Only fire if resettable reward is at least 10% of penalty per step
             if resettable_value <= penalty_magnitude * 0.1:
                 pass  # too small to matter
             else:
                 resettable_names = [s.name for s in model.resettable_sources]
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.CRITICAL,
-                    message=(f"Death-resettable rewards ({', '.join(resettable_names)}) "
-                             f"combined with step penalty ({model.total_step_penalty:+.4f}). "
-                             f"Dying is doubly incentivized: stops bleeding penalty AND "
-                             f"resets fresh rewards for re-collection."),
-                    details={"resettable_sources": resettable_names,
-                             "total_step_penalty": model.total_step_penalty},
-                    recommendation="Remove step penalty or don't reset rewards on death",
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.CRITICAL,
+                        message=(
+                            f"Death-resettable rewards ({', '.join(resettable_names)}) "
+                            f"combined with step penalty ({model.total_step_penalty:+.4f}). "
+                            f"Dying is doubly incentivized: stops bleeding penalty AND "
+                            f"resets fresh rewards for re-collection."
+                        ),
+                        details={
+                            "resettable_sources": resettable_names,
+                            "total_step_penalty": model.total_step_penalty,
+                        },
+                        recommendation="Remove step penalty or don't reset rewards on death",
+                    )
+                )
 
         return verdicts
 
@@ -869,12 +1080,15 @@ class ShapingNotPotentialBased(Rule):
     Machine-verified: ng_shaping_preserves_optimal (LEAN 4, zero sorry)."""
 
     @property
-    def name(self): return "shaping_not_potential_based"
+    def name(self):
+        return "shaping_not_potential_based"
 
     @property
     def description(self):
-        return ("Non-potential-based shaping can change the optimal policy. "
-                "Only F(s,a,s') = γΦ(s') - Φ(s) guarantees invariance (Ng 1999)")
+        return (
+            "Non-potential-based shaping can change the optimal policy. "
+            "Only F(s,a,s') = γΦ(s') - Φ(s) guarantees invariance (Ng 1999)"
+        )
 
     @property
     def proof(self):
@@ -898,29 +1112,38 @@ class ShapingNotPotentialBased(Rule):
         verdicts = []
         for source in model.shaping_sources:
             if source.requires_action:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.WARNING,
-                    message=(f"Shaping reward '{source.name}' depends on action. "
-                             f"This is NOT potential-based (Ng 1999 requires "
-                             f"F(s,a,s') = γΦ(s') - Φ(s), independent of a). "
-                             f"Optimal policy may change."),
-                    details={"source": source.name,
-                             "action_dependent": True},
-                    recommendation=(f"Redesign '{source.name}' as a state-only "
-                                    f"potential difference, or verify empirically "
-                                    f"that the shaping doesn't distort the policy"),
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.WARNING,
+                        message=(
+                            f"Shaping reward '{source.name}' depends on action. "
+                            f"This is NOT potential-based (Ng 1999 requires "
+                            f"F(s,a,s') = γΦ(s') - Φ(s), independent of a). "
+                            f"Optimal policy may change."
+                        ),
+                        details={"source": source.name, "action_dependent": True},
+                        recommendation=(
+                            f"Redesign '{source.name}' as a state-only "
+                            f"potential difference, or verify empirically "
+                            f"that the shaping doesn't distort the policy"
+                        ),
+                    )
+                )
             if source.can_loop and not source.intentional:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.INFO,
-                    message=(f"Shaping reward '{source.name}' can be cycled. "
-                             f"If this is potential-based (Φ(s') - Φ(s)), the "
-                             f"cycle sum is zero (telescoping). If not, the "
-                             f"agent may exploit the cycle."),
-                    details={"source": source.name},
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.INFO,
+                        message=(
+                            f"Shaping reward '{source.name}' can be cycled. "
+                            f"If this is potential-based (Φ(s') - Φ(s)), the "
+                            f"cycle sum is zero (telescoping). If not, the "
+                            f"agent may exploit the cycle."
+                        ),
+                        details={"source": source.name},
+                    )
+                )
         return verdicts
 
 
@@ -936,12 +1159,15 @@ class ProxyRewardHackability(Rule):
     (LEAN 4, zero sorry)."""
 
     @property
-    def name(self): return "proxy_reward_hackability"
+    def name(self):
+        return "proxy_reward_hackability"
 
     @property
     def description(self):
-        return ("Proxy reward may be hackable: optimizing the proxy could "
-                "degrade the true objective (Skalse et al. 2022)")
+        return (
+            "Proxy reward may be hackable: optimizing the proxy could "
+            "degrade the true objective (Skalse et al. 2022)"
+        )
 
     @property
     def proof(self):
@@ -970,37 +1196,50 @@ class ProxyRewardHackability(Rule):
         action_dependent = [s for s in model.shaping_sources if s.requires_action]
         if action_dependent:
             names = [s.name for s in action_dependent]
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.WARNING,
-                message=(f"Action-dependent shaping ({', '.join(names)}) acts as "
-                         f"a proxy reward that may be hackable relative to the "
-                         f"true goal ({', '.join(goal_names)}). Skalse et al. "
-                         f"proved that non-trivial unhackable proxies exist — "
-                         f"but this configuration is not guaranteed to be one."),
-                details={"shaping_sources": names,
-                         "goal_sources": goal_names},
-                recommendation=("Use potential-based shaping (Ng 1999) to "
-                                "guarantee the proxy preserves optimal policy"),
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.WARNING,
+                    message=(
+                        f"Action-dependent shaping ({', '.join(names)}) acts as "
+                        f"a proxy reward that may be hackable relative to the "
+                        f"true goal ({', '.join(goal_names)}). Skalse et al. "
+                        f"proved that non-trivial unhackable proxies exist — "
+                        f"but this configuration is not guaranteed to be one."
+                    ),
+                    details={"shaping_sources": names, "goal_sources": goal_names},
+                    recommendation=(
+                        "Use potential-based shaping (Ng 1999) to "
+                        "guarantee the proxy preserves optimal policy"
+                    ),
+                )
+            )
 
         # Dense shaping that dominates sparse goal = effective proxy replacement
-        shaping_ev = sum(abs(s.value) * model.max_steps
-                         for s in model.shaping_sources)
+        shaping_ev = sum(abs(s.value) * model.max_steps for s in model.shaping_sources)
         goal_ev = model.max_goal_reward
         if goal_ev > 0 and shaping_ev > 10 * goal_ev:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.WARNING,
-                message=(f"Shaping magnitude ({shaping_ev:.0f}) is "
-                         f"{shaping_ev/goal_ev:.0f}x the goal ({goal_ev:.0f}). "
-                         f"The shaping effectively replaces the goal as the "
-                         f"optimization target — a classic proxy hacking setup."),
-                details={"shaping_ev": shaping_ev, "goal_ev": goal_ev,
-                         "ratio": shaping_ev / goal_ev},
-                recommendation=("Reduce shaping magnitude or increase goal "
-                                "reward so the true objective dominates"),
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.WARNING,
+                    message=(
+                        f"Shaping magnitude ({shaping_ev:.0f}) is "
+                        f"{shaping_ev / goal_ev:.0f}x the goal ({goal_ev:.0f}). "
+                        f"The shaping effectively replaces the goal as the "
+                        f"optimization target — a classic proxy hacking setup."
+                    ),
+                    details={
+                        "shaping_ev": shaping_ev,
+                        "goal_ev": goal_ev,
+                        "ratio": shaping_ev / goal_ev,
+                    },
+                    recommendation=(
+                        "Reduce shaping magnitude or increase goal "
+                        "reward so the true objective dominates"
+                    ),
+                )
+            )
 
         return verdicts
 
@@ -1015,20 +1254,25 @@ class StagedRewardPlateau(Rule):
     longer the plateau."""
 
     @property
-    def name(self): return "staged_reward_plateau"
+    def name(self):
+        return "staged_reward_plateau"
 
     @property
     def description(self):
-        return ("Staged rewards with prerequisite gates create learning "
-                "plateaus — no gradient signal until prerequisites are met")
+        return (
+            "Staged rewards with prerequisite gates create learning "
+            "plateaus — no gradient signal until prerequisites are met"
+        )
 
     @property
     def proof(self):
         return FormalBasis(
             proof_name="staged_sparsity",
             strength=ProofStrength.VERIFIED,
-            statement=("∀ p : Fin n → [0,1], ∀ j, ∏ p_i ≤ p_j "
-                       "(product of stage probabilities ≤ any single stage)"),
+            statement=(
+                "∀ p : Fin n → [0,1], ∀ j, ∏ p_i ≤ p_j "
+                "(product of stage probabilities ≤ any single stage)"
+            ),
             parameters={"stage_probs": "p", "n_stages": "n"},
         )
 
@@ -1041,14 +1285,18 @@ class StagedRewardPlateau(Rule):
 
         for source in model.staged_sources:
             if source.prerequisite not in source_names:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.WARNING,
-                    message=(f"'{source.name}' requires prerequisite "
-                             f"'{source.prerequisite}' which is not a defined "
-                             f"reward source."),
-                    recommendation="Check prerequisite name matches a source",
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.WARNING,
+                        message=(
+                            f"'{source.name}' requires prerequisite "
+                            f"'{source.prerequisite}' which is not a defined "
+                            f"reward source."
+                        ),
+                        recommendation="Check prerequisite name matches a source",
+                    )
+                )
                 continue
 
             # Find the chain depth (with cycle detection)
@@ -1058,35 +1306,45 @@ class StagedRewardPlateau(Rule):
             while current and current in source_names and current not in visited:
                 chain.append(current)
                 visited.add(current)
-                prereq_src = next((s for s in model.reward_sources
-                                   if s.name == current), None)
+                prereq_src = next(
+                    (s for s in model.reward_sources if s.name == current), None
+                )
                 if prereq_src and prereq_src.prerequisite:
                     current = prereq_src.prerequisite
                 else:
                     break
 
             if len(chain) >= 3:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.WARNING,
-                    message=(f"Deep prerequisite chain ({len(chain)} stages): "
-                             f"{' → '.join(reversed(chain))}. Agent receives "
-                             f"zero gradient for later stages until all "
-                             f"prerequisites are achieved. Consider adding "
-                             f"intermediate shaping rewards."),
-                    details={"chain": list(reversed(chain)),
-                             "depth": len(chain)},
-                    recommendation=("Add distance-based shaping for each stage, "
-                                    "or use curriculum learning to unlock stages"),
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.WARNING,
+                        message=(
+                            f"Deep prerequisite chain ({len(chain)} stages): "
+                            f"{' → '.join(reversed(chain))}. Agent receives "
+                            f"zero gradient for later stages until all "
+                            f"prerequisites are achieved. Consider adding "
+                            f"intermediate shaping rewards."
+                        ),
+                        details={"chain": list(reversed(chain)), "depth": len(chain)},
+                        recommendation=(
+                            "Add distance-based shaping for each stage, "
+                            "or use curriculum learning to unlock stages"
+                        ),
+                    )
+                )
             elif len(chain) == 2:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.INFO,
-                    message=(f"'{source.name}' is gated by '{source.prerequisite}'. "
-                             f"No gradient signal until prerequisite is achieved."),
-                    details={"chain": list(reversed(chain))},
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.INFO,
+                        message=(
+                            f"'{source.name}' is gated by '{source.prerequisite}'. "
+                            f"No gradient signal until prerequisite is achieved."
+                        ),
+                        details={"chain": list(reversed(chain))},
+                    )
+                )
 
         return verdicts
 
@@ -1101,7 +1359,8 @@ class RewardDominanceImbalance(Rule):
     penalties at weight 0.00001."""
 
     @property
-    def name(self): return "reward_dominance_imbalance"
+    def name(self):
+        return "reward_dominance_imbalance"
 
     @property
     def proof(self):
@@ -1114,18 +1373,22 @@ class RewardDominanceImbalance(Rule):
 
     @property
     def description(self):
-        return ("One reward component dominates all others by >100x, "
-                "making other components invisible to the optimizer")
+        return (
+            "One reward component dominates all others by >100x, "
+            "making other components invisible to the optimizer"
+        )
 
     def applies_to(self, model):
-        per_step = [s for s in model.reward_sources
-                    if s.reward_type == RewardType.PER_STEP]
+        per_step = [
+            s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP
+        ]
         return len(per_step) >= 3
 
     def check(self, model, config=None):
         verdicts = []
-        per_step = [s for s in model.reward_sources
-                    if s.reward_type == RewardType.PER_STEP]
+        per_step = [
+            s for s in model.reward_sources if s.reward_type == RewardType.PER_STEP
+        ]
         if len(per_step) < 3:
             return verdicts
 
@@ -1142,26 +1405,39 @@ class RewardDominanceImbalance(Rule):
             return verdicts
 
         max_mag = max(magnitudes.values())
-        min_mag = min(v for v in magnitudes.values() if v > 0) if any(
-            v > 0 for v in magnitudes.values()) else 1.0
+        min_mag = (
+            min(v for v in magnitudes.values() if v > 0)
+            if any(v > 0 for v in magnitudes.values())
+            else 1.0
+        )
 
         if max_mag > 0 and min_mag > 0 and max_mag / min_mag > 100:
             dominant = [n for n, m in magnitudes.items() if m == max_mag]
-            invisible = [n for n, m in magnitudes.items()
-                         if m > 0 and max_mag / m > 100]
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.WARNING,
-                message=(f"'{dominant[0]}' (magnitude {max_mag:.4g}) dominates "
-                         f"by >{max_mag/min_mag:.0f}x over {len(invisible)} "
-                         f"other per-step components. Smaller terms "
-                         f"({', '.join(invisible[:3])}) are effectively "
-                         f"invisible to the optimizer."),
-                details={"dominant": dominant[0], "ratio": max_mag / min_mag,
-                         "invisible": invisible},
-                recommendation=("Rescale reward components to similar magnitude, "
-                                "or accept that smaller terms serve as tiebreakers"),
-            ))
+            invisible = [
+                n for n, m in magnitudes.items() if m > 0 and max_mag / m > 100
+            ]
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.WARNING,
+                    message=(
+                        f"'{dominant[0]}' (magnitude {max_mag:.4g}) dominates "
+                        f"by >{max_mag / min_mag:.0f}x over {len(invisible)} "
+                        f"other per-step components. Smaller terms "
+                        f"({', '.join(invisible[:3])}) are effectively "
+                        f"invisible to the optimizer."
+                    ),
+                    details={
+                        "dominant": dominant[0],
+                        "ratio": max_mag / min_mag,
+                        "invisible": invisible,
+                    },
+                    recommendation=(
+                        "Rescale reward components to similar magnitude, "
+                        "or accept that smaller terms serve as tiebreakers"
+                    ),
+                )
+            )
 
         return verdicts
 
@@ -1175,7 +1451,8 @@ class ExponentialSaturation(Rule):
     Common in legged locomotion velocity tracking."""
 
     @property
-    def name(self): return "exponential_saturation"
+    def name(self):
+        return "exponential_saturation"
 
     @property
     def proof(self):
@@ -1188,8 +1465,10 @@ class ExponentialSaturation(Rule):
 
     @property
     def description(self):
-        return ("Exponential tracking rewards saturate near the target, "
-                "creating flat gradient regions that prevent precise control")
+        return (
+            "Exponential tracking rewards saturate near the target, "
+            "creating flat gradient regions that prevent precise control"
+        )
 
     def applies_to(self, model):
         return any(s.value_type == "exponential" for s in model.reward_sources)
@@ -1201,17 +1480,26 @@ class ExponentialSaturation(Rule):
                 continue
             sigma = (source.value_params or {}).get("sigma", 0.25)
             if sigma < 0.5:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.INFO,
-                    message=(f"'{source.name}' uses exp(-error/{sigma}) tracking. "
-                             f"Saturates to ~0.95 at error={sigma*3:.2f}. "
-                             f"Agent may learn 'close enough' rather than precise."),
-                    details={"source": source.name, "sigma": sigma,
-                             "saturation_95": sigma * 3},
-                    recommendation=("If precision matters, consider linear or "
-                                    "quadratic penalty near the target"),
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.INFO,
+                        message=(
+                            f"'{source.name}' uses exp(-error/{sigma}) tracking. "
+                            f"Saturates to ~0.95 at error={sigma * 3:.2f}. "
+                            f"Agent may learn 'close enough' rather than precise."
+                        ),
+                        details={
+                            "source": source.name,
+                            "sigma": sigma,
+                            "saturation_95": sigma * 3,
+                        },
+                        recommendation=(
+                            "If precision matters, consider linear or "
+                            "quadratic penalty near the target"
+                        ),
+                    )
+                )
         return verdicts
 
 
@@ -1226,23 +1514,31 @@ class IntrinsicDominance(Rule):
     """
 
     @property
-    def name(self): return "intrinsic_dominance"
+    def name(self):
+        return "intrinsic_dominance"
 
     @property
     def description(self):
-        return ("Accumulated per-step intrinsic reward exceeds "
-                "the discounted goal reward over the episode")
+        return (
+            "Accumulated per-step intrinsic reward exceeds "
+            "the discounted goal reward over the episode"
+        )
 
     @property
     def proof(self):
         return FormalBasis(
             proof_name="intrinsic_dominates_goal",
             strength=ProofStrength.VERIFIED,
-            statement=("r_i * D_remaining > R_g → r_i * D_total > r_i * D_before + R_g. "
-                       "The agent prefers exploring over finishing when the intrinsic "
-                       "reward in the remaining steps exceeds the goal reward."),
-            parameters={"intrinsic_per_step": "r_i", "goal_reward": "R_g",
-                        "remaining_steps": "D_remaining"},
+            statement=(
+                "r_i * D_remaining > R_g → r_i * D_total > r_i * D_before + R_g. "
+                "The agent prefers exploring over finishing when the intrinsic "
+                "reward in the remaining steps exceeds the goal reward."
+            ),
+            parameters={
+                "intrinsic_per_step": "r_i",
+                "goal_reward": "R_g",
+                "remaining_steps": "D_remaining",
+            },
         )
 
     def applies_to(self, model):
@@ -1258,8 +1554,7 @@ class IntrinsicDominance(Rule):
             for s in model.reward_sources
         )
         has_goal = any(
-            s.reward_type in (RewardType.TERMINAL, RewardType.ON_EVENT)
-            and s.value > 0
+            s.reward_type in (RewardType.TERMINAL, RewardType.ON_EVENT) and s.value > 0
             for s in model.reward_sources
         )
         return has_intrinsic and has_goal
@@ -1272,7 +1567,8 @@ class IntrinsicDominance(Rule):
         # INFINITE respawn. Intentional sources (alive bonus, survival
         # reward) are the goal itself, not intrinsic motivation.
         intrinsic_per_step = sum(
-            _best_case_value(s) for s in model.reward_sources
+            _best_case_value(s)
+            for s in model.reward_sources
             if s.reward_type == RewardType.PER_STEP
             and s.respawn == RespawnBehavior.INFINITE
             and s.value > 0
@@ -1300,49 +1596,65 @@ class IntrinsicDominance(Rule):
         ratio = intrinsic_ev / goal_ev
 
         if ratio >= 5:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.CRITICAL,
-                message=(f"Accumulated intrinsic reward "
-                         f"(EV={intrinsic_ev:+.4f}) is {ratio:.1f}x the "
-                         f"goal reward ({goal_ev:+.4f}). "
-                         f"Agent will optimize curiosity over task completion."),
-                details={"intrinsic_ev": intrinsic_ev, "goal_ev": goal_ev,
-                         "ratio": ratio},
-                recommendation=(
-                    "Reduce intrinsic coefficient, anneal it during training, "
-                    "increase goal reward, or use separate value heads for "
-                    "intrinsic and extrinsic returns (Burda 2019)"),
-                learn_more=(
-                    "Non-PBRS per-step reward additions can change the optimal "
-                    "policy (Ng 1999). When the accumulated intrinsic signal "
-                    "exceeds the goal, the agent earns more from exploring than "
-                    "from finishing the task. Documented failures: Pong agent "
-                    "maximizes bounces not score (Burda 2019), ChopperCommand "
-                    "scores 4.7x worse with RND than epsilon-greedy (Taiga 2021), "
-                    "MiniGrid agent visits 100 novel states without noise but only "
-                    "5 with noisy TV (Mavor-Parker 2022).\n"
-                    "Fixes: (1) anneal intrinsic coefficient during training, "
-                    "(2) use separate value heads with different discount factors "
-                    "(gamma_E=0.999, gamma_I=0.99 per RND paper), "
-                    "(3) constrained optimization (EIPO, Hong 2022), "
-                    "(4) increase goal reward magnitude."
-                ),
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.CRITICAL,
+                    message=(
+                        f"Accumulated intrinsic reward "
+                        f"(EV={intrinsic_ev:+.4f}) is {ratio:.1f}x the "
+                        f"goal reward ({goal_ev:+.4f}). "
+                        f"Agent will optimize curiosity over task completion."
+                    ),
+                    details={
+                        "intrinsic_ev": intrinsic_ev,
+                        "goal_ev": goal_ev,
+                        "ratio": ratio,
+                    },
+                    recommendation=(
+                        "Reduce intrinsic coefficient, anneal it during training, "
+                        "increase goal reward, or use separate value heads for "
+                        "intrinsic and extrinsic returns (Burda 2019)"
+                    ),
+                    learn_more=(
+                        "Non-PBRS per-step reward additions can change the optimal "
+                        "policy (Ng 1999). When the accumulated intrinsic signal "
+                        "exceeds the goal, the agent earns more from exploring than "
+                        "from finishing the task. Documented failures: Pong agent "
+                        "maximizes bounces not score (Burda 2019), ChopperCommand "
+                        "scores 4.7x worse with RND than epsilon-greedy (Taiga 2021), "
+                        "MiniGrid agent visits 100 novel states without noise but only "
+                        "5 with noisy TV (Mavor-Parker 2022).\n"
+                        "Fixes: (1) anneal intrinsic coefficient during training, "
+                        "(2) use separate value heads with different discount factors "
+                        "(gamma_E=0.999, gamma_I=0.99 per RND paper), "
+                        "(3) constrained optimization (EIPO, Hong 2022), "
+                        "(4) increase goal reward magnitude."
+                    ),
+                )
+            )
         elif ratio >= 0.5:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.WARNING,
-                message=(f"Accumulated intrinsic reward "
-                         f"(EV={intrinsic_ev:+.4f}) is {ratio:.1f}x the "
-                         f"goal reward ({goal_ev:+.4f}). "
-                         f"Intrinsic signal may compete with task completion."),
-                details={"intrinsic_ev": intrinsic_ev, "goal_ev": goal_ev,
-                         "ratio": ratio},
-                recommendation=(
-                    "Consider reducing intrinsic coefficient or increasing "
-                    "goal reward to ensure task completion dominates"),
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.WARNING,
+                    message=(
+                        f"Accumulated intrinsic reward "
+                        f"(EV={intrinsic_ev:+.4f}) is {ratio:.1f}x the "
+                        f"goal reward ({goal_ev:+.4f}). "
+                        f"Intrinsic signal may compete with task completion."
+                    ),
+                    details={
+                        "intrinsic_ev": intrinsic_ev,
+                        "goal_ev": goal_ev,
+                        "ratio": ratio,
+                    },
+                    recommendation=(
+                        "Consider reducing intrinsic coefficient or increasing "
+                        "goal reward to ensure task completion dominates"
+                    ),
+                )
+            )
         return verdicts
 
 
@@ -1359,22 +1671,26 @@ class DiscountHorizonMismatch(Rule):
     """
 
     @property
-    def name(self): return "discount_horizon_mismatch"
+    def name(self):
+        return "discount_horizon_mismatch"
 
     @property
     def description(self):
-        return ("Discount factor creates an effective horizon shorter "
-                "than the episode, making distant rewards invisible")
+        return (
+            "Discount factor creates an effective horizon shorter "
+            "than the episode, making distant rewards invisible"
+        )
 
     @property
     def proof(self):
         return FormalBasis(
             proof_name="horizon_coverage",
             strength=ProofStrength.VERIFIED,
-            statement=("T > 3 × 1/(1-γ) → T(1-γ) > 3. The episode is "
-                       "more than 3x the effective horizon."),
-            parameters={"gamma": "γ", "episode_length": "T",
-                        "horizon": "1/(1-γ)"},
+            statement=(
+                "T > 3 × 1/(1-γ) → T(1-γ) > 3. The episode is "
+                "more than 3x the effective horizon."
+            ),
+            parameters={"gamma": "γ", "episode_length": "T", "horizon": "1/(1-γ)"},
         )
 
     def applies_to(self, model):
@@ -1401,37 +1717,51 @@ class DiscountHorizonMismatch(Rule):
         effective_horizon = 1.0 / (1.0 - model.gamma)
         horizon_ratio = model.max_steps / effective_horizon
 
-        end_discount = model.gamma ** model.max_steps
+        end_discount = model.gamma**model.max_steps
 
         if horizon_ratio > 10 and end_discount < 0.01:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.CRITICAL,
-                message=(f"Effective horizon is {effective_horizon:.0f} steps "
-                         f"but episode is {model.max_steps} steps "
-                         f"({horizon_ratio:.0f}x longer). A reward at the "
-                         f"end is discounted to {end_discount:.6f} "
-                         f"(effectively zero)."),
-                details={"effective_horizon": effective_horizon,
-                         "max_steps": model.max_steps,
-                         "end_discount": end_discount},
-                recommendation=(f"Increase gamma to {1 - 1/model.max_steps:.4f} "
-                                f"or higher, or shorten the episode"),
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.CRITICAL,
+                    message=(
+                        f"Effective horizon is {effective_horizon:.0f} steps "
+                        f"but episode is {model.max_steps} steps "
+                        f"({horizon_ratio:.0f}x longer). A reward at the "
+                        f"end is discounted to {end_discount:.6f} "
+                        f"(effectively zero)."
+                    ),
+                    details={
+                        "effective_horizon": effective_horizon,
+                        "max_steps": model.max_steps,
+                        "end_discount": end_discount,
+                    },
+                    recommendation=(
+                        f"Increase gamma to {1 - 1 / model.max_steps:.4f} "
+                        f"or higher, or shorten the episode"
+                    ),
+                )
+            )
         elif horizon_ratio > 3:
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=Severity.WARNING,
-                message=(f"Effective horizon is {effective_horizon:.0f} steps "
-                         f"but episode is {model.max_steps} steps "
-                         f"({horizon_ratio:.1f}x longer). Rewards in the "
-                         f"second half are heavily discounted "
-                         f"(end={end_discount:.4f})."),
-                details={"effective_horizon": effective_horizon,
-                         "max_steps": model.max_steps,
-                         "end_discount": end_discount},
-                recommendation="Consider increasing gamma or adding shaping",
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=Severity.WARNING,
+                    message=(
+                        f"Effective horizon is {effective_horizon:.0f} steps "
+                        f"but episode is {model.max_steps} steps "
+                        f"({horizon_ratio:.1f}x longer). Rewards in the "
+                        f"second half are heavily discounted "
+                        f"(end={end_discount:.4f})."
+                    ),
+                    details={
+                        "effective_horizon": effective_horizon,
+                        "max_steps": model.max_steps,
+                        "end_discount": end_discount,
+                    },
+                    recommendation="Consider increasing gamma or adding shaping",
+                )
+            )
         return verdicts
 
 
@@ -1449,21 +1779,26 @@ class NegativeOnlyReward(Rule):
     """
 
     @property
-    def name(self): return "negative_only_reward"
+    def name(self):
+        return "negative_only_reward"
 
     @property
     def description(self):
-        return ("All reward components are zero or negative. "
-                "No positive signal to guide learning.")
+        return (
+            "All reward components are zero or negative. "
+            "No positive signal to guide learning."
+        )
 
     @property
     def proof(self):
         return FormalBasis(
             proof_name="negative_reward_nonpositive_value",
             strength=ProofStrength.VERIFIED,
-            statement=("max_reward ≤ 0 ∧ D > 0 → max_reward × D ≤ 0. "
-                       "Non-positive rewards yield non-positive value "
-                       "for every policy."),
+            statement=(
+                "max_reward ≤ 0 ∧ D > 0 → max_reward × D ≤ 0. "
+                "Non-positive rewards yield non-positive value "
+                "for every policy."
+            ),
             parameters={"max_reward": "max(s.value)", "D": "discounted_steps"},
         )
 
@@ -1477,16 +1812,14 @@ class NegativeOnlyReward(Rule):
 
         has_positive = any(s.value > 0 for s in model.reward_sources)
         has_positive_range = any(
-            s.value_range and max(s.value_range) > 0
-            for s in model.reward_sources
+            s.value_range and max(s.value_range) > 0 for s in model.reward_sources
         )
 
         if not has_positive and not has_positive_range:
             # Distinguish reward desert (constant negative, no gradient)
             # from tracking control (state-dependent negative, informative)
             has_tracking_signal = any(
-                s.value < 0 and s.state_dependent
-                for s in model.reward_sources
+                s.value < 0 and s.state_dependent for s in model.reward_sources
             )
 
             if has_tracking_signal:
@@ -1524,15 +1857,19 @@ class NegativeOnlyReward(Rule):
                     "actual_penalty so progress yields positive signal"
                 )
 
-            verdicts.append(Verdict(
-                rule_name=self.name,
-                severity=severity,
-                message=message,
-                details={"sources": [s.name for s in model.reward_sources],
-                         "values": [s.value for s in model.reward_sources],
-                         "has_tracking_signal": has_tracking_signal},
-                recommendation=recommendation,
-            ))
+            verdicts.append(
+                Verdict(
+                    rule_name=self.name,
+                    severity=severity,
+                    message=message,
+                    details={
+                        "sources": [s.name for s in model.reward_sources],
+                        "values": [s.value for s in model.reward_sources],
+                        "has_tracking_signal": has_tracking_signal,
+                    },
+                    recommendation=recommendation,
+                )
+            )
         return verdicts
 
 
@@ -1549,28 +1886,29 @@ class RewardDelayHorizon(Rule):
     """
 
     @property
-    def name(self): return "reward_delay_horizon"
+    def name(self):
+        return "reward_delay_horizon"
 
     @property
     def description(self):
-        return ("Terminal goal reward is discounted to near-zero "
-                "by the time the agent could reach it")
+        return (
+            "Terminal goal reward is discounted to near-zero "
+            "by the time the agent could reach it"
+        )
 
     @property
     def proof(self):
         return FormalBasis(
             proof_name="discounted_reward_invisible",
             strength=ProofStrength.VERIFIED,
-            statement=("γ^t × R < ε → the discounted reward is below "
-                       "the visibility threshold."),
-            parameters={"reward": "R", "discount": "γ^t",
-                        "threshold": "ε"},
+            statement=(
+                "γ^t × R < ε → the discounted reward is below the visibility threshold."
+            ),
+            parameters={"reward": "R", "discount": "γ^t", "threshold": "ε"},
         )
 
     def applies_to(self, model):
-        return (len(model.goal_sources) > 0 and
-                model.gamma < 1.0 and
-                model.max_steps > 0)
+        return len(model.goal_sources) > 0 and model.gamma < 1.0 and model.max_steps > 0
 
     def check(self, model, config=None):
         verdicts = []
@@ -1579,37 +1917,51 @@ class RewardDelayHorizon(Rule):
             # If discovery prob is low, the expected first discovery is late
             avg_discovery_step = max(1, int(model.max_steps * 0.5))
 
-            discounted_value = source.value * model.gamma ** avg_discovery_step
+            discounted_value = source.value * model.gamma**avg_discovery_step
             ratio = discounted_value / source.value if source.value > 0 else 1.0
 
             if ratio < 0.01:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.CRITICAL,
-                    message=(f"'{source.name}' ({source.value:+.1f}) at ~step "
-                             f"{avg_discovery_step} is discounted to "
-                             f"{discounted_value:+.6f} ({ratio:.4%} of "
-                             f"original). The agent cannot see this reward."),
-                    details={"source": source.name,
-                             "original_value": source.value,
-                             "discounted_value": discounted_value,
-                             "avg_step": avg_discovery_step},
-                    recommendation=("Increase gamma, add intermediate "
-                                    "shaping rewards, or shorten the episode"),
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.CRITICAL,
+                        message=(
+                            f"'{source.name}' ({source.value:+.1f}) at ~step "
+                            f"{avg_discovery_step} is discounted to "
+                            f"{discounted_value:+.6f} ({ratio:.4%} of "
+                            f"original). The agent cannot see this reward."
+                        ),
+                        details={
+                            "source": source.name,
+                            "original_value": source.value,
+                            "discounted_value": discounted_value,
+                            "avg_step": avg_discovery_step,
+                        },
+                        recommendation=(
+                            "Increase gamma, add intermediate "
+                            "shaping rewards, or shorten the episode"
+                        ),
+                    )
+                )
             elif ratio < 0.1:
-                verdicts.append(Verdict(
-                    rule_name=self.name,
-                    severity=Severity.WARNING,
-                    message=(f"'{source.name}' ({source.value:+.1f}) at ~step "
-                             f"{avg_discovery_step} is discounted to "
-                             f"{discounted_value:+.4f} ({ratio:.1%} of "
-                             f"original). Weak signal."),
-                    details={"source": source.name,
-                             "discounted_value": discounted_value,
-                             "avg_step": avg_discovery_step},
-                    recommendation="Consider adding shaping or increasing gamma",
-                ))
+                verdicts.append(
+                    Verdict(
+                        rule_name=self.name,
+                        severity=Severity.WARNING,
+                        message=(
+                            f"'{source.name}' ({source.value:+.1f}) at ~step "
+                            f"{avg_discovery_step} is discounted to "
+                            f"{discounted_value:+.4f} ({ratio:.1%} of "
+                            f"original). Weak signal."
+                        ),
+                        details={
+                            "source": source.name,
+                            "discounted_value": discounted_value,
+                            "avg_step": avg_discovery_step,
+                        },
+                        recommendation="Consider adding shaping or increasing gamma",
+                    )
+                )
         return verdicts
 
 

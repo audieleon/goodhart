@@ -33,13 +33,57 @@ METADATA = {
 
 def run_example():
     model = EnvironmentModel(
-        name="Robosuite Pick-and-Place (staged rewards)", max_steps=200, gamma=0.99,
-        n_states=100000, n_actions=8, action_type="continuous", death_probability=0.0,
+        name="Robosuite Pick-and-Place (staged rewards)",
+        max_steps=200,
+        gamma=0.99,
+        n_states=100000,
+        n_actions=8,
+        action_type="continuous",
+        death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(name="grasp", reward_type=RewardType.ON_EVENT, value=0.35, requires_action=True, intentional=True, state_dependent=True))
-    model.add_reward_source(RewardSource(name="lift", reward_type=RewardType.ON_EVENT, value=0.15, requires_action=True, intentional=True, state_dependent=True, prerequisite="grasp"))
-    model.add_reward_source(RewardSource(name="hover", reward_type=RewardType.ON_EVENT, value=0.2, requires_action=True, intentional=True, state_dependent=True, prerequisite="lift"))
-    model.add_reward_source(RewardSource(name="place", reward_type=RewardType.TERMINAL, value=1.0, requires_action=True, intentional=True, state_dependent=True, prerequisite="hover"))
+    model.add_reward_source(
+        RewardSource(
+            name="grasp",
+            reward_type=RewardType.ON_EVENT,
+            value=0.35,
+            requires_action=True,
+            intentional=True,
+            state_dependent=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="lift",
+            reward_type=RewardType.ON_EVENT,
+            value=0.15,
+            requires_action=True,
+            intentional=True,
+            state_dependent=True,
+            prerequisite="grasp",
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="hover",
+            reward_type=RewardType.ON_EVENT,
+            value=0.2,
+            requires_action=True,
+            intentional=True,
+            state_dependent=True,
+            prerequisite="lift",
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="place",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            requires_action=True,
+            intentional=True,
+            state_dependent=True,
+            prerequisite="hover",
+        )
+    )
     engine = TrainingAnalysisEngine().add_all_rules()
 
     print("Robosuite Pick-and-Place — Staged Rewards")
@@ -49,7 +93,9 @@ def run_example():
     print("Reward chain:")
     for s in model.reward_sources:
         prereq = f" (requires: {s.prerequisite})" if s.prerequisite else ""
-        print(f"  {s.name:10s} {s.value:+.2f}  p(discover)={s.discovery_probability:.2f}{prereq}")
+        print(
+            f"  {s.name:10s} {s.value:+.2f}  p(discover)={s.discovery_probability:.2f}{prereq}"
+        )
     print()
 
     engine.print_report(model)

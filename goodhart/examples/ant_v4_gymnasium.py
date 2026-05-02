@@ -54,36 +54,44 @@ def run_example():
         n_actions=8,
         death_probability=0.02,
     )
-    model.add_reward_source(RewardSource(
-        name="forward_velocity",
-        reward_type=RewardType.PER_STEP,
-        value=1.0,
-        value_range=(-1.0, 6.0),
-        state_dependent=True,
-        scales_with="velocity",
-        requires_action=True,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="healthy_reward",
-        reward_type=RewardType.PER_STEP,
-        value=1.0,
-        respawn=RespawnBehavior.INFINITE,
-        requires_action=False,
-        intentional=False,
-    ))
-    model.add_reward_source(RewardSource(
-        name="ctrl_cost",
-        reward_type=RewardType.PER_STEP,
-        value=-0.5,
-        requires_action=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="contact_cost",
-        reward_type=RewardType.PER_STEP,
-        value=-0.0005,
-        requires_action=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="forward_velocity",
+            reward_type=RewardType.PER_STEP,
+            value=1.0,
+            value_range=(-1.0, 6.0),
+            state_dependent=True,
+            scales_with="velocity",
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="healthy_reward",
+            reward_type=RewardType.PER_STEP,
+            value=1.0,
+            respawn=RespawnBehavior.INFINITE,
+            requires_action=False,
+            intentional=False,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="ctrl_cost",
+            reward_type=RewardType.PER_STEP,
+            value=-0.5,
+            requires_action=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="contact_cost",
+            reward_type=RewardType.PER_STEP,
+            value=-0.0005,
+            requires_action=False,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

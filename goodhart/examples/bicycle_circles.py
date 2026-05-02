@@ -45,24 +45,28 @@ def run_example():
     )
 
     # Terminal goal reward
-    model.add_reward_source(RewardSource(
-        name="reach goal",
-        reward_type=RewardType.TERMINAL,
-        value=1.0,
-        discovery_probability=0.05,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="reach goal",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            discovery_probability=0.05,
+        )
+    )
 
     # Distance-decrease shaping reward — THIS IS THE TRAP
     # Agent can orbit the goal, repeatedly decreasing distance
     # on one side and increasing on the other. The shaping reward
     # only fires on decrease, creating an exploitable cycle.
-    model.add_reward_source(RewardSource(
-        name="distance decrease",
-        reward_type=RewardType.SHAPING,
-        value=0.1,
-        can_loop=True,       # can cycle: approach → pass → approach
-        loop_period=4,        # 4 steps per orbit cycle
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="distance decrease",
+            reward_type=RewardType.SHAPING,
+            value=0.1,
+            can_loop=True,  # can cycle: approach → pass → approach
+            loop_period=4,  # 4 steps per orbit cycle
+        )
+    )
 
     engine = TrainingAnalysisEngine().add_all_rules()
     engine.print_report(model)

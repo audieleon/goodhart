@@ -99,6 +99,7 @@ def reward_function(
         algorithm: Training algorithm name.
         **training_kwargs: Additional TrainingConfig fields.
     """
+
     def decorator(fn):
         env_name = name or fn.__name__
 
@@ -156,6 +157,7 @@ def reward_function(
         wrapper.goodhart_passed = goodhart_passed
 
         return wrapper
+
     return decorator
 
 
@@ -176,7 +178,7 @@ def analyze_function(fn, verbose=False, print_report=False) -> Result:
     Raises:
         AttributeError: If fn is not decorated with @reward_function.
     """
-    if not hasattr(fn, 'goodhart_model'):
+    if not hasattr(fn, "goodhart_model"):
         raise AttributeError(
             f"Function '{fn.__name__}' is not decorated with @reward_function. "
             f"Add @reward_function(sources=[...]) to annotate it."
@@ -206,6 +208,7 @@ def load_annotated_function(module_path: str):
     # Handle file paths
     if module_str.endswith(".py"):
         import importlib.util
+
         spec = importlib.util.spec_from_file_location("_goodhart_target", module_str)
         if spec is None or spec.loader is None:
             raise FileNotFoundError(f"Cannot load module from: {module_str}")
@@ -213,12 +216,13 @@ def load_annotated_function(module_path: str):
         spec.loader.exec_module(module)
     else:
         import importlib
+
         module = importlib.import_module(module_str)
 
     fn = getattr(module, func_name, None)
     if fn is None:
         raise AttributeError(f"Module '{module_str}' has no attribute '{func_name}'")
-    if not hasattr(fn, 'goodhart_model'):
+    if not hasattr(fn, "goodhart_model"):
         raise AttributeError(
             f"Function '{func_name}' in '{module_str}' is not decorated "
             f"with @reward_function."

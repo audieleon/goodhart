@@ -34,14 +34,64 @@ METADATA = {
 
 def run_example():
     model = EnvironmentModel(
-        name="SMAC 3m (StarCraft micro)", max_steps=120, gamma=0.99,
-        n_states=100000, n_actions=11, action_type="discrete", death_probability=0.1,
+        name="SMAC 3m (StarCraft micro)",
+        max_steps=120,
+        gamma=0.99,
+        n_states=100000,
+        n_actions=11,
+        action_type="discrete",
+        death_probability=0.1,
     )
-    model.add_reward_source(RewardSource(name="enemy_killed", reward_type=RewardType.ON_EVENT, value=10.0, max_occurrences=3, requires_action=True, intentional=True))
-    model.add_reward_source(RewardSource(name="ally_killed", reward_type=RewardType.ON_EVENT, value=-5.0, max_occurrences=3, state_dependent=True, requires_action=False, intentional=True))
-    model.add_reward_source(RewardSource(name="damage_dealt", reward_type=RewardType.PER_STEP, value=0.5, state_dependent=True, requires_action=True, intentional=False))
-    model.add_reward_source(RewardSource(name="damage_received", reward_type=RewardType.PER_STEP, value=-0.25, state_dependent=True, requires_action=False, intentional=True))
-    model.add_reward_source(RewardSource(name="win_bonus", reward_type=RewardType.TERMINAL, value=200.0, requires_action=True, intentional=True))
+    model.add_reward_source(
+        RewardSource(
+            name="enemy_killed",
+            reward_type=RewardType.ON_EVENT,
+            value=10.0,
+            max_occurrences=3,
+            requires_action=True,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="ally_killed",
+            reward_type=RewardType.ON_EVENT,
+            value=-5.0,
+            max_occurrences=3,
+            state_dependent=True,
+            requires_action=False,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="damage_dealt",
+            reward_type=RewardType.PER_STEP,
+            value=0.5,
+            state_dependent=True,
+            requires_action=True,
+            intentional=False,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="damage_received",
+            reward_type=RewardType.PER_STEP,
+            value=-0.25,
+            state_dependent=True,
+            requires_action=False,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="win_bonus",
+            reward_type=RewardType.TERMINAL,
+            value=200.0,
+            requires_action=True,
+            intentional=True,
+        )
+    )
     engine = TrainingAnalysisEngine().add_all_rules()
 
     print("SMAC StarCraft Micromanagement")

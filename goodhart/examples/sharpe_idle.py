@@ -11,7 +11,7 @@ METADATA = {
     "id": "sharpe_idle",
     "source_paper": (
         'Moody & Saffell, "Reinforcement Learning for Trading," '
-        'NeurIPS 1998, pp. 917-923'
+        "NeurIPS 1998, pp. 917-923"
     ),
     "paper_url": "http://papers.neurips.cc/paper/1551-reinforcement-learning-for-trading.pdf",
     "source_code_url": None,
@@ -76,25 +76,27 @@ def run_example():
 
     model = EnvironmentModel(
         name="Trading via Differential Sharpe (Moody & Saffell 1998)",
-        max_steps=300,    # 25 years monthly
+        max_steps=300,  # 25 years monthly
         gamma=0.99,
         n_states=100000,
-        n_actions=3,      # short, neutral, long
+        n_actions=3,  # short, neutral, long
         action_type="discrete",
         death_probability=0.0,
     )
 
     # Differential Sharpe ratio D_t (Eq. 4)
     # Small per-step value, positive when profitable
-    model.add_reward_source(RewardSource(
-        name="differential_sharpe",
-        reward_type=RewardType.PER_STEP,
-        value=0.01,       # typical D_t magnitude
-        state_dependent=True,
-        requires_action=True,
-        intentional=True,
-        explore_fraction=0.0,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="differential_sharpe",
+            reward_type=RewardType.PER_STEP,
+            value=0.01,  # typical D_t magnitude
+            state_dependent=True,
+            requires_action=True,
+            intentional=True,
+            explore_fraction=0.0,
+        )
+    )
 
     engine.print_report(model)
 

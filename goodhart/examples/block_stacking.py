@@ -54,22 +54,26 @@ def run_example():
         n_actions=6,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="bottom_face_height",
-        reward_type=RewardType.SHAPING,
-        value=1.0,
-        state_dependent=True,
-        requires_action=True,
-        can_loop=False,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="grasp_shaping",
-        reward_type=RewardType.SHAPING,
-        value=0.5,
-        requires_action=True,
-        can_loop=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="bottom_face_height",
+            reward_type=RewardType.SHAPING,
+            value=1.0,
+            state_dependent=True,
+            requires_action=True,
+            can_loop=False,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="grasp_shaping",
+            reward_type=RewardType.SHAPING,
+            value=0.5,
+            requires_action=True,
+            can_loop=False,
+        )
+    )
 
     config = TrainingConfig(
         lr=3e-4,

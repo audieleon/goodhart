@@ -38,15 +38,24 @@ def run_example():
 
     model = EnvironmentModel(
         name="CoinRun (goal misgeneralization)",
-        max_steps=1000, gamma=0.999,
-        n_states=100000, n_actions=15,
-        action_type="discrete", death_probability=0.02,
+        max_steps=1000,
+        gamma=0.999,
+        n_states=100000,
+        n_actions=15,
+        action_type="discrete",
+        death_probability=0.02,
     )
-    model.add_reward_source(RewardSource(
-        name="coin", reward_type=RewardType.TERMINAL, value=10.0,
-        requires_action=True, requires_exploration=True,
-        discovery_probability=0.5, intentional=True,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="coin",
+            reward_type=RewardType.TERMINAL,
+            value=10.0,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.5,
+            intentional=True,
+        )
+    )
 
     print("=" * 70)
     print("CoinRun — goal misgeneralization (TOOL LIMITATION)")

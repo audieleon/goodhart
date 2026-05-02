@@ -41,10 +41,14 @@ def run_example():
         name="Multi-specialist model (any task)",
         max_steps=500,
     )
-    model.add_reward_source(RewardSource(
-        name="task reward", reward_type=RewardType.TERMINAL, value=1.0,
-        discovery_probability=0.5,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="task reward",
+            reward_type=RewardType.TERMINAL,
+            value=1.0,
+            discovery_probability=0.5,
+        )
+    )
 
     # Config WITHOUT floor — will collapse
     config_bad = TrainingConfig(

@@ -56,32 +56,38 @@ def run_example():
         n_actions=2,
         death_probability=0.0,
     )
-    model.add_reward_source(RewardSource(
-        name="goal_reached",
-        reward_type=RewardType.ON_EVENT,
-        value=1.0,
-        respawn=RespawnBehavior.ON_EPISODE,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.1,
-        intentional=True,
-    ))
-    model.add_reward_source(RewardSource(
-        name="distance_shaping",
-        reward_type=RewardType.SHAPING,
-        value=0.01,
-        state_dependent=True,
-        scales_with="distance",
-        requires_action=True,
-        can_loop=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="goal_reached",
+            reward_type=RewardType.ON_EVENT,
+            value=1.0,
+            respawn=RespawnBehavior.ON_EPISODE,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.1,
+            intentional=True,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="distance_shaping",
+            reward_type=RewardType.SHAPING,
+            value=0.01,
+            state_dependent=True,
+            scales_with="distance",
+            requires_action=True,
+            can_loop=False,
+        )
+    )
     # Model cost as penalty (honest approximation)
-    model.add_reward_source(RewardSource(
-        name="hazard_cost_as_penalty",
-        reward_type=RewardType.ON_EVENT,
-        value=-0.1,
-        requires_action=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="hazard_cost_as_penalty",
+            reward_type=RewardType.ON_EVENT,
+            value=-0.1,
+            requires_action=False,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

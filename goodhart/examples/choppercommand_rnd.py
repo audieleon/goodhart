@@ -53,22 +53,26 @@ def run_example():
         action_type="discrete",
         death_probability=0.05,
     )
-    model.add_reward_source(RewardSource(
-        name="score",
-        reward_type=RewardType.ON_EVENT,
-        value=100.0,  # typical per-enemy score
-        requires_action=True,
-        intentional=True,
-        discovery_probability=0.3,  # easy to find enemies
-    ))
-    model.add_reward_source(RewardSource(
-        name="rnd_bonus",
-        reward_type=RewardType.PER_STEP,
-        value=0.005,  # beta=0.00005, typical RND ~0.1
-        respawn=RespawnBehavior.INFINITE,
-        requires_action=True,
-        intentional=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="score",
+            reward_type=RewardType.ON_EVENT,
+            value=100.0,  # typical per-enemy score
+            requires_action=True,
+            intentional=True,
+            discovery_probability=0.3,  # easy to find enemies
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="rnd_bonus",
+            reward_type=RewardType.PER_STEP,
+            value=0.005,  # beta=0.00005, typical RND ~0.1
+            respawn=RespawnBehavior.INFINITE,
+            requires_action=True,
+            intentional=False,
+        )
+    )
 
     engine.print_report(model)
 

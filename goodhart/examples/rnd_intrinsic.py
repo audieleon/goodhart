@@ -51,23 +51,27 @@ def run_example():
         n_actions=18,
         death_probability=0.1,
     )
-    model.add_reward_source(RewardSource(
-        name="game_score",
-        reward_type=RewardType.ON_EVENT,
-        value=100.0,
-        max_occurrences=0,
-        requires_action=True,
-        requires_exploration=True,
-        discovery_probability=0.001,
-    ))
-    model.add_reward_source(RewardSource(
-        name="rnd_intrinsic",
-        reward_type=RewardType.PER_STEP,
-        value=0.01,
-        respawn=RespawnBehavior.INFINITE,
-        requires_action=True,
-        intentional=False,
-    ))
+    model.add_reward_source(
+        RewardSource(
+            name="game_score",
+            reward_type=RewardType.ON_EVENT,
+            value=100.0,
+            max_occurrences=0,
+            requires_action=True,
+            requires_exploration=True,
+            discovery_probability=0.001,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="rnd_intrinsic",
+            reward_type=RewardType.PER_STEP,
+            value=0.01,
+            respawn=RespawnBehavior.INFINITE,
+            requires_action=True,
+            intentional=False,
+        )
+    )
 
     config = TrainingConfig(
         algorithm="PPO",

@@ -57,21 +57,31 @@ def run_example():
 
     # Walker2d typical config
     print("--- Walker2d (typical configuration) ---")
-    model = EnvironmentModel(name="Walker2d", max_steps=1000,
-                             death_probability=0.02)
-    model.add_reward_source(RewardSource(
-        name="alive bonus", reward_type=RewardType.PER_STEP,
-        value=1.0, respawn=RespawnBehavior.INFINITE,
-        requires_action=False,
-    ))
-    model.add_reward_source(RewardSource(
-        name="velocity reward", reward_type=RewardType.SHAPING,
-        value=1.0, can_loop=False,
-    ))
-    model.add_reward_source(RewardSource(
-        name="energy penalty", reward_type=RewardType.PER_STEP,
-        value=-0.001,
-    ))
+    model = EnvironmentModel(name="Walker2d", max_steps=1000, death_probability=0.02)
+    model.add_reward_source(
+        RewardSource(
+            name="alive bonus",
+            reward_type=RewardType.PER_STEP,
+            value=1.0,
+            respawn=RespawnBehavior.INFINITE,
+            requires_action=False,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="velocity reward",
+            reward_type=RewardType.SHAPING,
+            value=1.0,
+            can_loop=False,
+        )
+    )
+    model.add_reward_source(
+        RewardSource(
+            name="energy penalty",
+            reward_type=RewardType.PER_STEP,
+            value=-0.001,
+        )
+    )
     engine.print_report(model)
 
     # Hopper with termination penalty
@@ -81,18 +91,24 @@ def run_example():
     print("place rather than risk falling for forward progress.")
     print()
 
-    model2 = EnvironmentModel(name="Hopper", max_steps=1000,
-                              death_probability=0.05)
-    model2.add_reward_source(RewardSource(
-        name="alive bonus", reward_type=RewardType.PER_STEP,
-        value=1.0, respawn=RespawnBehavior.INFINITE,
-        requires_action=False,
-    ))
-    model2.add_reward_source(RewardSource(
-        name="velocity", reward_type=RewardType.SHAPING,
-        value=0.5,  # lower than alive bonus
-        can_loop=False,
-    ))
+    model2 = EnvironmentModel(name="Hopper", max_steps=1000, death_probability=0.05)
+    model2.add_reward_source(
+        RewardSource(
+            name="alive bonus",
+            reward_type=RewardType.PER_STEP,
+            value=1.0,
+            respawn=RespawnBehavior.INFINITE,
+            requires_action=False,
+        )
+    )
+    model2.add_reward_source(
+        RewardSource(
+            name="velocity",
+            reward_type=RewardType.SHAPING,
+            value=0.5,  # lower than alive bonus
+            can_loop=False,
+        )
+    )
     engine.print_report(model2)
 
     print("When alive_bonus > velocity_reward, standing still")
@@ -103,19 +119,26 @@ def run_example():
 
     # The fix
     print("--- The Fix: Scale alive bonus below velocity ---")
-    model3 = EnvironmentModel(name="Walker2d (fixed)", max_steps=1000,
-                              death_probability=0.02)
-    model3.add_reward_source(RewardSource(
-        name="alive bonus", reward_type=RewardType.PER_STEP,
-        value=0.1,  # reduced from 1.0
-        respawn=RespawnBehavior.INFINITE,
-        requires_action=False,
-    ))
-    model3.add_reward_source(RewardSource(
-        name="velocity", reward_type=RewardType.SHAPING,
-        value=1.0,
-        can_loop=False,
-    ))
+    model3 = EnvironmentModel(
+        name="Walker2d (fixed)", max_steps=1000, death_probability=0.02
+    )
+    model3.add_reward_source(
+        RewardSource(
+            name="alive bonus",
+            reward_type=RewardType.PER_STEP,
+            value=0.1,  # reduced from 1.0
+            respawn=RespawnBehavior.INFINITE,
+            requires_action=False,
+        )
+    )
+    model3.add_reward_source(
+        RewardSource(
+            name="velocity",
+            reward_type=RewardType.SHAPING,
+            value=1.0,
+            can_loop=False,
+        )
+    )
     engine.print_report(model3)
 
     print("With alive_bonus << velocity_reward, standing still")
