@@ -7,7 +7,6 @@ Source: Todorov et al. 2012 (MuJoCo), Brockman et al. 2016 (Gymnasium)
 """
 
 from goodhart import reward_function, RewardSource, RewardType, RespawnBehavior
-import math
 
 METADATA = {
     "id": "humanoid_idle",
@@ -118,7 +117,7 @@ def run_example():
     print("=" * 70)
     print()
     print("Source: Todorov et al. 2012, Brockman et al. 2016")
-    print(f"Known issue: agent stands still because")
+    print("Known issue: agent stands still because")
     print(f"  healthy_reward ({HEALTHY_REWARD}/step)"
           f" >> velocity_reward (~{VELOCITY_SCALE}/step)")
     print()
@@ -145,11 +144,11 @@ def run_example():
     print(f"Standing still earns {idle/test:.1f}x more than walking.")
     print()
 
-    result = compute_reward.goodhart_check()
+    compute_reward.goodhart_check()
 
     print()
-    print(f"The fix: set HEALTHY_REWARD = 1.0 (Humanoid-v3 default)")
-    print(f"or use terminate_when_unhealthy=False with no healthy_reward.")
+    print("The fix: set HEALTHY_REWARD = 1.0 (Humanoid-v3 default)")
+    print("or use terminate_when_unhealthy=False with no healthy_reward.")
 
 
 if __name__ == "__main__":

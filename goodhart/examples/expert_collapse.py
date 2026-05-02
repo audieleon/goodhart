@@ -10,7 +10,6 @@ from goodhart.models import *
 from goodhart.engine import *
 from goodhart.rules.reward import *
 from goodhart.rules.training import *
-from goodhart.rules.architecture import PrecedentRule, Precedent
 
 METADATA = {
     "id": "expert_collapse",

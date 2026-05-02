@@ -92,7 +92,7 @@ def run_example():
         rollout_length=512,
         minibatch_size=4096,
     )
-    result = engine.print_report(model, config)
+    engine.print_report(model, config)
 
     print()
     print("Checkpoint shaping is well-designed here: one-time per episode,")

@@ -223,7 +223,7 @@ class TrainingAnalysisEngine(AnalysisEngine):
     def print_report(self, model: EnvironmentModel, config=None, verbose=False):
         from goodhart.fmt import (header, section, verdict as fmt_verdict,
                                   summary, passed_banner, DIM_COLOR, RULE_COLOR,
-                                  RESET, HEADER_COLOR, WARNING_COLOR, REC_COLOR)
+                                  RESET, HEADER_COLOR, REC_COLOR)
         result = self.analyze(model, config)
 
         subtitle = None

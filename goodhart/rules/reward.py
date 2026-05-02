@@ -7,7 +7,7 @@ degenerate equilibria and perverse incentives.
 import math
 
 from goodhart.models import (
-    EnvironmentModel, FormalBasis, ProofStrength, RewardType, RespawnBehavior,
+    FormalBasis, ProofStrength, RewardType, RespawnBehavior,
     Severity, Verdict,
 )
 from goodhart.engine import Rule
@@ -105,9 +105,9 @@ class PenaltyDominatesGoal(Rule):
                 message=(f"Total discounted penalty ({total_penalty:.2f}) is >{total_penalty/goal*100:.0f}% "
                          f"of goal reward ({goal:.2f}). Tight margin."),
                 details={"ratio": total_penalty / goal},
-                recommendation=(f"The margin between penalty and goal is thin. An agent that "
-                                f"takes a slightly suboptimal path may earn negative return. "
-                                f"Consider reducing the penalty or increasing the goal reward."),
+                recommendation=("The margin between penalty and goal is thin. An agent that "
+                                "takes a slightly suboptimal path may earn negative return. "
+                                "Consider reducing the penalty or increasing the goal reward."),
             ))
         return verdicts
 
@@ -263,7 +263,7 @@ class IdleExploit(Rule):
                          and not s.intentional]
 
         # Combine: idle sources + environmental penalties apply to idle
-        all_idle = idle_sources + env_penalties
+        idle_sources + env_penalties
 
         # If all positive idle sources are intentional (e.g., survival reward),
         # getting reward for existing IS the design. Not an exploit.
@@ -963,7 +963,7 @@ class ProxyRewardHackability(Rule):
             return verdicts
 
         # Check if shaping rewards create a proxy that could diverge from goal
-        shaping_names = [s.name for s in model.shaping_sources]
+        [s.name for s in model.shaping_sources]
         goal_names = [s.name for s in model.goal_sources]
 
         # Non-potential-based shaping = hackable proxy
@@ -1209,8 +1209,8 @@ class ExponentialSaturation(Rule):
                              f"Agent may learn 'close enough' rather than precise."),
                     details={"source": source.name, "sigma": sigma,
                              "saturation_95": sigma * 3},
-                    recommendation=(f"If precision matters, consider linear or "
-                                    f"quadratic penalty near the target"),
+                    recommendation=("If precision matters, consider linear or "
+                                    "quadratic penalty near the target"),
                 ))
         return verdicts
 
@@ -1594,8 +1594,8 @@ class RewardDelayHorizon(Rule):
                              "original_value": source.value,
                              "discounted_value": discounted_value,
                              "avg_step": avg_discovery_step},
-                    recommendation=(f"Increase gamma, add intermediate "
-                                    f"shaping rewards, or shorten the episode"),
+                    recommendation=("Increase gamma, add intermediate "
+                                    "shaping rewards, or shorten the episode"),
                 ))
             elif ratio < 0.1:
                 verdicts.append(Verdict(

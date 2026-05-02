@@ -72,7 +72,7 @@ def run_example():
         n_actors=1024,
         total_steps=10_000_000_000,
     )
-    result = engine.print_report(model, config)
+    engine.print_report(model, config)
 
     print()
     print("The tool correctly identifies the structural problem:")

@@ -85,7 +85,7 @@ def run_example():
         rnn_type="lstm",
         rnn_size=512,
     )
-    result = engine.print_report(model, config)
+    engine.print_report(model, config)
 
     print()
     print("The advisory_credit_assignment fires here alongside")

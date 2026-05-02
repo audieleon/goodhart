@@ -6,7 +6,7 @@ idle exploit possible because the pendulum hangs down at rest.
 Source: Gymnasium documentation, Brockman et al. 2016
 """
 
-from goodhart import reward_function, RewardSource, RewardType, TrainingConfig
+from goodhart import reward_function, RewardSource, RewardType
 
 METADATA = {
     "id": "pendulum_welldesigned",
@@ -118,7 +118,7 @@ def run_example():
     print()
 
     # Run analysis
-    result = compute_reward.goodhart_check()
+    compute_reward.goodhart_check()
 
     print()
     print("Clean bill (with a minor dominance warning). This is")

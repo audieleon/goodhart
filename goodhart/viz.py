@@ -5,9 +5,9 @@ given an EnvironmentModel's reward structure. Helps visualize why
 degenerate strategies can dominate intended behavior.
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict
 
-from goodhart.models import EnvironmentModel, RewardType, TrainingConfig
+from goodhart.models import EnvironmentModel, TrainingConfig
 
 
 # =====================================================================
@@ -35,7 +35,6 @@ def _compute_strategy_evs(model: EnvironmentModel,
     ev_idle = None
     ev_explore = None
     ev_die = None
-    ev_survive = None
     ev_loop = None
     goal_reward = None
 
@@ -47,7 +46,7 @@ def _compute_strategy_evs(model: EnvironmentModel,
                 ev_explore = d.get("ev_explore")
             elif v.rule_name == "death_beats_survival":
                 ev_die = d.get("ev_die")
-                ev_survive = d.get("ev_survive_10")
+                d.get("ev_survive_10")
             elif v.rule_name == "respawning_exploit":
                 if ev_loop is None or d.get("ev_loop", 0) > ev_loop:
                     ev_loop = d.get("ev_loop")
@@ -164,7 +163,8 @@ def reward_landscape_ascii(model: EnvironmentModel,
     Returns:
         A multi-line string with the ASCII chart.
     """
-    import os, sys
+    import os
+    import sys
 
     strategies = _compute_strategy_evs(model, result=result)
     sorted_strats = sorted(strategies.items(), key=lambda x: x[1], reverse=True)
@@ -225,7 +225,7 @@ def reward_landscape_ascii(model: EnvironmentModel,
         bar_len = max(1, int(bar_frac * bar_width))
 
         bar = "█" * bar_len
-        tag = f" ◀ agent learns this" if is_winner else ""
+        tag = " ◀ agent learns this" if is_winner else ""
         bold = BOLD if is_winner else ""
 
         lines.append(f"  {bold}{color}{ev:+9.2f}{RESET}  "

@@ -77,7 +77,7 @@ def run_example():
         n_actors=128,
         total_steps=10_000_000_000,
     )
-    result = engine.print_report(model, config)
+    engine.print_report(model, config)
 
     print()
     print("The respawning_exploit fires on rnd_intrinsic. The math")

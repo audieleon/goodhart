@@ -90,9 +90,9 @@ class EmbedDimCapacity(PrecedentRule):
                              f"May be too small for meaningful specialization."),
                     details={"params_per_specialist": params_per_specialist},
                     recommendation=(
-                        f"Precedent: Empirical -- 10K params/specialist showed "
-                        f"no advantage. MiniHack paper -- embed=16 failed on "
-                        f"hard tasks. Consider >=50K params per specialist."
+                        "Precedent: Empirical -- 10K params/specialist showed "
+                        "no advantage. MiniHack paper -- embed=16 failed on "
+                        "hard tasks. Consider >=50K params per specialist."
                     ),
                 ))
 
@@ -103,8 +103,8 @@ class EmbedDimCapacity(PrecedentRule):
                 message=(f"embed_dim={config.embed_dim} with {model.n_states} "
                          f"states. Limited representational capacity."),
                 recommendation=(
-                    f"Precedent: MiniHack small (embed=16) failed on "
-                    f"Room-Ultimate. Medium (embed=64) succeeded."
+                    "Precedent: MiniHack small (embed=16) failed on "
+                    "Room-Ultimate. Medium (embed=64) succeeded."
                 ),
             ))
 
@@ -115,8 +115,8 @@ class EmbedDimCapacity(PrecedentRule):
                 message=(f"Large model ({config.model_params/1e6:.1f}M params). "
                          f"Risk of overfitting on simple tasks."),
                 recommendation=(
-                    f"Precedent: larger models do not always outperform "
-                    f"smaller ones on simple tasks. More params != better."
+                    "Precedent: larger models do not always outperform "
+                    "smaller ones on simple tasks. More params != better."
                 ),
             ))
 
@@ -223,9 +223,9 @@ class RecurrenceType(PrecedentRule):
                 severity=Severity.INFO,
                 message="Using GRU instead of LSTM.",
                 recommendation=(
-                    f"Precedent: Empirical -- GRU vs LSTM produced different "
-                    f"results on MiniHack. If comparing to published baselines "
-                    f"that use LSTM, results may not be directly comparable."
+                    "Precedent: Empirical -- GRU vs LSTM produced different "
+                    "results on MiniHack. If comparing to published baselines "
+                    "that use LSTM, results may not be directly comparable."
                 ),
             ))
 
@@ -275,9 +275,9 @@ class ActorCountEffect(PrecedentRule):
                 message=(f"Only {total_actors} actors for {model.n_states} "
                          f"states. May be insufficient for exploration."),
                 recommendation=(
-                    f"Precedent: MiniHack paper used 256 actors. 64 "
-                    f"actors produced similar results on easy tasks but "
-                    f"may struggle on sparse-reward tasks."
+                    "Precedent: MiniHack paper used 256 actors. 64 "
+                    "actors produced similar results on easy tasks but "
+                    "may struggle on sparse-reward tasks."
                 ),
             ))
 

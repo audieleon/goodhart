@@ -77,13 +77,10 @@ def verdict(v, verbose=False):
     sev = v.severity.value
     if sev == "critical":
         icon = f"{CRITICAL_COLOR}X{RESET}"
-        sev_color = CRITICAL_COLOR
     elif sev == "warning":
         icon = f"{WARNING_COLOR}!{RESET}"
-        sev_color = WARNING_COLOR
     else:
         icon = f"{INFO_COLOR}i{RESET}"
-        sev_color = INFO_COLOR
 
     rule = f"{RULE_COLOR}{v.rule_name}{RESET}"
 

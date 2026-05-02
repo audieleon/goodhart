@@ -17,7 +17,7 @@ of the tool's boundaries.
 """
 
 from goodhart.models import (
-    EnvironmentModel, RewardType, RespawnBehavior, Severity, Verdict,
+    RewardType, Severity, Verdict,
 )
 from goodhart.engine import Rule
 

@@ -111,7 +111,7 @@ def run_example():
         total_steps=500_000_000,
         rollout_length=16,
     )
-    result = engine.print_report(model, config)
+    engine.print_report(model, config)
 
     print()
     print("The advisory_physics_exploit fires here: 200K states, 38")

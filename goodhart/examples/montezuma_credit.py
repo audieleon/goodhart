@@ -87,7 +87,7 @@ def run_example():
         total_steps=10_000_000_000,
         rollout_length=128,
     )
-    result = engine.print_report(model, config)
+    engine.print_report(model, config)
 
     print()
     print("=" * 70)

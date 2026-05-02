@@ -74,7 +74,7 @@ def run_example():
         n_actors=16,
         total_steps=500_000,
     )
-    result = engine.print_report(model, config)
+    engine.print_report(model, config)
 
     print()
     print("The tool flags budget sufficiency — with 1% discovery rate")

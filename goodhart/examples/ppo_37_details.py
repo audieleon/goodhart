@@ -186,9 +186,9 @@ class KLDivergenceThreshold(PrecedentRule):
                          f"{config.num_epochs} epochs. KL may exceed 0.02 "
                          f"(PPO blog threshold) causing policy instability."),
                 recommendation=(
-                    f"Precedent: PPO blog says approx_kl > 0.02 usually "
-                    f"means a bug. Jones says KL > 0.5 means stale experience. "
-                    f"Set target_kl=0.03 for safety."
+                    "Precedent: PPO blog says approx_kl > 0.02 usually "
+                    "means a bug. Jones says KL > 0.5 means stale experience. "
+                    "Set target_kl=0.03 for safety."
                 ),
             ))
 
@@ -220,9 +220,9 @@ class CorrelatedEnvironments(PrecedentRule):
             severity=Severity.INFO,
             message="Verify parallel environments are desynchronized.",
             recommendation=(
-                f"Precedent: Jones — correlated env starts cause learner to "
-                f"optimize for specific episode phases. Run N random warm-up "
-                f"steps in each env before collection."
+                "Precedent: Jones — correlated env starts cause learner to "
+                "optimize for specific episode phases. Run N random warm-up "
+                "steps in each env before collection."
             ),
         )]
 

@@ -91,7 +91,7 @@ def run_example():
         n_actors=8,
         total_steps=10_000_000,
     )
-    result = engine.print_report(model, config)
+    engine.print_report(model, config)
 
     print()
     print("Clean bill. This is correct.")

@@ -61,7 +61,7 @@ def run_example():
     print("What goodhart says:")
     print()
 
-    result = engine.print_report(model)
+    engine.print_report(model)
 
     print()
     print("=" * 70)

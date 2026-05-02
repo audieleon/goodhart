@@ -77,7 +77,7 @@ def run_example():
         n_actors=16,
         total_steps=5_000_000,
     )
-    result = engine.print_report(model, config)
+    engine.print_report(model, config)
 
     print()
     print("The tool catches that shaping is action-dependent (not")

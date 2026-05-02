@@ -94,9 +94,9 @@ class RewardComponentInteraction(PrecedentRule):
                                  f"'{magnitudes[-1][0]}'={min_mag}). "
                                  f"Small components will be ignored."),
                         recommendation=(
-                            f"Precedent: OpenAI Five needed 'surgery' to "
-                            f"rebalance reward components. Components with "
-                            f"<1% of max magnitude are effectively invisible."
+                            "Precedent: OpenAI Five needed 'surgery' to "
+                            "rebalance reward components. Components with "
+                            "<1% of max magnitude are effectively invisible."
                         ),
                     ))
 

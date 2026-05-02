@@ -75,7 +75,7 @@ def run_example():
         n_actors=64,
         total_steps=1_000_000,
     )
-    result = engine.print_report(model, config)
+    engine.print_report(model, config)
 
     print()
     print("=" * 70)

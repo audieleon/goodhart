@@ -138,7 +138,7 @@ def run_example():
     print(f"Test (SOFA 8→6, lactate 3→2.5): {test_shaping}")
     print()
 
-    result = compute_reward.goodhart_check()
+    compute_reward.goodhart_check()
 
     print()
     print("The tool correctly identifies the clinical risks:")
@@ -148,10 +148,10 @@ def run_example():
     print("     change the optimal treatment policy.")
     print()
     print("  2. Aggressive IV fluids reduce SOFA short-term (organs")
-    print(f"     perfuse better) but cause fluid overload long-term.")
+    print("     perfuse better) but cause fluid overload long-term.")
     print(f"     The {SOFA_OSCILLATION_PERIOD}-hour loop period means the")
-    print(f"     agent could learn to oscillate: bolus → SOFA drops →")
-    print(f"     reabsorbed → SOFA rises → bolus.")
+    print("     agent could learn to oscillate: bolus → SOFA drops →")
+    print("     reabsorbed → SOFA rises → bolus.")
     print()
     print("This is the highest-stakes domain for reward design.")
 

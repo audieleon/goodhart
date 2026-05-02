@@ -17,7 +17,6 @@ from goodhart.models import (
     EnvironmentModel,
     RewardSource,
     RewardType,
-    RespawnBehavior,
 )
 
 

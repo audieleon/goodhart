@@ -82,7 +82,9 @@ __all__ = [
     # Training rules
     "LearningRateRegime", "CriticLearningRate", "EntropyCollapse",
     "ClipFractionPrediction", "ExpertCollapse", "BatchSizeInteraction",
-    "ParallelismEffect", "MemoryCapacity", "TRAINING_RULES",
+    "ParallelismEffect", "MemoryCapacity",
+    "ReplayBufferRatio", "TargetNetworkUpdate", "EpsilonSchedule",
+    "SoftUpdateRate", "SACAlpha", "TRAINING_RULES",
     # Architecture rules
     "PrecedentRule", "Precedent", "EmbedDimCapacity",
     "RoutingFloorNecessity", "RecurrenceType", "ActorCountEffect",

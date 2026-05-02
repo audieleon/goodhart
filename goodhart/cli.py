@@ -22,12 +22,6 @@ Usage (in your training script):
 import argparse
 import json
 import sys
-import textwrap
-from goodhart.models import (
-    EnvironmentModel, RewardSource, RewardType, RespawnBehavior,
-    Severity, Result,
-)
-from goodhart.models import TrainingConfig
 from goodhart.engine import TrainingAnalysisEngine
 from goodhart.rules import RULE_COUNT
 from goodhart.builders import build_model_and_config, load_config_file, build_from_config_dict
@@ -82,8 +76,7 @@ def preflight_check(goal: float = 0.0, penalty: float = 0.0,
         print(json.dumps(result.to_dict(), indent=2))
     elif not quiet:
         from goodhart.fmt import (header, section, verdict as fmt_verdict,
-                                  summary, passed_banner, failed_banner,
-                                  DIM_COLOR, RESET)
+                                  summary, passed_banner)
         header(f"Pre-flight Check: {name}",
                f"goal={goal}, penalty={penalty}, steps={max_steps}, "
                f"p(goal)={discovery_prob}, actors={n_actors}")
@@ -233,7 +226,7 @@ def _run_doctor(args):
                 fixes["budget"] = (
                     min_steps,
                     config.total_steps,
-                    f"minimum for ~10 goal discoveries",
+                    "minimum for ~10 goal discoveries",
                 )
             else:
                 fixes["budget"] = (
@@ -254,7 +247,7 @@ def _run_doctor(args):
             fixes["critic_lr"] = (
                 new_clr,
                 config.critic_lr or config.lr,
-                f"10x lower than actor lr",
+                "10x lower than actor lr",
             )
 
         issue_dicts.append(issue_entry)
@@ -642,7 +635,7 @@ Tab completion (bash):
         if field_name not in _FIELD_REF:
             print(f"  Unknown field: {field_name}")
             print()
-            print(f"  Available fields:")
+            print("  Available fields:")
             for fname, (owner, _, _, short, _) in _FIELD_REF.items():
                 print(f"    {fname:25s} ({owner})")
             return
@@ -726,7 +719,7 @@ Tab completion (bash):
 
         if not rule:
             print(f"Unknown rule: {args.explain}")
-            print(f"Use --rules to see all available rules.")
+            print("Use --rules to see all available rules.")
             return
 
         from goodhart.fmt import (explain_header, explain_section,
@@ -861,17 +854,17 @@ Tab completion (bash):
         print(f'   it ceases to be a good measure."{RESET}')
         print(f'  {DIM_COLOR}-- Charles Goodhart, 1975{RESET}')
         print()
-        print(f"  In reinforcement learning, the reward function IS that measure.")
-        print(f"  Your agent targets it directly. It finds ways to maximize the")
-        print(f"  number without doing the task:")
+        print("  In reinforcement learning, the reward function IS that measure.")
+        print("  Your agent targets it directly. It finds ways to maximize the")
+        print("  number without doing the task:")
         print()
         print(f"    {WARNING_COLOR}-{RESET} Standing still {DIM_COLOR}(avoids step penalties){RESET}")
         print(f"    {WARNING_COLOR}-{RESET} Dying immediately {DIM_COLOR}(stops accumulating costs){RESET}")
         print(f"    {WARNING_COLOR}-{RESET} Going in circles {DIM_COLOR}(harvests respawning rewards){RESET}")
         print(f"    {WARNING_COLOR}-{RESET} Exploiting physics {DIM_COLOR}(maximizes reward through simulator bugs){RESET}")
         print()
-        print(f"  This tool catches the mathematical signatures of these failures")
-        print(f"  from your configuration alone — before you spend compute.")
+        print("  This tool catches the mathematical signatures of these failures")
+        print("  from your configuration alone — before you spend compute.")
         print()
         # Dataset counts updated at release (too slow to compute from JSONL)
         proved = sum(1 for r in TrainingAnalysisEngine().add_all_rules().rules
@@ -880,7 +873,7 @@ Tab completion (bash):
         print(f"  {HEADER_COLOR}{proved} rules{RESET} linked to LEAN 4 proofs (105 theorems, zero sorry)")
         print()
         print(f"  {DIM_COLOR}Cannot catch: physics exploits, goal misgeneralization,")
-        print(f"  learned-reward gaming, missing reward terms. When config patterns")
+        print("  learned-reward gaming, missing reward terms. When config patterns")
         print(f"  match these blind spots, advisory hints are emitted.{RESET}")
         print()
         print(f"  {DIM_COLOR}Sources:{RESET}")
