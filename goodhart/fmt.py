@@ -45,7 +45,7 @@ RESET = _RESET
 
 # Fixed terminal width for wrapping
 try:
-    TERM_WIDTH = min(os.get_terminal_size().columns, 100) if sys.stdout.isatty() else 80
+    TERM_WIDTH = min(os.get_terminal_size().columns, 80) if sys.stdout.isatty() else 80
 except (OSError, ValueError, AttributeError):
     TERM_WIDTH = 80
 INDENT = "     "
